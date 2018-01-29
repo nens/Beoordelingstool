@@ -247,6 +247,15 @@
         <height>201</height>
        </rect>
       </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="tabKeyNavigation">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>350</number>
+      </attribute>
       <row>
        <property name="text">
         <string>CAA</string>
@@ -260,6 +269,171 @@
       <row>
        <property name="text">
         <string>CAJ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAM</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAN</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAO</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAQ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAR</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBC</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBD</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBE</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBF</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBH</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBI</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBJ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBK</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>New Row</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBO</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBP</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCC</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCD</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCK</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCM</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCN</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCO</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCP</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCQ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCR</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCS</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CDA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CDB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CDD</string>
        </property>
       </row>
       <column>

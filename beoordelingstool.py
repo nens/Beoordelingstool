@@ -318,6 +318,7 @@ class Beoordelingstool:
         # shapefile_name = "{}.shp".format(name)
         # data_source = driver.CreateDataSource(os.path.abspath(os.path.join(TEMP_DIR, shapefile_name)))
         srs = osr.SpatialReference()
+        # manholes[0]["CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
         layer = data_source.CreateLayer(shapefile_path, srs, ogr.wkbPoint)
         layer = self.fields_to_shp(layer, manholes)
@@ -376,9 +377,9 @@ class Beoordelingstool:
         CAA = ogr.FieldDefn("CAA", ogr.OFTString)
         CAA.SetWidth(255)
         layer.CreateField(CAA)
-        CAB = ogr.FieldDefn("CAB", ogr.OFTString)
-        CAB.SetWidth(255)
-        layer.CreateField(CAB)
+        # CAB = ogr.FieldDefn("CAB", ogr.OFTString)
+        # CAB.SetWidth(255)
+        # layer.CreateField(CAB)
         CAJ = ogr.FieldDefn("CAJ", ogr.OFTString)
         CAJ.SetWidth(255)
         layer.CreateField(CAJ)
@@ -512,8 +513,10 @@ class Beoordelingstool:
         """
         # Get values
         CAA = manhole["CAA"]
-        CAB = manhole["CAB"]
-        x, y = CAB.split()
+        # CAB = manhole["CAB"]
+        # x, y = CAB.split()
+        x = manhole["x"]
+        y = manhole["y"]
         CAJ = manhole["CAJ"]
         CAL = manhole["CAL"]
         CAM = manhole["CAM"]
@@ -560,10 +563,11 @@ class Beoordelingstool:
         point = ogr.CreateGeometryFromWkt(wkt)
         feature.SetGeometry(point)
         feature.SetField("CAA", str(CAA))
-        feature.SetField("CAB", str(CAB))
+        # feature.SetField("CAB", str(CAB))
         feature.SetField("CAJ", str(CAJ))
         feature.SetField("CAL", str(CAL))
         feature.SetField("CAM", str(CAM))
+        feature.SetField("CAN", str(CAN))
         feature.SetField("CAO", str(CAO))
         feature.SetField("CAQ", str(CAQ))
         feature.SetField("CAR", str(CAR))
@@ -612,8 +616,43 @@ class Beoordelingstool:
             # print f['CAA'], f.attributes()  # , f.field(0).name
             self.dockwidget.value_plaintextedit.setPlainText(str(f["Opmerking"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f["CAA"]))
-            self.dockwidget.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAB"]))
-            self.dockwidget.tablewidget_manholes.setItem(0, 2, QTableWidgetItem(f["CAJ"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAJ"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 2, QTableWidgetItem(f["CAL"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 3, QTableWidgetItem(f["CAM"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 4, QTableWidgetItem(f["CAN"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 5, QTableWidgetItem(f["CAO"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 6, QTableWidgetItem(f["CAQ"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 7, QTableWidgetItem(f["CAR"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 8, QTableWidgetItem(f["CBA"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 9, QTableWidgetItem(f["CBB"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 10, QTableWidgetItem(f["CBC"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 11, QTableWidgetItem(f["CBD"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 12, QTableWidgetItem(f["CBE"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 13, QTableWidgetItem(f["CBF"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 14, QTableWidgetItem(f["CBH"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 15, QTableWidgetItem(f["CBI"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 16, QTableWidgetItem(f["CBJ"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 17, QTableWidgetItem(f["CBK"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 18, QTableWidgetItem(f["CBL"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 19, QTableWidgetItem(f["CBM"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 20, QTableWidgetItem(f["CBO"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 21, QTableWidgetItem(f["CBP"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 22, QTableWidgetItem(f["CCA"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 23, QTableWidgetItem(f["CCB"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 24, QTableWidgetItem(f["CCC"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 25, QTableWidgetItem(f["CCD"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 26, QTableWidgetItem(f["CCK"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 27, QTableWidgetItem(f["CCM"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 28, QTableWidgetItem(f["CCN"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 29, QTableWidgetItem(f["CCO"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 30, QTableWidgetItem(f["CCP"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 31, QTableWidgetItem(f["CCQ"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 32, QTableWidgetItem(f["CCR"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 33, QTableWidgetItem(f["CCS"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 34, QTableWidgetItem(f["CDA"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 35, QTableWidgetItem(f["CDB"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 36, QTableWidgetItem(f["CDC"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 37, QTableWidgetItem(f["CDD"]))
 
 
 def add_layer(iface, file):
