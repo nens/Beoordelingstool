@@ -1,7 +1,7 @@
 #/***************************************************************************
-# SewerAssessor
+# Beoordelingstool
 #
-# De Sewer Assessor is een QGIS plug-in die helpt bij het bepalen van eigenschappen van de riolering.
+# The Beoordelingstool is a QGIS plugin for judging the quality of the manholes and pipes of a sewer.
 #							 -------------------
 #		begin				: 2017-04-26
 #		git sha				: $Format:%H$
@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	sewer_assessor.py sewer_assessor_dockwidget.py
+	beoordelingstool.py beoordelingstool_dockwidget.py
 
-PLUGINNAME = SewerAssessor
+PLUGINNAME = Beoordelingstool
 
 PY_FILES = \
 	__init__.py \
-	sewer_assessor.py sewer_assessor_dockwidget.py
+	beoordelingstool.py beoordelingstool_dockwidget.py
 
-UI_FILES = sewer_assessor_dockwidget_base.ui
+UI_FILES = beoordelingstool_dockwidget_base.ui
 
 EXTRAS = metadata.txt icon.png
 
