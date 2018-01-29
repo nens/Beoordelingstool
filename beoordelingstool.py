@@ -251,6 +251,9 @@ class Beoordelingstool:
                     self.save_shapefile)
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
                     self.get_selected_manhole)
+                self.selected_feature_id = 0
+                self.dockwidget.pushbutton_save_attribute.clicked.connect(
+                    self.save_beoordeling)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -377,9 +380,6 @@ class Beoordelingstool:
         CAA = ogr.FieldDefn("CAA", ogr.OFTString)
         CAA.SetWidth(255)
         layer.CreateField(CAA)
-        # CAB = ogr.FieldDefn("CAB", ogr.OFTString)
-        # CAB.SetWidth(255)
-        # layer.CreateField(CAB)
         CAJ = ogr.FieldDefn("CAJ", ogr.OFTString)
         CAJ.SetWidth(255)
         layer.CreateField(CAJ)
@@ -513,8 +513,6 @@ class Beoordelingstool:
         """
         # Get values
         CAA = manhole["CAA"]
-        # CAB = manhole["CAB"]
-        # x, y = CAB.split()
         x = manhole["x"]
         y = manhole["y"]
         CAJ = manhole["CAJ"]
@@ -563,7 +561,6 @@ class Beoordelingstool:
         point = ogr.CreateGeometryFromWkt(wkt)
         feature.SetGeometry(point)
         feature.SetField("CAA", str(CAA))
-        # feature.SetField("CAB", str(CAB))
         feature.SetField("CAJ", str(CAJ))
         feature.SetField("CAL", str(CAL))
         feature.SetField("CAM", str(CAM))
@@ -611,9 +608,7 @@ class Beoordelingstool:
     def get_selected_manhole(self):
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
-        # print fields
         for f in layer.selectedFeatures():
-            # print f['CAA'], f.attributes()  # , f.field(0).name
             self.dockwidget.value_plaintextedit.setPlainText(str(f["Opmerking"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f["CAA"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAJ"]))
@@ -653,6 +648,19 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_manholes.setItem(0, 35, QTableWidgetItem(f["CDB"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 36, QTableWidgetItem(f["CDC"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 37, QTableWidgetItem(f["CDD"]))
+            self.selected_feature_id = f.id()
+
+    def save_beoordeling(self):
+        """Save herstelmaatregel and opmerking in the shapefile."""
+        layer = iface.activeLayer()
+        fid = self.selected_feature_id
+        herstelmaatregel = str(self.dockwidget.field_combobox.currentText())
+        opmerking = str(self.dockwidget.value_plaintextedit.toPlainText())
+        layer.startEditing()
+        layer.changeAttributeValue(fid, 38, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(fid, 39, opmerking)  # Opmerking
+        layer.commitChanges()
+        layer.triggerRepaint()
 
 
 def add_layer(iface, file):
