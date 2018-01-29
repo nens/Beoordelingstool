@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>431</width>
-    <height>216</height>
+    <height>407</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,13 +26,13 @@
       <x>0</x>
       <y>0</y>
       <width>431</width>
-      <height>191</height>
+      <height>381</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="tab_eeneral">
      <attribute name="title">
       <string>General</string>
      </attribute>
@@ -119,6 +119,138 @@
         <string>Save shapefile</string>
        </property>
       </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_manholes">
+     <attribute name="title">
+      <string>Manholes</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupbox_manholes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>411</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Manholes</string>
+      </property>
+      <widget class="QPushButton" name="pushbutton_get_selected_manhole">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>30</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Get selected manhole</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupbox_attributes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>411</width>
+        <height>261</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Attributes</string>
+      </property>
+      <widget class="QLabel" name="field_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>80</y>
+         <width>51</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Field</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="field_combobox">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>80</y>
+         <width>341</width>
+         <height>27</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="value_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>170</y>
+         <width>51</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Value</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="value_lineedit">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>130</y>
+         <width>341</width>
+         <height>81</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="id_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>30</y>
+         <width>51</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Id</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="id_label_number">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>30</y>
+         <width>341</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="pushbutton_save_attribute">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>310</y>
+        <width>161</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save attribute</string>
+      </property>
      </widget>
     </widget>
    </widget>
