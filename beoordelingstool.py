@@ -47,6 +47,7 @@ TEXTBOX_DOWNLOAD_RIOOL = "download_riool_text"
 # from .utils.constants import BUTTON_DOWNLOAD_PUTTEN
 # from .utils.constants import TEXTBOX_DOWNLOAD_PUTTEN
 FILE_TYPE_JSON = "json"
+# HERSTELMAATREGEL_DEFAULT = 1
 # from .utils.constants import FILE_TYPE_JSON
 # from .utils.get_data import get_file
 
@@ -306,20 +307,13 @@ class Beoordelingstool:
         save_message = "Save shapefile"
         output = self.get_shapefile_path(save_message)
         shapefile_path = "{}.shp".format(output)
-        # self.layer_shapefile = add_layer(self.iface, output)
         # Get json
         filename_json = self.dockwidget.download_riool_text.text()
-        # print filename_json
         manholes, pipes = self.get_json(filename_json)
-        # pp = pprint.PrettyPrinter(indent=4)
-        # for i in pipes:
-        #     pp.pprint(i)
 
         # Create manhole shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
         data_source = driver.CreateDataSource(shapefile_path)
-        # shapefile_name = "{}.shp".format(name)
-        # data_source = driver.CreateDataSource(os.path.abspath(os.path.join(TEMP_DIR, shapefile_name)))
         srs = osr.SpatialReference()
         # manholes[0]["CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
@@ -328,9 +322,7 @@ class Beoordelingstool:
         for manhole in manholes:
             layer = self.feature_to_shp(layer, manhole)
         data_source = None
-        # Add fields to shapefile  # fields_to_shp
-        # Add values to shapefile  # features_to_shp
-        # Add shapefile as layer  # add_layer
+        layer = iface.addVectorLayer(shapefile_path, "manholes", "ogr")
 
     def get_json(self, filename):
         """Function to get a JSON."""
@@ -338,13 +330,10 @@ class Beoordelingstool:
         pipes = []
         with open(filename) as json_file:
             json_data = json.load(json_file)
-            # pp.pprint(json_data["manholes"][0]["CAB"])
             for manhole in json_data["manholes"]:
                 manholes.append(manhole)
             for pipe in json_data["pipes"]:
                 pipes.append(pipe)
-        # pp.pprint(manholes[0])
-        # pp.pprint(manholes[1])
         return (manholes, pipes)
 
     def get_shapefile_path(self, save_message):
@@ -553,6 +542,7 @@ class Beoordelingstool:
         CDC = manhole["CDC"]
         CDD = manhole["CDD"]
         herstelmaatregel = manhole["Herstelmaatregel"]
+        # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
         opmerking = manhole["Opmerking"]
 
         # Set values
