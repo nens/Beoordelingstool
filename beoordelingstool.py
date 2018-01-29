@@ -32,6 +32,7 @@ from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QTableWidgetItem
 from PyQt4.QtGui import QIcon
 # Initialize Qt resources from file resources.py
 import resources
@@ -248,6 +249,8 @@ class Beoordelingstool:
                     self.search_json_riool)
                 self.dockwidget.shapefile_save_button.clicked.connect(
                     self.save_shapefile)
+                self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
+                    self.get_selected_manhole)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -303,7 +306,7 @@ class Beoordelingstool:
         # self.layer_shapefile = add_layer(self.iface, output)
         # Get json
         filename_json = self.dockwidget.download_riool_text.text()
-        print filename_json
+        # print filename_json
         manholes, pipes = self.get_json(filename_json)
         # pp = pprint.PrettyPrinter(indent=4)
         # for i in pipes:
@@ -601,6 +604,17 @@ class Beoordelingstool:
         feature = None
         return layer
 
+    def get_selected_manhole(self):
+        layer = iface.activeLayer()
+        fields = layer.dataProvider().fields()
+        # print fields
+        for f in layer.selectedFeatures():
+            # print f['CAA'], f.attributes()  # , f.field(0).name
+            self.dockwidget.value_plaintextedit.setPlainText(str(f["Opmerking"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f["CAA"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAB"]))
+            self.dockwidget.tablewidget_manholes.setItem(0, 2, QTableWidgetItem(f["CAJ"]))
+
 
 def add_layer(iface, file):
     """Function to create a vector layer of a shapefile."""
@@ -612,4 +626,3 @@ def add_layer(iface, file):
         file, layer_name, "ogr")
     # Return the layer
     return layer
-
