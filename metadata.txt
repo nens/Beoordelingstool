@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=Beoordelingstool
+qgisMinimumVersion=2.0
+description=The Beoordelingstool is a QGIS plugin for judging the quality of the manholes and pipes of a sewer.
+version=0.1
+author=Nelen & Schuurmans
+email=madeleine.vanwinkel@nelen-schuurmans.nl
+
+about=Doel: Het doel van de plugin is het kunnen beoordelen van het rioleringsstelsel. Functies: De plug-in helpt bij het beoordelen van rioolputten en leidingen met bijbehorende meetpunten. Requirements: QGIS 2.14.12
+
+tracker=https://github.com/nens/Beoordelingstool
+repository=https://github.com/nens/Beoordelingstool
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=https://github.com/nens/Beoordelingstool
+
+# Tags are comma separated with spaces allowed
+tags=riool, riolering, sewer, beoordeling, rioolputten, leidingen, meetpunten
+
+homepage=https://github.com/nens/Beoordelingstool
+category=Plugins
+icon=icon.png
+# experimental flag
+experimental=True
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
