@@ -348,7 +348,7 @@ class Beoordelingstool:
         driver = ogr.GetDriverByName("ESRI Shapefile")
         data_source = driver.CreateDataSource(shapefile_path)
         srs = osr.SpatialReference()
-        # manholes[0]["CRS"]  # "Netherlands-RD"
+        # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
         layer = data_source.CreateLayer(shapefile_path, srs, ogr.wkbLineString)
         layer = self.fields_to_pipes_shp(layer, manholes)
@@ -696,12 +696,150 @@ class Beoordelingstool:
         Returns:
             (shapefile layer) layer: A shapefile layer.
         """
+        AAA = ogr.FieldDefn("AAA", ogr.OFTString)
+        AAA.SetWidth(255)
+        layer.CreateField(AAA)
+        AAB = ogr.FieldDefn("AAB", ogr.OFTString)
+        AAB.SetWidth(255)
+        layer.CreateField(AAB)
         AAD = ogr.FieldDefn("AAD", ogr.OFTString)
         AAD.SetWidth(255)
         layer.CreateField(AAD)
         AAE = ogr.FieldDefn("AAE", ogr.OFTString)
         AAE.SetWidth(255)
         layer.CreateField(AAE)
+        AAF = ogr.FieldDefn("AAF", ogr.OFTString)
+        AAF.SetWidth(255)
+        layer.CreateField(AAF)
+        AAG = ogr.FieldDefn("AAG", ogr.OFTString)
+        AAG.SetWidth(255)
+        layer.CreateField(AAG)
+        AAJ = ogr.FieldDefn("AAJ", ogr.OFTString)
+        AAJ.SetWidth(255)
+        layer.CreateField(AAJ)
+        AAK = ogr.FieldDefn("AAK", ogr.OFTString)
+        AAK.SetWidth(255)
+        layer.CreateField(AAK)
+        AAL = ogr.FieldDefn("AAL", ogr.OFTString)
+        AAL.SetWidth(255)
+        layer.CreateField(AAL)
+        AAM = ogr.FieldDefn("AAM", ogr.OFTString)
+        AAM.SetWidth(255)
+        layer.CreateField(AAM)
+        AAN = ogr.FieldDefn("AAN", ogr.OFTString)
+        AAN.SetWidth(255)
+        layer.CreateField(AAN)
+        AAO = ogr.FieldDefn("AAO", ogr.OFTString)
+        AAO.SetWidth(255)
+        layer.CreateField(AAO)
+        AAP = ogr.FieldDefn("AAP", ogr.OFTString)
+        AAP.SetWidth(255)
+        layer.CreateField(AAP)
+        AAQ = ogr.FieldDefn("AAQ", ogr.OFTString)
+        AAQ.SetWidth(255)
+        layer.CreateField(AAQ)
+        ABA = ogr.FieldDefn("ABA", ogr.OFTString)
+        ABA.SetWidth(255)
+        layer.CreateField(ABA)
+        ABB = ogr.FieldDefn("ABB", ogr.OFTString)
+        ABB.SetWidth(255)
+        layer.CreateField(ABB)
+        ABC = ogr.FieldDefn("ABC", ogr.OFTString)
+        ABC.SetWidth(255)
+        layer.CreateField(ABC)
+        ABE = ogr.FieldDefn("ABE", ogr.OFTString)
+        ABE.SetWidth(255)
+        layer.CreateField(ABE)
+        ABF = ogr.FieldDefn("ABF", ogr.OFTString)
+        ABF.SetWidth(255)
+        layer.CreateField(ABF)
+        ABH = ogr.FieldDefn("ABH", ogr.OFTString)
+        ABH.SetWidth(255)
+        layer.CreateField(ABH)
+        ABI = ogr.FieldDefn("ABI", ogr.OFTString)
+        ABI.SetWidth(255)
+        layer.CreateField(ABI)
+        ABJ = ogr.FieldDefn("ABJ", ogr.OFTString)
+        ABJ.SetWidth(255)
+        layer.CreateField(ABJ)
+        ABK = ogr.FieldDefn("ABK", ogr.OFTString)
+        ABK.SetWidth(255)
+        layer.CreateField(ABK)
+        ABL = ogr.FieldDefn("ABL", ogr.OFTString)
+        ABL.SetWidth(255)
+        layer.CreateField(ABL)
+        ABM = ogr.FieldDefn("ABM", ogr.OFTString)
+        ABM.SetWidth(255)
+        layer.CreateField(ABM)
+        ABP = ogr.FieldDefn("ABP", ogr.OFTString)
+        ABP.SetWidth(255)
+        layer.CreateField(ABP)
+        ABQ = ogr.FieldDefn("ABQ", ogr.OFTString)
+        ABQ.SetWidth(255)
+        layer.CreateField(ABQ)
+        ABS = ogr.FieldDefn("ABS", ogr.OFTString)
+        ABS.SetWidth(255)
+        layer.CreateField(ABS)
+        ACA = ogr.FieldDefn("ACA", ogr.OFTString)
+        ACA.SetWidth(255)
+        layer.CreateField(ACA)
+        ACB = ogr.FieldDefn("ACB", ogr.OFTString)
+        ACB.SetWidth(255)
+        layer.CreateField(ACB)
+        ACC = ogr.FieldDefn("ACC", ogr.OFTString)
+        ACC.SetWidth(255)
+        layer.CreateField(ACC)
+        ACD = ogr.FieldDefn("ACD", ogr.OFTString)
+        ACD.SetWidth(255)
+        layer.CreateField(ACD)
+        ACG = ogr.FieldDefn("ACG", ogr.OFTString)
+        ACG.SetWidth(255)
+        layer.CreateField(ACG)
+        ACJ = ogr.FieldDefn("ACJ", ogr.OFTString)
+        ACJ.SetWidth(255)
+        layer.CreateField(ACJ)
+        ACK = ogr.FieldDefn("ACK", ogr.OFTString)
+        ACK.SetWidth(255)
+        layer.CreateField(ACK)
+        ACM = ogr.FieldDefn("ACM", ogr.OFTString)
+        ACM.SetWidth(255)
+        layer.CreateField(ACM)
+        ACN = ogr.FieldDefn("ACN", ogr.OFTString)
+        ACN.SetWidth(255)
+        layer.CreateField(ACN)
+        ADA = ogr.FieldDefn("ADA", ogr.OFTString)
+        ADA.SetWidth(255)
+        layer.CreateField(ADA)
+        ADB = ogr.FieldDefn("ADB", ogr.OFTString)
+        ADB.SetWidth(255)
+        layer.CreateField(ADB)
+        ADC = ogr.FieldDefn("ADC", ogr.OFTString)
+        ADC.SetWidth(255)
+        layer.CreateField(ADC)
+        AXA = ogr.FieldDefn("AXA", ogr.OFTString)
+        AXA.SetWidth(255)
+        layer.CreateField(AXA)
+        AXB = ogr.FieldDefn("AXB", ogr.OFTString)
+        AXB.SetWidth(255)
+        layer.CreateField(AXB)
+        AXF = ogr.FieldDefn("AXF", ogr.OFTString)
+        AXF.SetWidth(255)
+        layer.CreateField(AXF)
+        AXG = ogr.FieldDefn("AXG", ogr.OFTString)
+        AXG.SetWidth(255)
+        layer.CreateField(AXG)
+        AXH = ogr.FieldDefn("AXH", ogr.OFTString)
+        AXH.SetWidth(255)
+        layer.CreateField(AXH)
+        ZC = ogr.FieldDefn("ZC", ogr.OFTString)
+        ZC.SetWidth(255)
+        layer.CreateField(ZC)
+        herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
+        herstelmaatregel.SetWidth(255)
+        layer.CreateField(herstelmaatregel)
+        opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
+        opmerking.SetWidth(255)
+        layer.CreateField(opmerking)
         return layer
 
     def feature_to_pipes_shp(self, layer, pipe):
@@ -717,20 +855,113 @@ class Beoordelingstool:
             (shapefile layer) layer: A shapefile layer.
         """
         # Get values
-        AAD = pipe["AAD"]
-        AAE = pipe["AAE"]
         start_x = pipe["Beginpunt x"]
         start_y = pipe["Beginpunt y"]
         end_x = pipe["Eindpunt x"]
         end_y = pipe["Eindpunt y"]
+        AAA = pipe["AAA"]
+        AAB = pipe["AAB"]
+        AAD = pipe["AAD"]
+        AAE = pipe["AAE"]
+        AAF = pipe["AAF"]
+        AAG = pipe["AAG"]
+        AAJ = pipe["AAJ"]
+        AAK = pipe["AAK"]
+        AAL = pipe["AAL"]
+        AAM = pipe["AAM"]
+        AAN = pipe["AAN"]
+        AAO = pipe["AAO"]
+        AAP = pipe["AAP"]
+        AAQ = pipe["AAQ"]
+        ABA = pipe["ABA"]
+        ABB = pipe["ABB"]
+        ABC = pipe["ABC"]
+        ABE = pipe["ABE"]
+        ABF = pipe["ABF"]
+        ABH = pipe["ABH"]
+        ABI = pipe["ABI"]
+        ABJ = pipe["ABJ"]
+        ABK = pipe["ABK"]
+        ABL = pipe["ABL"]
+        ABM = pipe["ABM"]
+        ABP = pipe["ABP"]
+        ABQ = pipe["ABQ"]
+        ABS = pipe["ABS"]
+        ACA = pipe["ACA"]
+        ACB = pipe["ACB"]
+        ACC = pipe["ACC"]
+        ACD = pipe["ACD"]
+        ACG = pipe["ACG"]
+        ACJ = pipe["ACJ"]
+        ACK = pipe["ACK"]
+        ACM = pipe["ACM"]
+        ACN = pipe["ACN"]
+        ADA = pipe["ADA"]
+        ADB = pipe["ADB"]
+        ADC = pipe["ADC"]
+        AXA = pipe["AXA"]
+        AXB = pipe["AXB"]
+        AXF = pipe["AXF"]
+        AXG = pipe["AXG"]
+        AXH = pipe["AXH"]
+        ZC = pipe["ZC"]
+        herstelmaatregel = pipe["Herstelmaatregel"]
+        # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
+        opmerking = pipe["Opmerking"]
 
         # Set values
         feature = ogr.Feature(layer.GetLayerDefn())
         wkt = "LINESTRING({} {}, {} {})".format(start_x, start_y, end_x, end_y)
         line = ogr.CreateGeometryFromWkt(wkt)
         feature.SetGeometry(line)
+        feature.SetField("AAA", str(AAA))
+        feature.SetField("AAB", str(AAB))
         feature.SetField("AAD", str(AAD))
         feature.SetField("AAE", str(AAE))
+        feature.SetField("AAF", str(AAF))
+        feature.SetField("AAG", str(AAG))
+        feature.SetField("AAJ", str(AAJ))
+        feature.SetField("AAK", str(AAK))
+        feature.SetField("AAL", str(AAL))
+        feature.SetField("AAM", str(AAM))
+        feature.SetField("AAN", str(AAN))
+        feature.SetField("AAO", str(AAO))
+        feature.SetField("AAP", str(AAP))
+        feature.SetField("AAQ", str(AAQ))
+        feature.SetField("ABA", str(ABA))
+        feature.SetField("ABB", str(ABB))
+        feature.SetField("ABC", str(ABC))
+        feature.SetField("ABE", str(ABE))
+        feature.SetField("ABF", str(ABF))
+        feature.SetField("ABH", str(ABH))
+        feature.SetField("ABI", str(ABI))
+        feature.SetField("ABJ", str(ABJ))
+        feature.SetField("ABK", str(ABK))
+        feature.SetField("ABL", str(ABL))
+        feature.SetField("ABM", str(ABM))
+        feature.SetField("ABP", str(ABP))
+        feature.SetField("ABQ", str(ABQ))
+        feature.SetField("ABS", str(ABS))
+        feature.SetField("ACA", str(ACA))
+        feature.SetField("ACB", str(ACB))
+        feature.SetField("ACC", str(ACC))
+        feature.SetField("ACD", str(ACD))
+        feature.SetField("ACG", str(ACG))
+        feature.SetField("ACJ", str(ACJ))
+        feature.SetField("ACK", str(ACK))
+        feature.SetField("ACM", str(ACM))
+        feature.SetField("ACN", str(ACN))
+        feature.SetField("ADA", str(ADA))
+        feature.SetField("ADB", str(ADB))
+        feature.SetField("ADC", str(ADC))
+        feature.SetField("AXA", str(AXA))
+        feature.SetField("AXB", str(AXB))
+        feature.SetField("AXF", str(AXF))
+        feature.SetField("AXG", str(AXG))
+        feature.SetField("AXH", str(AXH))
+        feature.SetField("ZC", str(ZC))
+        feature.SetField("Herstelmaa", str(herstelmaatregel))
+        feature.SetField("Opmerking", str(opmerking))
         layer.CreateFeature(feature)
 
         feature = None
