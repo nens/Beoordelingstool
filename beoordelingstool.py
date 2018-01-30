@@ -248,13 +248,15 @@ class Beoordelingstool:
                 # Connect the search buttons with the search_file functions
                 self.dockwidget.download_riool_search.clicked.connect(
                     self.search_json_riool)
-                self.dockwidget.shapefile_save_button.clicked.connect(
-                    self.save_shapefile)
+                self.dockwidget.save_shapefile_putten_button.clicked.connect(
+                    self.save_shapefile_putten)
+                self.dockwidget.save_shapefile_leidingen_button.clicked.connect(
+                    self.save_shapefile_leidingen)
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
                     self.get_selected_manhole)
                 self.selected_feature_id = 0
                 self.dockwidget.pushbutton_save_attribute.clicked.connect(
-                    self.save_beoordeling)
+                    self.save_beoordeling_putten)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -301,10 +303,14 @@ class Beoordelingstool:
             if TEXTBOX == TEXTBOX_DOWNLOAD_RIOOL:
                 self.dockwidget.download_riool_text.setText(filename)
 
-    def save_shapefile(self):
-        """Function to get a file."""
+    def save_shapefile_putten(self):
+        """
+        Function to save the manholes of the json.
+        This function also shows the shapefile on the map.
+        """
+
         # Get shapefile path
-        save_message = "Save shapefile"
+        save_message = "Save manholes shapefile"
         output = self.get_shapefile_path(save_message)
         shapefile_path = "{}.shp".format(output)
         # Get json
@@ -318,23 +324,38 @@ class Beoordelingstool:
         # manholes[0]["CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
         layer = data_source.CreateLayer(shapefile_path, srs, ogr.wkbPoint)
-        layer = self.fields_to_shp(layer, manholes)
+        layer = self.fields_to_manholes_shp(layer, manholes)
         for manhole in manholes:
-            layer = self.feature_to_shp(layer, manhole)
+            layer = self.feature_to_manholes_shp(layer, manhole)
         data_source = None
         layer = iface.addVectorLayer(shapefile_path, "manholes", "ogr")
 
-    def get_json(self, filename):
-        """Function to get a JSON."""
-        manholes = []
-        pipes = []
-        with open(filename) as json_file:
-            json_data = json.load(json_file)
-            for manhole in json_data["manholes"]:
-                manholes.append(manhole)
-            for pipe in json_data["pipes"]:
-                pipes.append(pipe)
-        return (manholes, pipes)
+    def save_shapefile_leidingen(self):
+        """
+        Function to save the pipes of the json.
+        This function also shows this shapefile on the map.
+        """
+
+        # Get shapefile path
+        save_message = "Save pipes shapefile"
+        output = self.get_shapefile_path(save_message)
+        shapefile_path = "{}.shp".format(output)
+        # Get json
+        filename_json = self.dockwidget.download_riool_text.text()
+        manholes, pipes = self.get_json(filename_json)
+
+        # Create pipes shapefile
+        driver = ogr.GetDriverByName("ESRI Shapefile")
+        data_source = driver.CreateDataSource(shapefile_path)
+        srs = osr.SpatialReference()
+        # manholes[0]["CRS"]  # "Netherlands-RD"
+        srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
+        layer = data_source.CreateLayer(shapefile_path, srs, ogr.wkbLineString)
+        layer = self.fields_to_pipes_shp(layer, manholes)
+        for pipe in pipes:
+            layer = self.feature_to_pipes_shp(layer, pipe)
+        data_source = None
+        layer = iface.addVectorLayer(shapefile_path, "pipes", "ogr")
 
     def get_shapefile_path(self, save_message):
         """Function to get a file."""
@@ -355,7 +376,19 @@ class Beoordelingstool:
 
         return filename
 
-    def fields_to_shp(self, layer, location):
+    def get_json(self, filename):
+        """Function to get a JSON."""
+        manholes = []
+        pipes = []
+        with open(filename) as json_file:
+            json_data = json.load(json_file)
+            for manhole in json_data["manholes"]:
+                manholes.append(manhole)
+            for pipe in json_data["pipes"]:
+                pipes.append(pipe)
+        return (manholes, pipes)
+
+    def fields_to_manholes_shp(self, layer, location):
         """
         Add fields to a shapefile layer.
 
@@ -488,7 +521,7 @@ class Beoordelingstool:
         layer.CreateField(opmerking)
         return layer
 
-    def feature_to_shp(self, layer, manhole):
+    def feature_to_manholes_shp(self, layer, manhole):
         """
         Add features to a shapefile.
 
@@ -640,7 +673,7 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_manholes.setItem(0, 37, QTableWidgetItem(f["CDD"]))
             self.selected_feature_id = f.id()
 
-    def save_beoordeling(self):
+    def save_beoordeling_putten(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
         fid = self.selected_feature_id
@@ -651,6 +684,57 @@ class Beoordelingstool:
         layer.changeAttributeValue(fid, 39, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+
+    def fields_to_pipes_shp(self, layer, location):
+        """
+        Add fields to a shapefile layer.
+
+        Args:
+            (shapefile layer) layer: A shapefile layer.
+            (shapefile layer) location: A shapefile layer.
+
+        Returns:
+            (shapefile layer) layer: A shapefile layer.
+        """
+        AAD = ogr.FieldDefn("AAD", ogr.OFTString)
+        AAD.SetWidth(255)
+        layer.CreateField(AAD)
+        AAE = ogr.FieldDefn("AAE", ogr.OFTString)
+        AAE.SetWidth(255)
+        layer.CreateField(AAE)
+        return layer
+
+    def feature_to_pipes_shp(self, layer, pipe):
+        """
+        Add features to a shapefile.
+
+        Args:
+            (shapefile layer) layer: A shapefile layer.
+            (dict) queryset: A Django queryset that will be used for getting
+                the values of the fields.
+
+        Returns:
+            (shapefile layer) layer: A shapefile layer.
+        """
+        # Get values
+        AAD = pipe["AAD"]
+        AAE = pipe["AAE"]
+        start_x = pipe["Beginpunt x"]
+        start_y = pipe["Beginpunt y"]
+        end_x = pipe["Eindpunt x"]
+        end_y = pipe["Eindpunt y"]
+
+        # Set values
+        feature = ogr.Feature(layer.GetLayerDefn())
+        wkt = "LINESTRING({} {}, {} {})".format(start_x, start_y, end_x, end_y)
+        line = ogr.CreateGeometryFromWkt(wkt)
+        feature.SetGeometry(line)
+        feature.SetField("AAD", str(AAD))
+        feature.SetField("AAE", str(AAE))
+        layer.CreateFeature(feature)
+
+        feature = None
+        return layer
 
 
 def add_layer(iface, file):
