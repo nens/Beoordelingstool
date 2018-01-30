@@ -255,7 +255,7 @@ class Beoordelingstool:
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
                     self.get_selected_manhole)
                 self.selected_feature_id = 0
-                self.dockwidget.pushbutton_save_attribute.clicked.connect(
+                self.dockwidget.pushbutton_save_attribute_manholes.clicked.connect(
                     self.save_beoordeling_putten)
 
             # connect to provide cleanup on closing of dockwidget
@@ -632,7 +632,7 @@ class Beoordelingstool:
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
-            self.dockwidget.value_plaintextedit.setPlainText(str(f["Opmerking"]))
+            self.dockwidget.value_plaintextedit_manholes.setPlainText(str(f["Opmerking"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f["CAA"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAJ"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 2, QTableWidgetItem(f["CAL"]))
@@ -677,8 +677,8 @@ class Beoordelingstool:
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
         fid = self.selected_feature_id
-        herstelmaatregel = str(self.dockwidget.field_combobox.currentText())
-        opmerking = str(self.dockwidget.value_plaintextedit.toPlainText())
+        herstelmaatregel = str(self.dockwidget.field_combobox_manholes.currentText())
+        opmerking = str(self.dockwidget.value_plaintextedit_manholes.toPlainText())
         layer.startEditing()
         layer.changeAttributeValue(fid, 38, herstelmaatregel)  # Herstelmaatregel
         layer.changeAttributeValue(fid, 39, opmerking)  # Opmerking
