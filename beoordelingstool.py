@@ -358,11 +358,28 @@ class Beoordelingstool:
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
         layer = data_source.CreateLayer(shapefile_path, srs, ogr.wkbLineString)
-        layer = self.fields_to_pipes_shp(layer, manholes)
-        for pipe in pipes:
-            layer = self.feature_to_pipes_shp(layer, pipe)
+        # data_source = None
+
+        # Create measuring points shapefile
+        measuring_points_path = os.path.join(os.path.dirname(shapefile_path), "measuring_points.shp")
+        print measuring_points_path
+        driver = ogr.GetDriverByName("ESRI Shapefile")
+        data_source_measuring_point = driver.CreateDataSource(measuring_points_path)
+        srs = osr.SpatialReference()
+        # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
+        srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
+        measuring_points_layer = data_source_measuring_point.CreateLayer(measuring_points_path, srs, ogr.wkbLineString)
+
+        # Populate pipe shapefile
+        layer = self.fields_to_pipes_shp(layer, pipes)
+        measuring_points_layer = self.fields_to_measuring_points_shp(measuring_points_layer)
+        for pipe in pipes:  # add iterator for populating ID field
+            layer = self.feature_to_pipes_shp(layer, pipe)  # add measuring points layer to save measuring points in if there are any
         data_source = None
         layer = iface.addVectorLayer(shapefile_path, "pipes", "ogr")
+        data_source_measuring_point = None
+        measuring_points_layer = iface.addVectorLayer(measuring_points_path, "measuring_points", "ogr")
+        # Populate measuring points shapefile
 
     def get_shapefile_path(self, save_message):
         """Function to get a file."""
@@ -703,6 +720,9 @@ class Beoordelingstool:
         Returns:
             (shapefile layer) layer: A shapefile layer.
         """
+        ID = ogr.FieldDefn("ID", ogr.OFTString)
+        ID.SetWidth(255)
+        layer.CreateField(ID)
         AAA = ogr.FieldDefn("AAA", ogr.OFTString)
         AAA.SetWidth(255)
         layer.CreateField(AAA)
@@ -862,6 +882,7 @@ class Beoordelingstool:
             (shapefile layer) layer: A shapefile layer.
         """
         # Get values
+        id_nr = 0
         start_x = pipe["Beginpunt x"]
         start_y = pipe["Beginpunt y"]
         end_x = pipe["Eindpunt x"]
@@ -921,6 +942,7 @@ class Beoordelingstool:
         wkt = "LINESTRING({} {}, {} {})".format(start_x, start_y, end_x, end_y)
         line = ogr.CreateGeometryFromWkt(wkt)
         feature.SetGeometry(line)
+        feature.SetField("ID", str(id_nr))
         feature.SetField("AAA", str(AAA))
         feature.SetField("AAB", str(AAB))
         feature.SetField("AAD", str(AAD))
@@ -1034,7 +1056,65 @@ class Beoordelingstool:
         herstelmaatregel = str(self.dockwidget.field_combobox_pipes.currentText())
         opmerking = str(self.dockwidget.value_plaintextedit_pipes.toPlainText())
         layer.startEditing()
-        layer.changeAttributeValue(fid, 46, herstelmaatregel)  # Herstelmaatregel
-        layer.changeAttributeValue(fid, 47, opmerking)  # Opmerking
+        layer.changeAttributeValue(fid, 47, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(fid, 48, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+
+    def fields_to_measuring_points_shp(self, layer):
+        """
+        Add fields to a shapefile layer.
+
+        Args:
+            (shapefile layer) layer: A shapefile layer.
+            (shapefile layer) location: A shapefile layer.
+
+        Returns:
+            (shapefile layer) layer: A shapefile layer.
+        """
+        ID = ogr.FieldDefn("ID", ogr.OFTString)
+        ID.SetWidth(255)
+        layer.CreateField(ID)
+        PIPES_ID = ogr.FieldDefn("PIPES_ID", ogr.OFTString)
+        PIPES_ID.SetWidth(255)
+        layer.CreateField(PIPES_ID)
+        x = ogr.FieldDefn("x", ogr.OFTString)
+        x.SetWidth(255)
+        layer.CreateField(x)
+        y = ogr.FieldDefn("y", ogr.OFTString)
+        y.SetWidth(255)
+        layer.CreateField(y)
+        A = ogr.FieldDefn("A", ogr.OFTString)
+        A.SetWidth(255)
+        layer.CreateField(A)
+        B = ogr.FieldDefn("B", ogr.OFTString)
+        B.SetWidth(255)
+        layer.CreateField(B)
+        D = ogr.FieldDefn("D", ogr.OFTString)
+        D.SetWidth(255)
+        layer.CreateField(D)
+        E = ogr.FieldDefn("E", ogr.OFTString)
+        E.SetWidth(255)
+        layer.CreateField(E)
+        F = ogr.FieldDefn("F", ogr.OFTString)
+        F.SetWidth(255)
+        layer.CreateField(F)
+        I = ogr.FieldDefn("I", ogr.OFTString)
+        I.SetWidth(255)
+        layer.CreateField(I)
+        J = ogr.FieldDefn("J", ogr.OFTString)
+        J.SetWidth(255)
+        layer.CreateField(J)
+        N = ogr.FieldDefn("N", ogr.OFTString)
+        N.SetWidth(255)
+        layer.CreateField(N)
+        O = ogr.FieldDefn("O", ogr.OFTString)
+        O.SetWidth(255)
+        layer.CreateField(O)
+        herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
+        herstelmaatregel.SetWidth(255)
+        layer.CreateField(herstelmaatregel)
+        opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
+        opmerking.SetWidth(255)
+        layer.CreateField(opmerking)
+        return layer
