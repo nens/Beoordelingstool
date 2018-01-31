@@ -261,11 +261,15 @@ class Beoordelingstool:
                 self.selected_feature_id = 0
                 self.dockwidget.pushbutton_save_attribute_manholes.clicked.connect(
                     self.save_beoordeling_putten)
+                self.dockwidget.pushbutton_pipe_to_measuring_station.clicked.connect(
+                    self.show_measuring_station)
                 # Pipes tab
                 self.dockwidget.pushbutton_get_selected_pipe.clicked.connect(
                     self.get_selected_pipe)
                 self.dockwidget.pushbutton_save_attribute_pipes.clicked.connect(
                     self.save_beoordeling_leidingen)
+                self.dockwidget.pushbutton_measuring_station_to_pipe.clicked.connect(
+                    self.show_pipe)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -1068,6 +1072,11 @@ class Beoordelingstool:
         layer.commitChanges()
         layer.triggerRepaint()
 
+    def show_measuring_station(self):
+        """Show the measuring station that belongs to a certain pipe."""
+        # Go to measuring stations tab
+        self.dockwidget.tabWidget.setCurrentIndex(3)
+
     def fields_to_measuring_points_shp(self, layer):
         """
         Add fields to a shapefile layer.
@@ -1194,3 +1203,8 @@ class Beoordelingstool:
 
         feature = None
         return layer
+
+    def show_pipe(self):
+        """Show the pipe to which a measuring station belongs."""
+        # Go to the pipe tab
+        self.dockwidget.tabWidget.setCurrentIndex(2)
