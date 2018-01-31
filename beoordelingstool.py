@@ -246,17 +246,24 @@ class Beoordelingstool:
                 self.dockwidget = BeoordelingstoolDockWidget()
                 # DOWNLOAD
                 # Connect the search buttons with the search_file functions
+                # General tab
                 self.dockwidget.download_riool_search.clicked.connect(
                     self.search_json_riool)
                 self.dockwidget.save_shapefile_putten_button.clicked.connect(
                     self.save_shapefile_putten)
                 self.dockwidget.save_shapefile_leidingen_button.clicked.connect(
                     self.save_shapefile_leidingen)
+                # Manholes tab
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
                     self.get_selected_manhole)
                 self.selected_feature_id = 0
                 self.dockwidget.pushbutton_save_attribute_manholes.clicked.connect(
                     self.save_beoordeling_putten)
+                # Pipes tab
+                self.dockwidget.pushbutton_get_selected_pipe.clicked.connect(
+                    self.get_selected_pipe)
+                # self.dockwidget.pushbutton_save_attribute_pipes.clicked.connect(
+                #     self.save_beoordeling_leidingen)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -966,6 +973,59 @@ class Beoordelingstool:
 
         feature = None
         return layer
+
+    def get_selected_pipe(self):
+        layer = iface.activeLayer()
+        fields = layer.dataProvider().fields()
+        for f in layer.selectedFeatures():
+            self.dockwidget.value_plaintextedit_pipes.setPlainText(str(f["Opmerking"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 0, QTableWidgetItem(f["AAA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 1, QTableWidgetItem(f["AAB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 2, QTableWidgetItem(f["AAD"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 3, QTableWidgetItem(f["AAE"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 4, QTableWidgetItem(f["AAF"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 5, QTableWidgetItem(f["AAG"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 6, QTableWidgetItem(f["AAJ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 7, QTableWidgetItem(f["AAK"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 8, QTableWidgetItem(f["AAL"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 9, QTableWidgetItem(f["AAM"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 10, QTableWidgetItem(f["AAN"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 11, QTableWidgetItem(f["AAO"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 12, QTableWidgetItem(f["AAP"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 13, QTableWidgetItem(f["AAQ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 14, QTableWidgetItem(f["ABA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 15, QTableWidgetItem(f["ABB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 16, QTableWidgetItem(f["ABC"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 17, QTableWidgetItem(f["ABE"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 18, QTableWidgetItem(f["ABF"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 19, QTableWidgetItem(f["ABH"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 20, QTableWidgetItem(f["ABI"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 21, QTableWidgetItem(f["ABJ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 22, QTableWidgetItem(f["ABK"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 23, QTableWidgetItem(f["ABL"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 24, QTableWidgetItem(f["ABM"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 25, QTableWidgetItem(f["ABP"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 26, QTableWidgetItem(f["ABQ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 27, QTableWidgetItem(f["ABS"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 28, QTableWidgetItem(f["ACA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 29, QTableWidgetItem(f["ACB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 30, QTableWidgetItem(f["ACC"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 31, QTableWidgetItem(f["ACD"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 32, QTableWidgetItem(f["ACG"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 33, QTableWidgetItem(f["ACJ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 34, QTableWidgetItem(f["ACK"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 35, QTableWidgetItem(f["ACM"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 36, QTableWidgetItem(f["ACN"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 37, QTableWidgetItem(f["ADA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 38, QTableWidgetItem(f["ADB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 39, QTableWidgetItem(f["ADC"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 40, QTableWidgetItem(f["AXA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 41, QTableWidgetItem(f["AXB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 42, QTableWidgetItem(f["AXF"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 43, QTableWidgetItem(f["AXG"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 44, QTableWidgetItem(f["AXH"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 45, QTableWidgetItem(f["ZC"]))
+            self.selected_feature_id = f.id()
 
 
 def add_layer(iface, file):
