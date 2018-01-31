@@ -22,9 +22,11 @@
 """
 import osgeo.ogr as ogr
 import osgeo.osr as osr
-import pprint
+import os.path
+# import pprint
 import json
 import re
+
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QSettings
 from PyQt4.QtCore import Qt
@@ -34,13 +36,13 @@ from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QTableWidgetItem
 from PyQt4.QtGui import QIcon
+from qgis.utils import iface
 # Initialize Qt resources from file resources.py
 import resources
-from qgis.utils import iface
+
 
 # Import the code for the DockWidget
 from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
-import os.path
 
 BUTTON_DOWNLOAD_RIOOL = "download_riool_search"
 TEXTBOX_DOWNLOAD_RIOOL = "download_riool_text"
@@ -309,6 +311,7 @@ class Beoordelingstool:
             """Set the filename in the proper textbox."""
             if TEXTBOX == TEXTBOX_DOWNLOAD_RIOOL:
                 self.dockwidget.download_riool_text.setText(filename)
+                # print filename  # riool.json
 
     def save_shapefile_putten(self):
         """
@@ -362,19 +365,23 @@ class Beoordelingstool:
 
         # Create measuring points shapefile
         measuring_points_path = os.path.join(os.path.dirname(shapefile_path), "measuring_points.shp")
-        print measuring_points_path
         driver = ogr.GetDriverByName("ESRI Shapefile")
         data_source_measuring_point = driver.CreateDataSource(measuring_points_path)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
-        measuring_points_layer = data_source_measuring_point.CreateLayer(measuring_points_path, srs, ogr.wkbLineString)
+        measuring_points_layer = data_source_measuring_point.CreateLayer(measuring_points_path, srs, ogr.wkbPoint)
 
         # Populate pipe shapefile
         layer = self.fields_to_pipes_shp(layer, pipes)
         measuring_points_layer = self.fields_to_measuring_points_shp(measuring_points_layer)
+        pipe_id = 0
         for pipe in pipes:  # add iterator for populating ID field
-            layer = self.feature_to_pipes_shp(layer, pipe)  # add measuring points layer to save measuring points in if there are any
+            layer = self.feature_to_pipes_shp(layer, pipe_id, pipe)  # add measuring points layer to save measuring points in if there are any
+            if pipe["ZC"]:
+                for measuring_point in pipe["ZC"]:
+                    measuring_points_layer = self.feature_to_measuring_points_shp(measuring_points_layer, pipe_id, measuring_point)
+            pipe_id += 1
         data_source = None
         layer = iface.addVectorLayer(shapefile_path, "pipes", "ogr")
         data_source_measuring_point = None
@@ -869,7 +876,7 @@ class Beoordelingstool:
         layer.CreateField(opmerking)
         return layer
 
-    def feature_to_pipes_shp(self, layer, pipe):
+    def feature_to_pipes_shp(self, layer, id_nr, pipe):
         """
         Add features to a shapefile.
 
@@ -882,7 +889,7 @@ class Beoordelingstool:
             (shapefile layer) layer: A shapefile layer.
         """
         # Get values
-        id_nr = 0
+        id_nr = id_nr
         start_x = pipe["Beginpunt x"]
         start_y = pipe["Beginpunt y"]
         end_x = pipe["Eindpunt x"]
@@ -1072,10 +1079,7 @@ class Beoordelingstool:
         Returns:
             (shapefile layer) layer: A shapefile layer.
         """
-        ID = ogr.FieldDefn("ID", ogr.OFTString)
-        ID.SetWidth(255)
-        layer.CreateField(ID)
-        PIPES_ID = ogr.FieldDefn("PIPES_ID", ogr.OFTString)
+        PIPES_ID = ogr.FieldDefn("PIPE_ID", ogr.OFTString)
         PIPES_ID.SetWidth(255)
         layer.CreateField(PIPES_ID)
         x = ogr.FieldDefn("x", ogr.OFTString)
@@ -1090,6 +1094,9 @@ class Beoordelingstool:
         B = ogr.FieldDefn("B", ogr.OFTString)
         B.SetWidth(255)
         layer.CreateField(B)
+        C = ogr.FieldDefn("C", ogr.OFTString)
+        C.SetWidth(255)
+        layer.CreateField(C)
         D = ogr.FieldDefn("D", ogr.OFTString)
         D.SetWidth(255)
         layer.CreateField(D)
@@ -1099,12 +1106,21 @@ class Beoordelingstool:
         F = ogr.FieldDefn("F", ogr.OFTString)
         F.SetWidth(255)
         layer.CreateField(F)
+        G = ogr.FieldDefn("G", ogr.OFTString)
+        G.SetWidth(255)
+        layer.CreateField(G)
         I = ogr.FieldDefn("I", ogr.OFTString)
         I.SetWidth(255)
         layer.CreateField(I)
         J = ogr.FieldDefn("J", ogr.OFTString)
         J.SetWidth(255)
         layer.CreateField(J)
+        K = ogr.FieldDefn("K", ogr.OFTString)
+        K.SetWidth(255)
+        layer.CreateField(K)
+        M = ogr.FieldDefn("M", ogr.OFTString)
+        M.SetWidth(255)
+        layer.CreateField(M)
         N = ogr.FieldDefn("N", ogr.OFTString)
         N.SetWidth(255)
         layer.CreateField(N)
@@ -1117,4 +1133,64 @@ class Beoordelingstool:
         opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
         opmerking.SetWidth(255)
         layer.CreateField(opmerking)
+        return layer
+
+    def feature_to_measuring_points_shp(self, layer, pipe_id, measuring_point):
+        """
+        Add features to a shapefile.
+
+        Args:
+            (shapefile layer) layer: A shapefile layer.
+            (dict) queryset: A Django queryset that will be used for getting
+                the values of the fields.
+
+        Returns:
+            (shapefile layer) layer: A shapefile layer.
+        """
+        # Get values
+        x = measuring_point["x"] if measuring_point["x"] else 0.0
+        y = measuring_point["y"] if measuring_point["y"] else 0.0
+        A = measuring_point.get("A", None)
+        B = measuring_point.get("B", None)
+        C = measuring_point.get("C", None)
+        D = measuring_point.get("D", None)
+        E = measuring_point.get("E", None)
+        F = measuring_point.get("F", None)
+        G = measuring_point.get("G", None)
+        I = measuring_point.get("I", None)
+        J = measuring_point.get("J", None)
+        K = measuring_point.get("K", None)
+        M = measuring_point.get("M", None)
+        N = measuring_point.get("N", None)
+        O = measuring_point.get("O", None)
+        herstelmaatregel = measuring_point["Herstelmaatregel"] if measuring_point["Herstelmaatregel"] else 1
+        # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
+        opmerking = measuring_point["Opmerking"] if measuring_point["Opmerking"] else ""
+
+        # Set values
+        feature = ogr.Feature(layer.GetLayerDefn())
+        wkt = "POINT({} {})".format(x, y)
+        point = ogr.CreateGeometryFromWkt(wkt)
+        feature.SetGeometry(point)
+        feature.SetField("PIPE_ID", str(pipe_id))
+        feature.SetField("x", str(x))
+        feature.SetField("y", str(y))
+        feature.SetField("A", str(A))
+        feature.SetField("B", str(B))
+        feature.SetField("C", str(C))
+        feature.SetField("D", str(D))
+        feature.SetField("E", str(E))
+        feature.SetField("F", str(F))
+        feature.SetField("G", str(G))
+        feature.SetField("I", str(I))
+        feature.SetField("J", str(J))
+        feature.SetField("K", str(K))
+        feature.SetField("M", str(M))
+        feature.SetField("N", str(N))
+        feature.SetField("O", str(O))
+        feature.SetField("Herstelmaa", str(herstelmaatregel))
+        feature.SetField("Opmerking", str(opmerking))
+        layer.CreateFeature(feature)
+
+        feature = None
         return layer

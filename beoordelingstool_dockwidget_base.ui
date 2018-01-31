@@ -71,7 +71,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>riool.json</string>
+        <string>/home/madeleine/code/QGIS_plugins/Beoordelingstool_extra/temp_new.json</string>
        </property>
        <property name="readOnly">
         <bool>true</bool>
