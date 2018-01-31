@@ -262,8 +262,8 @@ class Beoordelingstool:
                 # Pipes tab
                 self.dockwidget.pushbutton_get_selected_pipe.clicked.connect(
                     self.get_selected_pipe)
-                # self.dockwidget.pushbutton_save_attribute_pipes.clicked.connect(
-                #     self.save_beoordeling_leidingen)
+                self.dockwidget.pushbutton_save_attribute_pipes.clicked.connect(
+                    self.save_beoordeling_leidingen)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -1027,14 +1027,14 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_pipes.setItem(0, 45, QTableWidgetItem(f["ZC"]))
             self.selected_feature_id = f.id()
 
-
-def add_layer(iface, file):
-    """Function to create a vector layer of a shapefile."""
-    # file_name = "{}.shp".format(file)
-    # layer_name = re.sub(r".*/", "", file_name)
-    layer_name = re.sub(r".*/", "", file)
-    layer_name = re.sub(r".shp", "", layer_name)
-    layer = iface.addVectorLayer(
-        file, layer_name, "ogr")
-    # Return the layer
-    return layer
+    def save_beoordeling_leidingen(self):
+        """Save herstelmaatregel and opmerking in the shapefile."""
+        layer = iface.activeLayer()
+        fid = self.selected_feature_id
+        herstelmaatregel = str(self.dockwidget.field_combobox_pipes.currentText())
+        opmerking = str(self.dockwidget.value_plaintextedit_pipes.toPlainText())
+        layer.startEditing()
+        layer.changeAttributeValue(fid, 46, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(fid, 47, opmerking)  # Opmerking
+        layer.commitChanges()
+        layer.triggerRepaint()
