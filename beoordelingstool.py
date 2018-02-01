@@ -270,6 +270,9 @@ class Beoordelingstool:
                     self.save_beoordeling_leidingen)
                 self.dockwidget.pushbutton_measuring_station_to_pipe.clicked.connect(
                     self.show_pipe)
+                # Measuring stations tab
+                self.dockwidget.pushbutton_get_selected_measuring_station.clicked.connect(
+                    self.get_selected_measuring_station)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -1208,3 +1211,24 @@ class Beoordelingstool:
         """Show the pipe to which a measuring station belongs."""
         # Go to the pipe tab
         self.dockwidget.tabWidget.setCurrentIndex(2)
+
+    def get_selected_measuring_station(self):
+        layer = iface.activeLayer()
+        fields = layer.dataProvider().fields()
+        for f in layer.selectedFeatures():
+            self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(str(f["Opmerking"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(f["PIPE_ID"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(f["A"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 2, QTableWidgetItem(f["B"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 3, QTableWidgetItem(f["C"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 4, QTableWidgetItem(f["D"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 5, QTableWidgetItem(f["E"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 6, QTableWidgetItem(f["F"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 7, QTableWidgetItem(f["G"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 8, QTableWidgetItem(f["I"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 9, QTableWidgetItem(f["J"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 10, QTableWidgetItem(f["K"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 11, QTableWidgetItem(f["M"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 12, QTableWidgetItem(f["N"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(f["O"]))
+            self.selected_feature_id = f.id()
