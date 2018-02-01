@@ -36,6 +36,7 @@ from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QTableWidgetItem
 from PyQt4.QtGui import QIcon
+from qgis.core import QgsFeature
 from qgis.utils import iface
 # Initialize Qt resources from file resources.py
 import resources
@@ -256,12 +257,13 @@ class Beoordelingstool:
                 self.dockwidget.save_shapefile_leidingen_button.clicked.connect(
                     self.save_shapefile_leidingen)
                 # Manholes tab
+                self.selected_manhole_id = 0
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
                     self.get_selected_manhole)
-                self.selected_feature_id = 0
                 self.dockwidget.pushbutton_save_attribute_manholes.clicked.connect(
                     self.save_beoordeling_putten)
                 # Pipes tab
+                self.selected_pipe_id = 0
                 self.dockwidget.pushbutton_get_selected_pipe.clicked.connect(
                     self.get_selected_pipe)
                 self.dockwidget.pushbutton_save_attribute_pipes.clicked.connect(
@@ -269,12 +271,17 @@ class Beoordelingstool:
                 self.dockwidget.pushbutton_pipe_to_measuring_station.clicked.connect(
                     self.show_measuring_station)
                 # Measuring stations tab
+                self.selected_measuring_station_id = 0
                 self.dockwidget.pushbutton_get_selected_measuring_station.clicked.connect(
                     self.get_selected_measuring_station)
                 self.dockwidget.pushbutton_save_attribute_measuring_stations.clicked.connect(
                     self.save_beoordeling_measuring_stations)
+                self.dockwidget.pushbutton_measuring_stations_previous.clicked.connect(
+                    self.show_previous_measuring_station)
                 self.dockwidget.pushbutton_measuring_station_to_pipe.clicked.connect(
                     self.show_pipe)
+                self.dockwidget.pushbutton_measuring_stations_next.clicked.connect(
+                    self.show_next_measuring_station)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -711,12 +718,12 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_manholes.setItem(0, 35, QTableWidgetItem(f["CDB"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 36, QTableWidgetItem(f["CDC"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 37, QTableWidgetItem(f["CDD"]))
-            self.selected_feature_id = f.id()
+            self.selected_manhole_id = f.id()
 
     def save_beoordeling_putten(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
-        fid = self.selected_feature_id
+        fid = self.selected_manhole_id
         herstelmaatregel = str(self.dockwidget.field_combobox_manholes.currentText())
         opmerking = str(self.dockwidget.value_plaintextedit_manholes.toPlainText())
         layer.startEditing()
@@ -1063,12 +1070,12 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_pipes.setItem(0, 43, QTableWidgetItem(f["AXG"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 44, QTableWidgetItem(f["AXH"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 45, QTableWidgetItem(f["ZC"]))
-            self.selected_feature_id = f.id()
+            self.selected_pipe_id = f.id()
 
     def save_beoordeling_leidingen(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
-        fid = self.selected_feature_id
+        fid = self.selected_pipe_id
         herstelmaatregel = str(self.dockwidget.field_combobox_pipes.currentText())
         opmerking = str(self.dockwidget.value_plaintextedit_pipes.toPlainText())
         layer.startEditing()
@@ -1233,12 +1240,66 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 11, QTableWidgetItem(f["M"]))
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 12, QTableWidgetItem(f["N"]))
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(f["O"]))
-            self.selected_feature_id = f.id()
+            self.selected_measuring_station_id = f.id()
+
+    def show_next_measuring_station(self):
+        """Show the next measuring station."""
+        layer = iface.activeLayer()
+        features_amount = layer.featureCount()
+        measuring_station_id_new = self.selected_measuring_station_id + 1
+        if measuring_station_id_new < features_amount:
+            self.selected_measuring_station_id = measuring_station_id_new
+            layer.setSelectedFeatures([int(self.selected_measuring_station_id)])
+            new_feature = layer.selectedFeatures()[0]
+
+            # Set values
+            self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(new_feature["Opmerking"] if new_feature["Opmerking"] else '')
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 2, QTableWidgetItem(new_feature["B"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 3, QTableWidgetItem(new_feature["C"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 4, QTableWidgetItem(new_feature["D"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 5, QTableWidgetItem(new_feature["E"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 6, QTableWidgetItem(new_feature["F"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 7, QTableWidgetItem(new_feature["G"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 8, QTableWidgetItem(new_feature["I"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 9, QTableWidgetItem(new_feature["J"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 10, QTableWidgetItem(new_feature["K"] if new_feature["K"] else None))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 11, QTableWidgetItem(new_feature["M"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 12, QTableWidgetItem(new_feature["N"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
+
+    def show_previous_measuring_station(self):
+        """Show the next measuring station."""
+        layer = iface.activeLayer()
+        features_amount = layer.featureCount()
+        measuring_station_id_new = self.selected_measuring_station_id - 1
+        if measuring_station_id_new > -1:
+            self.selected_measuring_station_id = measuring_station_id_new
+            layer.setSelectedFeatures([int(self.selected_measuring_station_id)])
+            new_feature = layer.selectedFeatures()[0]
+
+            # Set values
+            self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(new_feature["Opmerking"] if new_feature["Opmerking"] else '')
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 2, QTableWidgetItem(new_feature["B"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 3, QTableWidgetItem(new_feature["C"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 4, QTableWidgetItem(new_feature["D"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 5, QTableWidgetItem(new_feature["E"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 6, QTableWidgetItem(new_feature["F"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 7, QTableWidgetItem(new_feature["G"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 8, QTableWidgetItem(new_feature["I"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 9, QTableWidgetItem(new_feature["J"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 10, QTableWidgetItem(new_feature["K"] if new_feature["K"] else None))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 11, QTableWidgetItem(new_feature["M"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 12, QTableWidgetItem(new_feature["N"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
 
     def save_beoordeling_measuring_stations(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
-        fid = self.selected_feature_id
+        fid = self.selected_measuring_station_id
         herstelmaatregel = str(self.dockwidget.field_combobox_measuring_stations.currentText())
         opmerking = str(self.dockwidget.value_plaintextedit_measuring_stations.toPlainText())
         layer.startEditing()
