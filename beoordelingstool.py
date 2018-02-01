@@ -261,18 +261,20 @@ class Beoordelingstool:
                 self.selected_feature_id = 0
                 self.dockwidget.pushbutton_save_attribute_manholes.clicked.connect(
                     self.save_beoordeling_putten)
-                self.dockwidget.pushbutton_pipe_to_measuring_station.clicked.connect(
-                    self.show_measuring_station)
                 # Pipes tab
                 self.dockwidget.pushbutton_get_selected_pipe.clicked.connect(
                     self.get_selected_pipe)
                 self.dockwidget.pushbutton_save_attribute_pipes.clicked.connect(
                     self.save_beoordeling_leidingen)
-                self.dockwidget.pushbutton_measuring_station_to_pipe.clicked.connect(
-                    self.show_pipe)
+                self.dockwidget.pushbutton_pipe_to_measuring_station.clicked.connect(
+                    self.show_measuring_station)
                 # Measuring stations tab
                 self.dockwidget.pushbutton_get_selected_measuring_station.clicked.connect(
                     self.get_selected_measuring_station)
+                self.dockwidget.pushbutton_save_attribute_measuring_stations.clicked.connect(
+                    self.save_beoordeling_measuring_stations)
+                self.dockwidget.pushbutton_measuring_station_to_pipe.clicked.connect(
+                    self.show_pipe)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -1232,3 +1234,15 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 12, QTableWidgetItem(f["N"]))
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(f["O"]))
             self.selected_feature_id = f.id()
+
+    def save_beoordeling_measuring_stations(self):
+        """Save herstelmaatregel and opmerking in the shapefile."""
+        layer = iface.activeLayer()
+        fid = self.selected_feature_id
+        herstelmaatregel = str(self.dockwidget.field_combobox_measuring_stations.currentText())
+        opmerking = str(self.dockwidget.value_plaintextedit_measuring_stations.toPlainText())
+        layer.startEditing()
+        layer.changeAttributeValue(fid, 16, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(fid, 17, opmerking)  # Opmerking
+        layer.commitChanges()
+        layer.triggerRepaint()
