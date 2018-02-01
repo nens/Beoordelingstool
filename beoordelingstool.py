@@ -23,7 +23,6 @@
 import osgeo.ogr as ogr
 import osgeo.osr as osr
 import os.path
-# import pprint
 import json
 import re
 
@@ -37,6 +36,7 @@ from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QTableWidgetItem
 from PyQt4.QtGui import QIcon
 from qgis.core import QgsFeature
+from qgis.core import QgsMapLayerRegistry
 from qgis.utils import iface
 # Initialize Qt resources from file resources.py
 import resources
@@ -1216,11 +1216,6 @@ class Beoordelingstool:
         feature = None
         return layer
 
-    def show_pipe(self):
-        """Show the pipe to which a measuring station belongs."""
-        # Go to the pipe tab
-        self.dockwidget.tabWidget.setCurrentIndex(2)
-
     def get_selected_measuring_station(self):
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
@@ -1242,12 +1237,12 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(f["O"]))
             self.selected_measuring_station_id = f.id()
 
-    def show_next_measuring_station(self):
+    def show_previous_measuring_station(self):
         """Show the next measuring station."""
         layer = iface.activeLayer()
         features_amount = layer.featureCount()
-        measuring_station_id_new = self.selected_measuring_station_id + 1
-        if measuring_station_id_new < features_amount:
+        measuring_station_id_new = self.selected_measuring_station_id - 1
+        if measuring_station_id_new > -1:
             self.selected_measuring_station_id = measuring_station_id_new
             layer.setSelectedFeatures([int(self.selected_measuring_station_id)])
             new_feature = layer.selectedFeatures()[0]
@@ -1269,12 +1264,72 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 12, QTableWidgetItem(new_feature["N"]))
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
 
-    def show_previous_measuring_station(self):
+    def show_pipe(self):
+        """Show the pipe to which a measuring station belongs."""
+        pipe_id = self.dockwidget.tablewidget_measuring_stations.itemAt(0,0).text()
+        self.selected_pipe_id = pipe_id
+        print pipe_id
+        layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
+        if layerList:
+            layer = layerList[0]
+            layer.setSelectedFeatures([int(self.selected_pipe_id)])
+            new_feature = layer.selectedFeatures()[0]
+            self.dockwidget.value_plaintextedit_pipes.setPlainText(str(new_feature["Opmerking"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 0, QTableWidgetItem(new_feature["AAA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 1, QTableWidgetItem(new_feature["AAB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 2, QTableWidgetItem(new_feature["AAD"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 3, QTableWidgetItem(new_feature["AAE"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 4, QTableWidgetItem(new_feature["AAF"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 5, QTableWidgetItem(new_feature["AAG"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 6, QTableWidgetItem(new_feature["AAJ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 7, QTableWidgetItem(new_feature["AAK"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 8, QTableWidgetItem(new_feature["AAL"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 9, QTableWidgetItem(new_feature["AAM"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 10, QTableWidgetItem(new_feature["AAN"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 11, QTableWidgetItem(new_feature["AAO"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 12, QTableWidgetItem(new_feature["AAP"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 13, QTableWidgetItem(new_feature["AAQ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 14, QTableWidgetItem(new_feature["ABA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 15, QTableWidgetItem(new_feature["ABB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 16, QTableWidgetItem(new_feature["ABC"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 17, QTableWidgetItem(new_feature["ABE"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 18, QTableWidgetItem(new_feature["ABF"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 19, QTableWidgetItem(new_feature["ABH"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 20, QTableWidgetItem(new_feature["ABI"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 21, QTableWidgetItem(new_feature["ABJ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 22, QTableWidgetItem(new_feature["ABK"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 23, QTableWidgetItem(new_feature["ABL"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 24, QTableWidgetItem(new_feature["ABM"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 25, QTableWidgetItem(new_feature["ABP"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 26, QTableWidgetItem(new_feature["ABQ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 27, QTableWidgetItem(new_feature["ABS"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 28, QTableWidgetItem(new_feature["ACA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 29, QTableWidgetItem(new_feature["ACB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 30, QTableWidgetItem(new_feature["ACC"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 31, QTableWidgetItem(new_feature["ACD"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 32, QTableWidgetItem(new_feature["ACG"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 33, QTableWidgetItem(new_feature["ACJ"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 34, QTableWidgetItem(new_feature["ACK"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 35, QTableWidgetItem(new_feature["ACM"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 36, QTableWidgetItem(new_feature["ACN"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 37, QTableWidgetItem(new_feature["ADA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 38, QTableWidgetItem(new_feature["ADB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 39, QTableWidgetItem(new_feature["ADC"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 40, QTableWidgetItem(new_feature["AXA"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 41, QTableWidgetItem(new_feature["AXB"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 42, QTableWidgetItem(new_feature["AXF"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 43, QTableWidgetItem(new_feature["AXG"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 44, QTableWidgetItem(new_feature["AXH"]))
+            self.dockwidget.tablewidget_pipes.setItem(0, 45, QTableWidgetItem(new_feature["ZC"]))
+        # Go to the pipe tab
+        self.dockwidget.tabWidget.setCurrentIndex(2)
+
+    def show_next_measuring_station(self):
         """Show the next measuring station."""
         layer = iface.activeLayer()
         features_amount = layer.featureCount()
-        measuring_station_id_new = self.selected_measuring_station_id - 1
-        if measuring_station_id_new > -1:
+        measuring_station_id_new = self.selected_measuring_station_id + 1
+        if measuring_station_id_new < features_amount:
             self.selected_measuring_station_id = measuring_station_id_new
             layer.setSelectedFeatures([int(self.selected_measuring_station_id)])
             new_feature = layer.selectedFeatures()[0]
