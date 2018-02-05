@@ -219,6 +219,8 @@ class Beoordelingstool:
         # self.dockwidget = None
 
         self.pluginIsActive = False
+        self.dockWidget = None
+        self.iface.removeDockWidget(self.dockwidget)
 
 
     def unload(self):
@@ -239,15 +241,20 @@ class Beoordelingstool:
     def run(self):
         """Run method that loads and starts the plugin"""
 
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
+        measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
         if not self.pluginIsActive:
-            self.pluginIsActive = True
 
             #print "** STARTING Beoordelingstool"
 
             # dockwidget may not exist if:
             #    first run of plugin
             #    removed on close (see self.onClosePlugin method)
-            if self.dockwidget == None:
+            # Check if the layers manholes, pipes and measuring_stations are active
+            if not manholes_layerList or not pipes_layerList or not measuring_stations_layerList:
+                iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
+            else:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = BeoordelingstoolDockWidget()
                 # DOWNLOAD
@@ -286,13 +293,23 @@ class Beoordelingstool:
                 self.dockwidget.pushbutton_measuring_stations_next.clicked.connect(
                     self.show_next_measuring_station)
 
-            # connect to provide cleanup on closing of dockwidget
-            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+                # connect to provide cleanup on closing of dockwidget
+                self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
-            # show the dockwidget
-            # TODO: fix to allow choice of dock location
-            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
-            self.dockwidget.show()
+                # show the dockwidget
+                # TODO: fix to allow choice of dock location
+                self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
+                self.dockwidget.show()
+                self.pluginIsActive = True
+
+        # Show a message if not all layers are active
+        elif self.pluginIsActive:
+            if not manholes_layerList or not pipes_layerList or not measuring_stations_layerList:
+                self.iface.removeDockWidget(self.dockwidget)
+                self.dockwidget = None
+                self.pluginIsActive = False
+                iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
+
 
     def search_json_riool(self):
         """Get the json of 'Rioolputten'."""
