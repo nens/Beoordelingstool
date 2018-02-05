@@ -1092,51 +1092,39 @@ class Beoordelingstool:
             current_measuring_point_pipe_id = self.dockwidget.tablewidget_measuring_stations.itemAt(0,0).text()
         except:  # No measuring point selected
             current_measuring_point_pipe_id = -1
-        if current_measuring_point_pipe_id != self.selected_pipe_id:
-            # Get first measuring point of pipe
-            layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
-            if layerList:
-                layer = layerList[0]
-                expr = QgsExpression("\"PIPE_ID\" IS '{}'".format(self.selected_pipe_id))
-                measuring_points = layer.getFeatures(QgsFeatureRequest(expr))  #.next()
-                ids = [measuring_point.id() for measuring_point in measuring_points]  # select only the features for which the expression is true
-                print ids
-                first_id = ids[0]
-                last_id = ids[-1] if ids[-1] else ids[0]
-                self.selected_measuring_station_id = first_id
-                print self.selected_measuring_station_id
-                layer.setSelectedFeatures([int(self.selected_measuring_station_id)])
-                new_feature = layer.selectedFeatures()[0]
-                # measuring_station_id = 1
-                # self.selected_measuring_station_id = measuring_station_id
-                # print self.selected_measuring_station_id
-                # layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
-                # if layerList:
-                #     layer = layerList[0]
-                #     layer.setSelectedFeatures([int(self.selected_measuring_station_id)])
-                #     new_feature = layer.selectedFeatures()[0]
+        # if current_measuring_point_pipe_id != self.selected_pipe_id:
+        layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        if layerList:
+            layer = layerList[0]
+            expr = QgsExpression("\"PIPE_ID\" IS '{}'".format(self.selected_pipe_id))
+            measuring_points = layer.getFeatures(QgsFeatureRequest(expr))  #.next()
+            ids = [measuring_point.id() for measuring_point in measuring_points]  # select only the features for which the expression is true
+            first_id = ids[0]
+            last_id = ids[-1] if ids[-1] else ids[0]
+            self.selected_measuring_station_id = first_id
+            layer.setSelectedFeatures([int(self.selected_measuring_station_id)])
+            new_feature = layer.selectedFeatures()[0]
 
-                # Set values
-                self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(new_feature["Opmerking"] if new_feature["Opmerking"] else '')
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 2, QTableWidgetItem(new_feature["B"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 3, QTableWidgetItem(new_feature["C"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 4, QTableWidgetItem(new_feature["D"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 5, QTableWidgetItem(new_feature["E"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 6, QTableWidgetItem(new_feature["F"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 7, QTableWidgetItem(new_feature["G"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 8, QTableWidgetItem(new_feature["I"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 9, QTableWidgetItem(new_feature["J"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 10, QTableWidgetItem(new_feature["K"] if new_feature["K"] else None))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 11, QTableWidgetItem(new_feature["M"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 12, QTableWidgetItem(new_feature["N"]))
-                self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
-                iface.setActiveLayer(layer)
-
-        layer.triggerRepaint()
-        # Go to measuring stations tab
-        self.dockwidget.tabWidget.setCurrentIndex(3)
+            # Set values
+            self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(new_feature["Opmerking"] if new_feature["Opmerking"] else '')
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 2, QTableWidgetItem(new_feature["B"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 3, QTableWidgetItem(new_feature["C"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 4, QTableWidgetItem(new_feature["D"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 5, QTableWidgetItem(new_feature["E"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 6, QTableWidgetItem(new_feature["F"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 7, QTableWidgetItem(new_feature["G"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 8, QTableWidgetItem(new_feature["I"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 9, QTableWidgetItem(new_feature["J"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 10, QTableWidgetItem(new_feature["K"] if new_feature["K"] else None))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 11, QTableWidgetItem(new_feature["M"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 12, QTableWidgetItem(new_feature["N"]))
+            self.dockwidget.tablewidget_measuring_stations.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
+            iface.setActiveLayer(layer)
+            layer.triggerRepaint()
+            # Go to measuring stations tab
+            self.dockwidget.tabWidget.setCurrentIndex(3)
 
     def fields_to_measuring_points_shp(self, layer):
         """
@@ -1320,7 +1308,6 @@ class Beoordelingstool:
         """Show the pipe to which a measuring station belongs."""
         pipe_id = self.dockwidget.tablewidget_measuring_stations.itemAt(0,0).text() if self.dockwidget.tablewidget_measuring_stations.itemAt(0,0) else 1
         self.selected_pipe_id = pipe_id
-        print pipe_id
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
         if layerList:
             layer = layerList[0]
