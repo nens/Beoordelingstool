@@ -303,6 +303,8 @@ class Beoordelingstool:
                 self.dockwidget = None
                 self.pluginIsActive = False
                 iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
+                self.download_dialog = BeoordelingstoolDownloadDialog()
+                self.download_dialog.show()
 
     def get_selected_manhole(self):
         layer = iface.activeLayer()
