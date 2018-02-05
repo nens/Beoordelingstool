@@ -1101,7 +1101,12 @@ class Beoordelingstool:
             ids = [measuring_point.id() for measuring_point in measuring_points]  # select only the features for which the expression is true
             first_id = ids[0]
             last_id = ids[-1] if ids[-1] else ids[0]
-            self.selected_measuring_station_id = first_id
+            # Show selected measuring station if it belongs to the selected pipe
+            if self.selected_measuring_station_id >= first_id and self.selected_measuring_station_id <= last_id:
+                pass
+            # Show first measuring station that belongs to the selected pipe:
+            else:
+                self.selected_measuring_station_id = first_id
             layer.setSelectedFeatures([int(self.selected_measuring_station_id)])
             new_feature = layer.selectedFeatures()[0]
 
