@@ -47,6 +47,7 @@ import resources
 
 # Import the code for the DockWidget
 from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
+from beoordelingstool_download_dialog import BeoordelingstoolDownloadDialog
 
 BUTTON_DOWNLOAD_RIOOL = "download_riool_search"
 TEXTBOX_DOWNLOAD_RIOOL = "download_riool_text"
@@ -100,6 +101,7 @@ class Beoordelingstool:
 
         self.pluginIsActive = False
         self.dockwidget = None
+        self.download_dialog = None
 
 
     # noinspection PyMethodMayBeStatic
@@ -254,6 +256,8 @@ class Beoordelingstool:
             # Check if the layers manholes, pipes and measuring_stations are active
             if not manholes_layerList or not pipes_layerList or not measuring_stations_layerList:
                 iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
+                self.download_dialog = BeoordelingstoolDownloadDialog()
+                self.download_dialog.show()
             else:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = BeoordelingstoolDockWidget()
