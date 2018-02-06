@@ -295,6 +295,9 @@ class Beoordelingstool:
                 self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
                 self.dockwidget.show()
                 self.pluginIsActive = True
+                # Set the active layer to the manholes layer to be in
+                # compliance with the Manholes tab of the dockwidget.
+                iface.setActiveLayer(manholes_layerList[0])
 
         # Show a message if not all layers are active
         elif self.pluginIsActive:
