@@ -25,6 +25,7 @@ import json
 import osgeo.ogr as ogr
 import osgeo.osr as osr
 import os
+import shutil
 
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
@@ -45,6 +46,8 @@ FILE_TYPE_JSON = "json"
 # HERSTELMAATREGEL_DEFAULT = 1
 # from .utils.constants import FILE_TYPE_JSON
 # from .utils.get_data import get_file
+
+LAYER_STYLES_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layer_styles'))
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'beoordelingstool_download_dialog.ui'))
@@ -172,6 +175,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         for manhole in manholes:
             layer = self.feature_to_manholes_shp(layer, manhole)
         data_source = None
+        # Copy qml as layer style
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "manholes.qml")), os.path.abspath(os.path.join(directory, "manholes.qml")))
         layer = iface.addVectorLayer(manholes_path, "manholes", "ogr")
 
     def save_shapefiles_pipes_measuringpoints(self, directory, pipes):
@@ -218,9 +223,15 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                     measuring_points_layer = self.feature_to_measuring_points_shp(measuring_points_layer, pipe_id, measuring_point)
             pipe_id += 1
         data_source = None
+        # Copy qml as layer style
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "pipes.qml")), os.path.abspath(os.path.join(directory, "pipes.qml")))
         layer = iface.addVectorLayer(pipes_path, "pipes", "ogr")
+
         data_source_measuring_point = None
+        # Copy qml as layer style
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "measuring_points.qml")), os.path.abspath(os.path.join(directory, "measuring_points.qml")))
         measuring_points_layer = iface.addVectorLayer(measuring_points_path, "measuring_points", "ogr")
+
 
     def get_json(self, filename):
         """Function to get a JSON."""
