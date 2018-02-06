@@ -118,12 +118,10 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             """Set the filename in the proper textbox."""
             if TEXTBOX == TEXTBOX_DOWNLOAD_RIOOL:
                 self.download_riool_text.setText(filename)
-                # print filename  # riool.json
 
     def save_shapefiles(self):
         """Save the manholes, pipes and measuring stations shapefiles."""
         directory = self.get_shapefiles_directory()
-        print directory
 
         # Get json
         filename_json = self.download_riool_text.text()
@@ -140,13 +138,14 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             init_path = settings.value('last_used_import_path', type=str)
         except TypeError:
             init_path = os.path.expanduser("~")
-        directory = QFileDialog.getExistingDirectory()
+        directory = QFileDialog.getExistingDirectory(None,
+                                                     'Select directory',
+                                                     init_path)
 
         if directory:
             settings.setValue('last_used_import_path',
                               os.path.dirname(directory))
 
-        # print directory
         return str(directory)
 
     def save_shapefile_manholes(self, directory, manholes):
@@ -161,7 +160,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         # Manholes path
         manholes_path = os.path.join(directory, "manholes.shp")
-        print manholes_path
 
         # Create manhole shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
@@ -897,7 +895,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
     #     measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
 
     #     if manholes_layerList or pipes_layerList or measuring_stations_layerList:
-    #         print("All layers exist")
     #         # dockwidget = BeoordelingstoolDockWidget()
     #         # dockwidget.closingPlugin.connect(dockwidget.closeEvent)
     #         # iface.addDockWidget(Qt.RightDockWidgetArea, dockwidget)
