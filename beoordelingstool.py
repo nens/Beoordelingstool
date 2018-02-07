@@ -852,21 +852,21 @@ def create_measuring_stations_list(measuring_stations_layer):
     measuring_stations_list = []
     for feature in measuring_stations_layer:
         measuring_station = {}
-        if feature["A"] and feature["A"] != "None": measuring_station["A"] = feature["A"]
-        if feature["B"] and feature["B"] != "None": measuring_station["B"] = feature["B"]
-        if feature["C"] and feature["C"] != "None": measuring_station["C"] = feature["C"]
-        if feature["D"] and feature["D"] != "None": measuring_station["D"] = feature["D"]
-        if feature["E"] and feature["E"] != "None": measuring_station["E"] = feature["E"]
-        if feature["F"] and feature["F"] != "None": measuring_station["F"] = feature["F"]
-        if feature["G"] and feature["G"] != "None": measuring_station["G"] = feature["G"]
-        if feature["I"] and feature["I"] != "None": measuring_station["I"] = feature["I"]
-        if feature["J"] and feature["J"] != "None": measuring_station["J"] = feature["J"]
-        if feature["K"] and feature["K"] != "None": measuring_station["K"] = feature["K"]
-        if feature["M"] and feature["M"] != "None": measuring_station["M"] = feature["M"]
-        if feature["N"] and feature["N"] != "None": measuring_station["N"] = feature["N"]
-        if feature["O"] and feature["O"] != "None": measuring_station["O"] = feature["O"]
-        measuring_station["Herstelmaa"] = feature["Herstelmaa"]
-        measuring_station["Opmerking"] = feature["Opmerking"]
+        if feature["A"] and feature["A"] != "None": measuring_station["A"] = str(feature["A"])
+        if feature["B"] and feature["B"] != "None": measuring_station["B"] = str(feature["B"])
+        if feature["C"] and feature["C"] != "None": measuring_station["C"] = str(feature["C"])
+        if feature["D"] and feature["D"] != "None": measuring_station["D"] = str(feature["D"])
+        if feature["E"] and feature["E"] != "None": measuring_station["E"] = str(feature["E"])
+        if feature["F"] and feature["F"] != "None": measuring_station["F"] = str(feature["F"])
+        if feature["G"] and feature["G"] != "None": measuring_station["G"] = str(feature["G"])
+        if feature["I"] and feature["I"] != "None": measuring_station["I"] = str(feature["I"])
+        if feature["J"] and feature["J"] != "None": measuring_station["J"] = str(feature["J"])
+        if feature["K"] and feature["K"] != "None": measuring_station["K"] = str(feature["K"])
+        if feature["M"] and feature["M"] != "None": measuring_station["M"] = str(feature["M"])
+        if feature["N"] and feature["N"] != "None": measuring_station["N"] = str(feature["N"])
+        if feature["O"] and feature["O"] != "None": measuring_station["O"] = str(feature["O"])
+        measuring_station["Herstelmaatregel"] = str(feature["Herstelmaa"])
+        measuring_station["Opmerking"] = str(feature["Opmerking"])
         # x & y of measuring points json are float in the Uploadservice!
         # currently, these properties are saved in the json as tuples  #  x': (146777.899562,)
         measuring_station["y"] = float(feature.geometry().asPoint().y()),
