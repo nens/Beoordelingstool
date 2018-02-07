@@ -36,6 +36,71 @@
      <attribute name="title">
       <string>General</string>
      </attribute>
+     <widget class="QLabel" name="label_project_name">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>411</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Project naam</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupbox_upload_voortgang">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>411</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Upload voortgang</string>
+      </property>
+      <widget class="QPushButton" name="pushbutton_upload_voortgang_json">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>40</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Upload json</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupbox_upload_final">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>130</y>
+        <width>411</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Upload final</string>
+      </property>
+      <widget class="QPushButton" name="pushbutton_upload_final_json">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>40</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Upload json</string>
+       </property>
+      </widget>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_manholes">
      <attribute name="title">

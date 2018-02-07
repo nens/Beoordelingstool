@@ -260,6 +260,8 @@ class Beoordelingstool:
                 # DOWNLOAD
                 # Connect the search buttons with the search_file functions
                 # General tab
+                self.dockwidget.pushbutton_upload_voortgang_json.clicked.connect(
+                    self.convert_shps_to_json_temp)
                 # Manholes tab
                 self.selected_manhole_id = 0
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
@@ -651,3 +653,223 @@ class Beoordelingstool:
         layer.changeAttributeValue(fid, 17, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+
+    def convert_shps_to_json_temp(self):
+        """
+        Convert the manholes, pipes and measuring points shapefiles to a json.
+        """
+        # Check if the manholes, pipes and measuring_points layers exist
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
+        measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        if manholes_layerList and pipes_layerList and measuring_stations_layerList:
+            # Check user login credentials ()
+            # Pipes
+            # Create pipes dict <- function (pipes and measuring point shapefiles as arg), returns pipes json
+            pipes = create_pipes_json(pipes_layerList[0], measuring_stations_layerList[0])
+            # Loop through pipes shapefile and add features of shapefile to the json
+            # if "ZC" -> add measuring points with same pipe id to the json
+            # only add attributes that are not "None" of the measuring points shapefile (because they do no exist in the json)# / NULL/ empty
+            # x & y of measuring points json should be float!
+            # Manholes
+            # Create manholes dict <- function (manholes shp as arg), returns manholes json
+            manholes = create_manholes_json(manholes_layerList[0])
+            # Loop through manholes shapefile and add features of shapefile to the json
+            # Create json of pipes dict and manholes dict
+            json_ = {}
+            json_["pipes"] = pipes
+            json_["manholes"] = manholes
+            import pprint
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(json_)
+            # print json_
+            # Create tempfolder to put json in# nodig?
+            # Save json in tempfolder# nodig?
+            # Upload json to server
+        else:
+            iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer.", level=QgsMessageBar.WARNING, duration=0)
+
+def create_manholes_json(manholes_layer):
+    """
+    Create a manholes dict from the manholes shapefile.
+
+    Args:
+        (shapefile) manholes_shapefile: The manholes shapefile.
+
+    Returns:
+        (dict) manholes: A dict containing the information from the
+            manholes shapefile.
+    """
+    manholes_list = []
+    for feature in manholes_layer.getFeatures():
+        manhole = {
+                "CRS": "Netherlands-RD",
+                "CDC": str(feature["CDC"]),
+                "CCK": str(feature["CCK"]),
+                "CAR": str(feature["CAR"]),
+                "CAQ": str(feature["CAQ"]),
+                "CCQ": str(feature["CCQ"]),
+                "CCP": str(feature["CCP"]),
+                "CCS": str(feature["CCS"]),
+                "CCR": str(feature["CCR"]),
+                "CCM": str(feature["CCM"]),
+                "CAJ": str(feature["CAJ"]),
+                "CCO": str(feature["CCO"]),
+                "CCN": str(feature["CCN"]),
+                "CAO": str(feature["CAO"]),
+                "CAN": str(feature["CAN"]),
+                "CAM": str(feature["CAM"]),
+                "CAL": str(feature["CAL"]),
+                "CCD": str(feature["CCD"]),
+                "CAA": str(feature["CAA"]),
+                "CCA": str(feature["CCA"]),
+                "CCC": str(feature["CCC"]),
+                "CCB": str(feature["CCB"]),
+                "CDD": str(feature["CDD"]),
+                "Herstelmaatregel": str(feature["Herstelmaa"]),
+                "CDB": str(feature["CDB"]),
+                "CBB": str(feature["CBB"]),
+                "CBC": str(feature["CBC"]),
+                "CBA": str(feature["CBA"]),
+                "CBF": str(feature["CBF"]),
+                "CDA": str(feature["CDA"]),
+                "CBD": str(feature["CBD"]),
+                "CBE": str(feature["CBE"]),
+                "CBJ": str(feature["CBJ"]),
+                "CBK": str(feature["CBK"]),
+                "CBH": str(feature["CBH"]),
+                "CBI": str(feature["CBI"]),
+                "CBO": str(feature["CBO"]),
+                "CBL": str(feature["CBL"]),
+                "CBM": str(feature["CBM"]),
+                "CBP": str(feature["CBP"]),
+                "Opmerking": str(feature["Opmerking"]),
+                "y": str(feature.geometry().asPoint().y()),
+                "x": str(feature.geometry().asPoint().x()),
+        }
+        manholes_list.append(manhole)
+
+    return manholes_list
+
+def create_pipes_json(pipes_layer, measuring_stations_layer):
+    """
+    Create a pipes dict from the pipes and measuring stations shapefile.
+    One pipe can have 0/> measuring stations.
+
+    Args:
+        (shapefile) pipes_shapefile: The pipes shapefile.
+        (shapefile) measuring_stations_shapefile: The measuring stations shapefile.
+
+    Returns:
+        (dict) pipes: A dict containing the information from the
+            pipes and measuring stations shapefile.
+    """
+    idx = measuring_stations_layer.fieldNameIndex("PIPE_ID")
+    values = measuring_stations_layer.uniqueValues(idx)
+    pipes_list = []
+    # Loop through pipes shapefile and add features of shapefile to the json
+    for feature in pipes_layer.getFeatures():
+        pipe = {
+            "AAE": str(feature["AAE"]), # list
+            "AAD": str(feature["AAD"]),
+            "AAG": str(feature["AAG"]),  # list!
+            "AAF": str(feature["AAF"]),
+            "AAA": str(feature["AAA"]),
+            "Beginpunt y": str(feature.geometry().asPolyline()[0].y()),
+            "Beginpunt x": str(feature.geometry().asPolyline()[0].x()),
+            "AAM": str(feature["AAM"]),
+            "AAL": str(feature["AAL"]),
+            "AAO": str(feature["AAO"]),
+            "AAN": str(feature["AAN"]),
+            "Eindpunt CRS": "Netherlands-RD",
+            "AAK": str(feature["AAK"]),
+            "AAJ": str(feature["AAJ"]),
+            "ACD": str(feature["ACD"]),
+            "AXA": str(feature["AXA"]),
+            "AAQ": str(feature["AAQ"]),
+            "AAP": str(feature["AAP"]),
+            "ACG": str(feature["ACG"]),
+            "AXH": str(feature["AXH"]),
+            "AXG": str(feature["AXG"]),
+            "AAB": str(feature["AAB"]),
+            "ACK": str(feature["ACK"]),
+            "ACJ": str(feature["ACJ"]),
+            "Beginpunt CRS": "Netherlands-RD",
+            "ACC": str(feature["ACC"]),
+            "ABA": str(feature["ABA"]),
+            "ABB": str(feature["ABB"]),
+            "ABC": str(feature["ABC"]),
+            "ACN": str(feature["ACN"]),
+            "ABE": str(feature["ABE"]),
+            "ABF": str(feature["ABF"]),
+            "ABH": str(feature["ABH"]),
+            "ABI": str(feature["ABI"]),
+            "ABJ": str(feature["ABJ"]),
+            "ABK": str(feature["ABK"]),
+            "ABL": str(feature["ABL"]),
+            "ABM": str(feature["ABM"]),
+            "ABP": str(feature["ABP"]),
+            "ABQ": str(feature["ABQ"]),
+            "ABS": str(feature["ABS"]),
+            "ADB": str(feature["ADB"]),
+            "ACM": str(feature["ACM"]),
+            "ADA": str(feature["ADA"]),
+            "ACB": str(feature["ACB"]),
+            "AXB": str(feature["AXB"]),
+            "Herstelmaatregel": str(feature["Herstelmaa"]),
+            "Eindpunt y": str(feature.geometry().asPolyline()[-1].y()),
+            "Eindpunt x": str(feature.geometry().asPolyline()[-1].x()),
+            "Opmerking": str(feature["Opmerking"]),
+            "AXF": str(feature["AXF"]),
+            "ACA": str(feature["ACA"]),
+            "ADC": str(feature["ADC"]),
+        }
+        # Add measuring stations to the pipe, if the pipe has measuring
+        # stations
+        if feature["ID"] in values:
+            expr = QgsExpression("\"PIPE_ID\" = '{}'".format(feature["ID"]))
+            request = QgsFeatureRequest(expr)
+            measuring_stations_layer_specific_pipe = measuring_stations_layer.getFeatures(request)
+            pipe["ZC"] = create_measuring_stations_list(measuring_stations_layer_specific_pipe)
+        pipes_list.append(pipe)
+
+    return pipes_list
+
+def create_measuring_stations_list(measuring_stations_layer):
+    """
+    Create a list from the measuring stations shapefile.
+    A list item is a json, representing a measuring station.
+
+    Args:
+        (shapefile) measuring_stations_shapefile: The measuring stations 
+            shapefile.
+
+    Returns:
+        (list) measuring_station_list: A list containing the information from
+            the measuring stations shapefile. A list item is a measuring
+            station, represented by a json.
+    """
+    measuring_stations_list = []
+    for feature in measuring_stations_layer:
+        measuring_station = {}
+        if feature["A"] and feature["A"] != "None": measuring_station["A"] = feature["A"]
+        if feature["B"] and feature["B"] != "None": measuring_station["B"] = feature["B"]
+        if feature["C"] and feature["C"] != "None": measuring_station["C"] = feature["C"]
+        if feature["D"] and feature["D"] != "None": measuring_station["D"] = feature["D"]
+        if feature["E"] and feature["E"] != "None": measuring_station["E"] = feature["E"]
+        if feature["F"] and feature["F"] != "None": measuring_station["F"] = feature["F"]
+        if feature["G"] and feature["G"] != "None": measuring_station["G"] = feature["G"]
+        if feature["I"] and feature["I"] != "None": measuring_station["I"] = feature["I"]
+        if feature["J"] and feature["J"] != "None": measuring_station["J"] = feature["J"]
+        if feature["K"] and feature["K"] != "None": measuring_station["K"] = feature["K"]
+        if feature["M"] and feature["M"] != "None": measuring_station["M"] = feature["M"]
+        if feature["N"] and feature["N"] != "None": measuring_station["N"] = feature["N"]
+        if feature["O"] and feature["O"] != "None": measuring_station["O"] = feature["O"]
+        measuring_station["Herstelmaa"] = feature["Herstelmaa"]
+        measuring_station["Opmerking"] = feature["Opmerking"]
+        # x & y of measuring points json are float in the Uploadservice!
+        # currently, these properties are saved in the json as tuples  #  x': (146777.899562,)
+        measuring_station["y"] = float(feature.geometry().asPoint().y()),
+        measuring_station["x"] = float(feature.geometry().asPoint().x()),
+        measuring_stations_list.append(measuring_station)
+    return measuring_stations_list
