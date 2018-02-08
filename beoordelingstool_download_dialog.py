@@ -666,9 +666,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         AAA = pipe["AAA"]
         AAB = pipe["AAB"]
         AAD = pipe["AAD"]
-        AAE = pipe["AAE"]
+        AAE = ", ".join(pipe["AAE"])
         AAF = pipe["AAF"]
-        AAG = pipe["AAG"]
+        AAG = ", ".join(pipe["AAG"])
         AAJ = pipe["AAJ"]
         AAK = pipe["AAK"]
         AAL = pipe["AAL"]
@@ -867,7 +867,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         M = measuring_point.get("M", None)
         N = measuring_point.get("N", None)
         O = measuring_point.get("O", None)
-        herstelmaatregel = measuring_point["Herstelmaatregel"] if measuring_point["Herstelmaatregel"] else 1
+        herstelmaatregel = measuring_point["Herstelmaatregel"] if measuring_point["Herstelmaatregel"] else ""
         # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
         opmerking = measuring_point["Opmerking"] if measuring_point["Opmerking"] else ""
 

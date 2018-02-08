@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import json
 import os.path
 import re
 
@@ -679,11 +680,14 @@ class Beoordelingstool:
             json_ = {}
             json_["pipes"] = pipes
             json_["manholes"] = manholes
-            import pprint
-            pp = pprint.PrettyPrinter(indent=4)
-            pp.pprint(json_)
+            # import pprint
+            # pp = pprint.PrettyPrinter(indent=4)
+            # pp.pprint(json_)
             # print json_
             # Create tempfolder to put json in# nodig?
+            json_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data.json')
+            with open(json_path, 'w') as outfile:
+                json.dump(json_, outfile, indent=2)
             # Save json in tempfolder# nodig?
             # Upload json to server
         else:
@@ -702,50 +706,52 @@ def create_manholes_json(manholes_layer):
     """
     manholes_list = []
     for feature in manholes_layer.getFeatures():
+        herstelmaatregel = str(feature["Herstelmaa"]) if str(feature["Herstelmaa"]) is not "NULL" else ""
+        opmerking = str(feature["Opmerking"]) if str(feature["Opmerking"]) is not "NULL" else ""
         manhole = {
-                "CRS": "Netherlands-RD",
-                "CDC": str(feature["CDC"]),
-                "CCK": str(feature["CCK"]),
-                "CAR": str(feature["CAR"]),
-                "CAQ": str(feature["CAQ"]),
-                "CCQ": str(feature["CCQ"]),
-                "CCP": str(feature["CCP"]),
-                "CCS": str(feature["CCS"]),
-                "CCR": str(feature["CCR"]),
-                "CCM": str(feature["CCM"]),
-                "CAJ": str(feature["CAJ"]),
-                "CCO": str(feature["CCO"]),
-                "CCN": str(feature["CCN"]),
-                "CAO": str(feature["CAO"]),
-                "CAN": str(feature["CAN"]),
-                "CAM": str(feature["CAM"]),
-                "CAL": str(feature["CAL"]),
-                "CCD": str(feature["CCD"]),
-                "CAA": str(feature["CAA"]),
-                "CCA": str(feature["CCA"]),
-                "CCC": str(feature["CCC"]),
-                "CCB": str(feature["CCB"]),
-                "CDD": str(feature["CDD"]),
-                "Herstelmaatregel": str(feature["Herstelmaa"]),
-                "CDB": str(feature["CDB"]),
-                "CBB": str(feature["CBB"]),
-                "CBC": str(feature["CBC"]),
-                "CBA": str(feature["CBA"]),
-                "CBF": str(feature["CBF"]),
-                "CDA": str(feature["CDA"]),
-                "CBD": str(feature["CBD"]),
-                "CBE": str(feature["CBE"]),
-                "CBJ": str(feature["CBJ"]),
-                "CBK": str(feature["CBK"]),
-                "CBH": str(feature["CBH"]),
-                "CBI": str(feature["CBI"]),
-                "CBO": str(feature["CBO"]),
-                "CBL": str(feature["CBL"]),
-                "CBM": str(feature["CBM"]),
-                "CBP": str(feature["CBP"]),
-                "Opmerking": str(feature["Opmerking"]),
-                "y": str(feature.geometry().asPoint().y()),
-                "x": str(feature.geometry().asPoint().x()),
+            "CRS": "Netherlands-RD",
+            "CDC": str(feature["CDC"]),
+            "CCK": str(feature["CCK"]),
+            "CAR": str(feature["CAR"]),
+            "CAQ": str(feature["CAQ"]),
+            "CCQ": str(feature["CCQ"]),
+            "CCP": str(feature["CCP"]),
+            "CCS": str(feature["CCS"]),
+            "CCR": str(feature["CCR"]),
+            "CCM": str(feature["CCM"]),
+            "CAJ": str(feature["CAJ"]),
+            "CCO": str(feature["CCO"]),
+            "CCN": str(feature["CCN"]),
+            "CAO": str(feature["CAO"]),
+            "CAN": str(feature["CAN"]),
+            "CAM": str(feature["CAM"]),
+            "CAL": str(feature["CAL"]),
+            "CCD": str(feature["CCD"]),
+            "CAA": str(feature["CAA"]),
+            "CCA": str(feature["CCA"]),
+            "CCC": str(feature["CCC"]),
+            "CCB": str(feature["CCB"]),
+            "CDD": str(feature["CDD"]),
+            "Herstelmaatregel": herstelmaatregel,
+            "CDB": str(feature["CDB"]),
+            "CBB": str(feature["CBB"]),
+            "CBC": str(feature["CBC"]),
+            "CBA": str(feature["CBA"]),
+            "CBF": str(feature["CBF"]),
+            "CDA": str(feature["CDA"]),
+            "CBD": str(feature["CBD"]),
+            "CBE": str(feature["CBE"]),
+            "CBJ": str(feature["CBJ"]),
+            "CBK": str(feature["CBK"]),
+            "CBH": str(feature["CBH"]),
+            "CBI": str(feature["CBI"]),
+            "CBO": str(feature["CBO"]),
+            "CBL": str(feature["CBL"]),
+            "CBM": str(feature["CBM"]),
+            "CBP": str(feature["CBP"]),
+            "Opmerking": opmerking,
+            "y": str(feature.geometry().asPoint().y()),
+            "x": str(feature.geometry().asPoint().x()),
         }
         manholes_list.append(manhole)
 
@@ -769,10 +775,12 @@ def create_pipes_json(pipes_layer, measuring_stations_layer):
     pipes_list = []
     # Loop through pipes shapefile and add features of shapefile to the json
     for feature in pipes_layer.getFeatures():
+        herstelmaatregel = str(feature["Herstelmaa"]) if str(feature["Herstelmaa"]) is not "NULL" else ""
+        opmerking = str(feature["Opmerking"]) if str(feature["Opmerking"]) is not "NULL" else ""
         pipe = {
-            "AAE": str(feature["AAE"]), # list
+            "AAE": feature["AAE"].split(', '),
             "AAD": str(feature["AAD"]),
-            "AAG": str(feature["AAG"]),  # list!
+            "AAG": feature["AAG"].split(', '),
             "AAF": str(feature["AAF"]),
             "AAA": str(feature["AAA"]),
             "Beginpunt y": str(feature.geometry().asPolyline()[0].y()),
@@ -816,10 +824,10 @@ def create_pipes_json(pipes_layer, measuring_stations_layer):
             "ADA": str(feature["ADA"]),
             "ACB": str(feature["ACB"]),
             "AXB": str(feature["AXB"]),
-            "Herstelmaatregel": str(feature["Herstelmaa"]),
+            "Herstelmaatregel": herstelmaatregel,
             "Eindpunt y": str(feature.geometry().asPolyline()[-1].y()),
             "Eindpunt x": str(feature.geometry().asPolyline()[-1].x()),
-            "Opmerking": str(feature["Opmerking"]),
+            "Opmerking": opmerking,
             "AXF": str(feature["AXF"]),
             "ACA": str(feature["ACA"]),
             "ADC": str(feature["ADC"]),
@@ -865,11 +873,12 @@ def create_measuring_stations_list(measuring_stations_layer):
         if feature["M"] and feature["M"] != "None": measuring_station["M"] = str(feature["M"])
         if feature["N"] and feature["N"] != "None": measuring_station["N"] = str(feature["N"])
         if feature["O"] and feature["O"] != "None": measuring_station["O"] = str(feature["O"])
-        measuring_station["Herstelmaatregel"] = str(feature["Herstelmaa"])
-        measuring_station["Opmerking"] = str(feature["Opmerking"])
-        # x & y of measuring points json are float in the Uploadservice!
-        # currently, these properties are saved in the json as tuples  #  x': (146777.899562,)
-        measuring_station["y"] = float(feature.geometry().asPoint().y()),
-        measuring_station["x"] = float(feature.geometry().asPoint().x()),
+        herstelmaatregel = str(feature["Herstelmaa"]) if str(feature["Herstelmaa"]) is not "NULL" else ""
+        measuring_station["Herstelmaatregel"] = herstelmaatregel
+        opmerking = str(feature["Opmerking"]) if str(feature["Opmerking"]) is not "NULL" else ""
+        measuring_station["Opmerking"] = opmerking
+        # x & y of measuring points json are saved in the json as tuples  #  x': (146777.899562,)
+        measuring_station["y"] = float(feature.geometry().asPoint().y())
+        measuring_station["x"] = float(feature.geometry().asPoint().x())
         measuring_stations_list.append(measuring_station)
     return measuring_stations_list
