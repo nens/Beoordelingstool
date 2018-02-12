@@ -1,5 +1,11 @@
 # Changelog
 
+0.2 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
 0.1 (2018-02-12)
 
 # Create 3 shapefiles of local json ('manholes', 'pipes' and 'measuring_stations') and save locally.
