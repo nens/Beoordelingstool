@@ -26,6 +26,8 @@ import os
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
 
+from .utils.constants import HERSTELMAATREGELEN
+
 TEXTBOX_DOWNLOAD_PUTTEN = "download_rioolputten_text"
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -45,10 +47,17 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.add_herstelmaatregelen()
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
         event.accept()
+
+    def add_herstelmaatregelen(self):
+        """Add the herstelmaatregelen to the comboboxes"""
+        self.field_combobox_manholes.addItems(HERSTELMAATREGELEN)
+        self.field_combobox_pipes.addItems(HERSTELMAATREGELEN)
+        self.field_combobox_measuring_stations.addItems(HERSTELMAATREGELEN)
 
     def set_filename(self, TEXTBOX, filename):
         """Set the filename in the proper textbox."""
