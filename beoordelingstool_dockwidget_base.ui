@@ -166,21 +166,6 @@
          <height>27</height>
         </rect>
        </property>
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
       </widget>
       <widget class="QLabel" name="value_label_manholes">
        <property name="geometry">
@@ -501,21 +486,6 @@
          <height>27</height>
         </rect>
        </property>
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
       </widget>
       <widget class="QLabel" name="value_label_pipes">
        <property name="geometry">
@@ -915,21 +885,6 @@
          <height>27</height>
         </rect>
        </property>
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
       </widget>
       <widget class="QLabel" name="value_label_measuring_stations">
        <property name="geometry">
