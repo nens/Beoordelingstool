@@ -71,7 +71,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Upload json</string>
+        <string>Save json</string>
        </property>
       </widget>
      </widget>
