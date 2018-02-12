@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1 (unreleased)
+0.1 (2018-02-12)
 
 # Create 3 shapefiles of local json ('manholes', 'pipes' and 'measuring_stations') and save locally.
 # Users can change the Herstelmaatregel and Opmerking attribute of these shapefiles with the dockwidget if te 3 layers are layers in QGIS.
