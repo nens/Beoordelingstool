@@ -317,6 +317,7 @@ class Beoordelingstool:
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
+            self.dockwidget.field_combobox_manholes.setCurrentIndex(self.dockwidget.field_combobox_manholes.findText(str(f["Herstelmaa"]))) if self.dockwidget.field_combobox_manholes.findText(str(f["Herstelmaa"])) else self.dockwidget.field_combobox_manholes.setCurrentIndex(0)
             self.dockwidget.value_plaintextedit_manholes.setPlainText(str(f["Opmerking"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f["CAA"]))
             self.dockwidget.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAJ"]))
@@ -374,6 +375,7 @@ class Beoordelingstool:
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
+            self.dockwidget.field_combobox_pipes.setCurrentIndex(self.dockwidget.field_combobox_pipes.findText(str(f["Herstelmaa"]))) if self.dockwidget.field_combobox_pipes.findText(str(f["Herstelmaa"])) else self.dockwidget.field_combobox_pipes.setCurrentIndex(0)
             self.dockwidget.value_plaintextedit_pipes.setPlainText(str(f["Opmerking"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 0, QTableWidgetItem(f["AAA"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 1, QTableWidgetItem(f["AAB"]))
@@ -460,6 +462,7 @@ class Beoordelingstool:
             new_feature = layer.selectedFeatures()[0]
 
             # Set values
+            self.dockwidget.field_combobox_measuring_stations.setCurrentIndex(self.dockwidget.field_combobox_measuring_stations.findText(str(new_feature["Herstelmaa"]))) if self.dockwidget.field_combobox_measuring_stations.findText(str(new_feature["Herstelmaa"])) else self.dockwidget.field_combobox_measuring_stations.setCurrentIndex(0)
             self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(new_feature["Opmerking"] if new_feature["Opmerking"] else '')
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
@@ -484,6 +487,7 @@ class Beoordelingstool:
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
+            self.dockwidget.field_combobox_measuring_stations.setCurrentIndex(self.dockwidget.field_combobox_measuring_stations.findText(str(f["Herstelmaa"]))) if self.dockwidget.field_combobox_measuring_stations.findText(str(f["Herstelmaa"])) else self.dockwidget.field_combobox_measuring_stations.setCurrentIndex(0)
             self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(str(f["Opmerking"]))
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(f["PIPE_ID"]))
             self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(f["A"]))
@@ -522,6 +526,7 @@ class Beoordelingstool:
                 # Set values
                 self.selected_measuring_station_id = measuring_station_id_new
                 # Update Measuring stations tab and tablewidget
+                self.dockwidget.field_combobox_measuring_stations.setCurrentIndex(self.dockwidget.field_combobox_measuring_stations.findText(str(new_feature["Herstelmaa"]))) if self.dockwidget.field_combobox_measuring_stations.findText(str(new_feature["Herstelmaa"])) else self.dockwidget.field_combobox_measuring_stations.setCurrentIndex(0)
                 self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(new_feature["Opmerking"] if new_feature["Opmerking"] else '')
                 self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
                 self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
@@ -552,6 +557,7 @@ class Beoordelingstool:
             layer = layerList[0]
             layer.setSelectedFeatures([int(self.selected_pipe_id)])
             new_feature = layer.selectedFeatures()[0]
+            self.dockwidget.field_combobox_pipes.setCurrentIndex(self.dockwidget.field_combobox_pipes.findText(str(new_feature["Herstelmaa"]))) if self.dockwidget.field_combobox_pipes.findText(str(new_feature["Herstelmaa"])) else self.dockwidget.field_combobox_pipes.setCurrentIndex(0)
             self.dockwidget.value_plaintextedit_pipes.setPlainText(str(new_feature["Opmerking"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 0, QTableWidgetItem(new_feature["AAA"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 1, QTableWidgetItem(new_feature["AAB"]))
@@ -624,6 +630,8 @@ class Beoordelingstool:
                 # Set values
                 self.selected_measuring_station_id = measuring_station_id_new
                 # Update Measuring stations tab and tablewidget
+
+                self.dockwidget.field_combobox_measuring_stations.setCurrentIndex(self.dockwidget.field_combobox_measuring_stations.findText(str(new_feature["Herstelmaa"]))) if self.dockwidget.field_combobox_measuring_stations.findText(str(new_feature["Herstelmaa"])) else self.dockwidget.field_combobox_measuring_stations.setCurrentIndex(0)
                 self.dockwidget.value_plaintextedit_measuring_stations.setPlainText(new_feature["Opmerking"] if new_feature["Opmerking"] else '')
                 self.dockwidget.tablewidget_measuring_stations.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
                 self.dockwidget.tablewidget_measuring_stations.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
