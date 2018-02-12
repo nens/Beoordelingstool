@@ -1,6 +1,6 @@
 # Changelog
 
-0.2 (unreleased)
+0.2 (2018-02-12)
 ----------------
 
 # Features are red by default, but become green when they get a 'Herstelmaatregel' ('Opmerking' is no longer required).
