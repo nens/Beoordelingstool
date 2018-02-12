@@ -1,0 +1,1071 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DockWidget</class>
+ <widget class="QDockWidget" name="DockWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>431</width>
+    <height>578</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Beoordelingstool</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>431</width>
+      <height>551</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="tab_general">
+     <attribute name="title">
+      <string>General</string>
+     </attribute>
+     <widget class="QLabel" name="label_project_name">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>411</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Project naam</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupbox_upload_voortgang">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>411</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Upload voortgang</string>
+      </property>
+      <widget class="QPushButton" name="pushbutton_upload_voortgang_json">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>40</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Upload json</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupbox_upload_final">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>130</y>
+        <width>411</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Upload final</string>
+      </property>
+      <widget class="QPushButton" name="pushbutton_upload_final_json">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>40</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Upload json</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_manholes">
+     <attribute name="title">
+      <string>Manholes</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupbox_manholes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>411</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Manholes</string>
+      </property>
+      <widget class="QPushButton" name="pushbutton_get_selected_manhole">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>30</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Get selected manhole</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupbox_attributes_manholes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>411</width>
+        <height>231</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Attributes</string>
+      </property>
+      <widget class="QLabel" name="field_label_manhole">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>40</y>
+         <width>121</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Herstelmaatregel</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="field_combobox_manholes">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>40</y>
+         <width>281</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="value_label_manholes">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>120</y>
+         <width>121</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Opmerking</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushbutton_save_attribute_manholes">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>190</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Save attribute</string>
+       </property>
+      </widget>
+      <widget class="QPlainTextEdit" name="value_plaintextedit_manholes">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>90</y>
+         <width>281</width>
+         <height>81</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QTableWidget" name="tablewidget_manholes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>310</y>
+        <width>411</width>
+        <height>201</height>
+       </rect>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="tabKeyNavigation">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>350</number>
+      </attribute>
+      <row>
+       <property name="text">
+        <string>CAA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAJ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAM</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAN</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAO</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAQ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CAR</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBC</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBD</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBE</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBF</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBH</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBI</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBJ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBK</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBM</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBO</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CBP</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCC</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCD</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCK</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCM</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCN</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCO</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCP</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCQ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCR</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CCS</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CDA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CDB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>CDD</string>
+       </property>
+      </row>
+      <column>
+       <property name="text">
+        <string>Value</string>
+       </property>
+      </column>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_pipes">
+     <attribute name="title">
+      <string>Pipes</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupbox_pipes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>411</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Pipes</string>
+      </property>
+      <widget class="QPushButton" name="pushbutton_get_selected_pipe">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>30</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Get selected pipe</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushbutton_pipe_to_measuring_station">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>80</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Measuring stations</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupbox_attributes_pipes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>411</width>
+        <height>241</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Attributes</string>
+      </property>
+      <widget class="QLabel" name="field_label_pipes">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>40</y>
+         <width>121</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Herstelmaatregel</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="field_combobox_pipes">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>40</y>
+         <width>281</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="value_label_pipes">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>120</y>
+         <width>121</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Opmerking</string>
+       </property>
+      </widget>
+      <widget class="QPlainTextEdit" name="value_plaintextedit_pipes">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>90</y>
+         <width>281</width>
+         <height>81</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushbutton_save_attribute_pipes">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>190</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Save attribute</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QTableWidget" name="tablewidget_pipes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>380</y>
+        <width>411</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="tabKeyNavigation">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>350</number>
+      </attribute>
+      <row>
+       <property name="text">
+        <string>AAA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAD</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAE</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAF</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAG</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAJ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAK</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAL</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAM</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAN</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAO</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAP</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AAQ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABC</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABE</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABF</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABH</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABI</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABJ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABK</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABL</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABM</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABP</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABQ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ABS</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACC</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACD</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACG</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACJ</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACK</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACM</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ACN</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ADA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ADB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ADC</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AXA</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AXB</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AXF</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AXG</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>AXH</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>ZC</string>
+       </property>
+      </row>
+      <column>
+       <property name="text">
+        <string>Value</string>
+       </property>
+      </column>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_measuring_stations">
+     <attribute name="title">
+      <string>Measuring stations</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupbox_measuring_stations">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>411</width>
+        <height>111</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Measuring stations</string>
+      </property>
+      <widget class="QPushButton" name="pushbutton_measuring_station_to_pipe">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>80</y>
+         <width>101</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Back to pipe</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushbutton_measuring_stations_previous">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>80</y>
+         <width>99</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Previous</string>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushbutton_measuring_stations_next">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>80</y>
+         <width>99</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Next</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushbutton_get_selected_measuring_station">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>30</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Get measuring station</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupbox_attributes_measuring_stations">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>411</width>
+        <height>241</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Attributes</string>
+      </property>
+      <widget class="QLabel" name="field_label_measuring_stations">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>40</y>
+         <width>121</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Herstelmaatregel</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="field_combobox_measuring_stations">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>40</y>
+         <width>281</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="value_label_measuring_stations">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>120</y>
+         <width>121</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Opmerking</string>
+       </property>
+      </widget>
+      <widget class="QPlainTextEdit" name="value_plaintextedit_measuring_stations">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>90</y>
+         <width>281</width>
+         <height>81</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushbutton_save_attribute_measuring_stations">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>190</y>
+         <width>161</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Save attribute</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QTableWidget" name="tablewidget_measuring_stations">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>380</y>
+        <width>411</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="tabKeyNavigation">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>350</number>
+      </attribute>
+      <row>
+       <property name="text">
+        <string>PIPE_ID</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>A</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>B</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>C</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>D</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>E</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>F</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>G</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>I</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>J</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>K</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>M</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>N</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>O</string>
+       </property>
+      </row>
+      <column>
+       <property name="text">
+        <string>Value</string>
+       </property>
+      </column>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
