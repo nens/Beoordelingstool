@@ -48,7 +48,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Download</string>
+    <string>Open gedownloade json</string>
    </property>
    <widget class="QLabel" name="download_riool_label">
     <property name="geometry">
