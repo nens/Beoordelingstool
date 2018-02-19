@@ -100,7 +100,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             init_path = os.path.expanduser("~")
         if file_type == FILE_TYPE_JSON:
           filename = QFileDialog.getOpenFileName(None,
-                                                 'Select import file',
+                                                 'Select json',
                                                  init_path,
                                                  'JSON (*.json)')
 
