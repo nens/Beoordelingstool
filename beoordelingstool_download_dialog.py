@@ -136,7 +136,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         except TypeError:
             init_path = os.path.expanduser("~")
         directory = QFileDialog.getExistingDirectory(None,
-                                                     'Select directory',
+                                                     'Save shapefiles',
                                                      init_path)
 
         if directory:
