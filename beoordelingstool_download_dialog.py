@@ -32,20 +32,10 @@ from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import QSettings
 from PyQt4.QtGui import QFileDialog
-# from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
-# from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
-
-BUTTON_DOWNLOAD_RIOOL = "download_riool_search"
-TEXTBOX_DOWNLOAD_RIOOL = "download_riool_text"
-# from .utils.constants import BUTTON_DOWNLOAD_PUTTEN
-# from .utils.constants import TEXTBOX_DOWNLOAD_PUTTEN
 FILE_TYPE_JSON = "json"
-# HERSTELMAATREGEL_DEFAULT = 1
-# from .utils.constants import FILE_TYPE_JSON
-# from .utils.get_data import get_file
 
 LAYER_STYLES_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layer_styles'))
 
@@ -70,8 +60,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Get json
         self.download_riool_search.clicked.connect(self.search_json_riool)
         # Save json in 3 shapefiles: manholes, pipes and measuring_points
-        # self.save_shapefiles_button.clicked.connect(
-        #     self.save_shapefiles)
         self.accepted.connect(self.save_shapefiles)
         # # Show dockwidget after pressing OK with all 3 layers
         # self.accepted.connect(self.show_dockwidget)
@@ -84,19 +72,26 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
     def search_json_riool(self):
         """Get the json of 'Rioolputten'."""
-        self.search_file(BUTTON_DOWNLOAD_RIOOL)
-
-    def search_file(self, BUTTON):
-        """Function to search a file."""
-        # if BUTTON == BUTTON_DOWNLOAD_RIOOL:
-        #     textbox = TEXTBOX_DOWNLOAD_RIOOL
         file_type = FILE_TYPE_JSON
+        self.search_file(file_type)
+
+    def search_file(self, file_type):
+        """
+        Function to search a file.
+
+        Args:
+            (str) file_type: The type of file.
+        """
         filename = self.get_file(file_type)
         self.json_path = filename
-        # self.set_filename(textbox, filename)
 
     def get_file(self, file_type):
-        """Function to get a file."""
+        """
+        Function to get a file.
+
+        Args:
+            (str) file_type: The type of file.
+        """
         settings = QSettings('beoordelingstool', 'qgisplugin')
 
         try:
@@ -114,11 +109,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                               os.path.dirname(filename))
 
         return filename
-
-    # def set_filename(self, TEXTBOX, filename):
-    #         """Set the filename in the proper textbox."""
-    #         if TEXTBOX == TEXTBOX_DOWNLOAD_RIOOL:
-    #             self.download_riool_text.setText(filename)
 
     def save_shapefiles(self):
         """Save the manholes, pipes and measuring stations shapefiles."""

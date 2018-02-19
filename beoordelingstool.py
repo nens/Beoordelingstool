@@ -47,16 +47,6 @@ import resources
 from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
 from beoordelingstool_download_dialog import BeoordelingstoolDownloadDialog
 
-BUTTON_DOWNLOAD_RIOOL = "download_riool_search"
-# TEXTBOX_DOWNLOAD_RIOOL = "download_riool_text"
-# from .utils.constants import BUTTON_DOWNLOAD_PUTTEN
-# from .utils.constants import TEXTBOX_DOWNLOAD_PUTTEN
-FILE_TYPE_JSON = "json"
-# HERSTELMAATREGEL_DEFAULT = 1
-# from .utils.constants import FILE_TYPE_JSON
-# from .utils.get_data import get_file
-
-
 class Beoordelingstool:
     """QGIS Plugin Implementation."""
 
