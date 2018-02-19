@@ -70,20 +70,17 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Get json
         self.download_riool_search.clicked.connect(self.search_json_riool)
         # Save json in 3 shapefiles: manholes, pipes and measuring_points
-        self.save_shapefiles_button.clicked.connect(
-            self.save_shapefiles)
+        # self.save_shapefiles_button.clicked.connect(
+        #     self.save_shapefiles)
+        self.accepted.connect(self.save_shapefiles)
         # # Show dockwidget after pressing OK with all 3 layers
         # self.accepted.connect(self.show_dockwidget)
+        self.json_path = ''
 
     def closeEvent(self, event):
         # self.closingPlugin.emit()
         # event.accept()
         pass
-
-    def set_filename(self, TEXTBOX, filename):
-        """Set the filename in the proper textbox."""
-        if TEXTBOX == TEXTBOX_DOWNLOAD_PUTTEN:
-            self.download_rioolputten_text.setText(filename)
 
     def search_json_riool(self):
         """Get the json of 'Rioolputten'."""
@@ -91,11 +88,12 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
     def search_file(self, BUTTON):
         """Function to search a file."""
-        if BUTTON == BUTTON_DOWNLOAD_RIOOL:
-            textbox = TEXTBOX_DOWNLOAD_RIOOL
+        # if BUTTON == BUTTON_DOWNLOAD_RIOOL:
+        #     textbox = TEXTBOX_DOWNLOAD_RIOOL
         file_type = FILE_TYPE_JSON
         filename = self.get_file(file_type)
-        self.set_filename(textbox, filename)
+        self.json_path = filename
+        # self.set_filename(textbox, filename)
 
     def get_file(self, file_type):
         """Function to get a file."""
@@ -117,17 +115,17 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         return filename
 
-    def set_filename(self, TEXTBOX, filename):
-            """Set the filename in the proper textbox."""
-            if TEXTBOX == TEXTBOX_DOWNLOAD_RIOOL:
-                self.download_riool_text.setText(filename)
+    # def set_filename(self, TEXTBOX, filename):
+    #         """Set the filename in the proper textbox."""
+    #         if TEXTBOX == TEXTBOX_DOWNLOAD_RIOOL:
+    #             self.download_riool_text.setText(filename)
 
     def save_shapefiles(self):
         """Save the manholes, pipes and measuring stations shapefiles."""
         directory = self.get_shapefiles_directory()
 
         # Get json
-        filename_json = self.download_riool_text.text()
+        filename_json = self.json_path
         manholes, pipes = self.get_json(filename_json)
 
         self.save_shapefile_manholes(directory, manholes)
@@ -150,6 +148,18 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                               os.path.dirname(directory))
 
         return str(directory)
+
+    def get_json(self, filename):
+        """Function to get a JSON."""
+        manholes = []
+        pipes = []
+        with open(filename) as json_file:
+            json_data = json.load(json_file)
+            for manhole in json_data["manholes"]:
+                manholes.append(manhole)
+            for pipe in json_data["pipes"]:
+                pipes.append(pipe)
+        return (manholes, pipes)
 
     def save_shapefile_manholes(self, directory, manholes):
         """
@@ -231,19 +241,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Copy qml as layer style
         shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "measuring_points.qml")), os.path.abspath(os.path.join(directory, "measuring_points.qml")))
         measuring_points_layer = iface.addVectorLayer(measuring_points_path, "measuring_points", "ogr")
-
-
-    def get_json(self, filename):
-        """Function to get a JSON."""
-        manholes = []
-        pipes = []
-        with open(filename) as json_file:
-            json_data = json.load(json_file)
-            for manhole in json_data["manholes"]:
-                manholes.append(manhole)
-            for pipe in json_data["pipes"]:
-                pipes.append(pipe)
-        return (manholes, pipes)
 
     def fields_to_manholes_shp(self, layer, location):
         """
@@ -852,8 +849,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (shapefile layer) layer: A shapefile layer.
         """
         # Get values
-        x = measuring_point["x"] if measuring_point["x"] else 0.0
-        y = measuring_point["y"] if measuring_point["y"] else 0.0
+        x = float(measuring_point["x"]) if measuring_point["x"] else 0.0
+        y = float(measuring_point["y"]) if measuring_point["y"] else 0.0
         A = measuring_point.get("A", None)
         B = measuring_point.get("B", None)
         C = measuring_point.get("C", None)

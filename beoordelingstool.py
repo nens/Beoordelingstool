@@ -48,7 +48,7 @@ from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
 from beoordelingstool_download_dialog import BeoordelingstoolDownloadDialog
 
 BUTTON_DOWNLOAD_RIOOL = "download_riool_search"
-TEXTBOX_DOWNLOAD_RIOOL = "download_riool_text"
+# TEXTBOX_DOWNLOAD_RIOOL = "download_riool_text"
 # from .utils.constants import BUTTON_DOWNLOAD_PUTTEN
 # from .utils.constants import TEXTBOX_DOWNLOAD_PUTTEN
 FILE_TYPE_JSON = "json"
