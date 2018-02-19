@@ -119,9 +119,11 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 # Get json
                 filename_json = self.json_path
                 manholes, pipes = self.get_json(filename_json)
-
+                # Save shapefiles
                 self.save_shapefile_manholes(directory, manholes)
                 self.save_shapefiles_pipes_measuringpoints(directory, pipes)
+            else:
+                iface.messageBar().pushMessage("Warning", "No shapefile directory found.", level=QgsMessageBar.WARNING, duration=0)
         else:
             iface.messageBar().pushMessage("Warning", "No json found.", level=QgsMessageBar.WARNING, duration=0)
 
