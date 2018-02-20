@@ -49,6 +49,11 @@ from beoordelingstool_download_dialog import BeoordelingstoolDownloadDialog
 
 # Import constants
 from .utils.constants import JSON_NAME
+from .utils.constants import JSON_KEY_PROJ
+from .utils.constants import JSON_KEY_NAME
+from .utils.constants import JSON_KEY_URL
+from .utils.constants import JSON_KEY_URL_JSON
+from .utils.constants import JSON_KEY_URL_ZIP
 
 class Beoordelingstool:
     """QGIS Plugin Implementation."""
@@ -323,8 +328,8 @@ class Beoordelingstool:
             layer_dir = get_layer_dir(manholes_layerList[0])
             json_path = os.path.join(layer_dir, JSON_NAME)
             data = json.load(open(json_path))
-            if data["project_name"]:
-                self.dockwidget.label_project_name.setText(data["project_name"])
+            if data[JSON_KEY_PROJ][JSON_KEY_NAME]:
+                self.dockwidget.label_project_name.setText(data[JSON_KEY_PROJ][JSON_KEY_NAME])
             else:
                 iface.messageBar().pushMessage("Warning", "No project name defined.", level=QgsMessageBar.WARNING, duration=0)
 
@@ -705,13 +710,35 @@ class Beoordelingstool:
             # Loop through manholes shapefile and add features of shapefile to the json
             # Create json of pipes dict and manholes dict
             json_ = {}
+            json_project = {}
+            if json_path:
+                data = json.load(open(json_path))
+                if data[JSON_KEY_PROJ][JSON_KEY_NAME]:
+                    json_project[JSON_KEY_NAME] = data[JSON_KEY_PROJ][JSON_KEY_NAME]
+                else:
+                    iface.messageBar().pushMessage("Error", "No project name found.", level=QgsMessageBar.ERROR, duration=0)
+                    return
+                if data[JSON_KEY_PROJ][JSON_KEY_URL]:
+                    json_project[JSON_KEY_URL] = data[JSON_KEY_PROJ][JSON_KEY_URL]
+                else:
+                    iface.messageBar().pushMessage("Error", "No project url found.", level=QgsMessageBar.ERROR, duration=0)
+                    return
+                if data[JSON_KEY_PROJ][JSON_KEY_URL_JSON]:
+                    json_project[JSON_KEY_URL_JSON] = data[JSON_KEY_PROJ][JSON_KEY_URL_JSON]
+                else:
+                    iface.messageBar().pushMessage("Error", "No upload url found for the JSON.", level=QgsMessageBar.ERROR, duration=0)
+                    return
+                if data[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]:
+                    json_project[JSON_KEY_URL_ZIP] = data[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]
+                else:
+                    iface.messageBar().pushMessage("Error", "No upload url found for the zip-file.", level=QgsMessageBar.ERROR, duration=0)
+                    return
+            else:
+                iface.messageBar().pushMessage("Error", "No json found.", level=QgsMessageBar.ERROR, duration=0)
+                return
+            json_[JSON_KEY_PROJ] = json_project
             json_["pipes"] = pipes
             json_["manholes"] = manholes
-            # import pprint
-            # pp = pprint.PrettyPrinter(indent=4)
-            # pp.pprint(json_)
-            # print json_
-            # Create tempfolder to put json in# nodig?
             with open("{}".format(json_path), 'w') as outfile:
                 json.dump(json_, outfile, indent=2)
             # Save json in tempfolder# nodig?

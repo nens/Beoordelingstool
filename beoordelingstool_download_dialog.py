@@ -121,7 +121,10 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 filename_json = self.json_path
                 manholes, pipes = self.get_json_manholes_and_pipes(filename_json)
                 # Save json as review.json
-                shutil.copyfile(os.path.abspath(self.json_path), os.path.abspath(os.path.join(directory, JSON_NAME)))
+                json_origin = os.path.abspath(self.json_path)
+                json_dest = os.path.abspath(os.path.join(directory, JSON_NAME))
+                if json_origin != json_dest:
+                    shutil.copyfile(os.path.abspath(json_origin, json_dest))
                 # Save shapefiles
                 self.save_shapefile_manholes(directory, manholes)
                 self.save_shapefiles_pipes_measuringpoints(directory, pipes)
