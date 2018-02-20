@@ -309,8 +309,24 @@ class Beoordelingstool:
                 self.download_dialog.show()
 
     def set_project_name(self):
-        """Set the project name on the General tab of the dockwidget."""
-        self.dockwidget.label_project_name.setText("Project name")
+        """
+        Set the project name on the General tab of the dockwidget.
+        The name of the project_name property of the review.json in the same
+        folder as the layer is used as the project name.
+        """
+        # Check if the manholes, pipes and measuring_points layers exist
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
+        measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        if manholes_layerList and pipes_layerList and measuring_stations_layerList:
+            # Get project name from the json saved in the same folder as the "manholes" layer
+            layer_dir = get_layer_dir(manholes_layerList[0])
+            json_path = os.path.join(layer_dir, JSON_NAME)
+            data = json.load(open(json_path))
+            if data["project_name"]:
+                self.dockwidget.label_project_name.setText(data["project_name"])
+            else:
+                iface.messageBar().pushMessage("Warning", "No project name defined.", level=QgsMessageBar.WARNING, duration=0)
 
     def get_selected_manhole(self):
         layer = iface.activeLayer()
