@@ -35,7 +35,8 @@ from PyQt4.QtGui import QFileDialog
 from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
-FILE_TYPE_JSON = "json"
+from .utils.constants import FILE_TYPE_JSON
+from .utils.constants import JSON_NAME
 
 LAYER_STYLES_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layer_styles'))
 
@@ -118,7 +119,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             if directory != '':
                 # Get json
                 filename_json = self.json_path
-                manholes, pipes = self.get_json(filename_json)
+                manholes, pipes = self.get_json_manholes_and_pipes(filename_json)
+                # Save json as review.json
+                shutil.copyfile(os.path.abspath(self.json_path), os.path.abspath(os.path.join(directory, JSON_NAME)))
                 # Save shapefiles
                 self.save_shapefile_manholes(directory, manholes)
                 self.save_shapefiles_pipes_measuringpoints(directory, pipes)
@@ -145,7 +148,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         return str(directory)
 
-    def get_json(self, filename):
+    def get_json_manholes_and_pipes(self, filename):
         """Function to get a JSON."""
         manholes = []
         pipes = []
