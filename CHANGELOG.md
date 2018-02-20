@@ -3,7 +3,7 @@
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- The JSON is saved in the same folder as the active manholes layer
 
 
 0.2 (2018-02-12)
