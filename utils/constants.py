@@ -4,6 +4,8 @@
 # Constants for file types
 FILE_TYPE_JSON = "json"
 
+JSON_NAME = "review.json"
+
 # Herstelmaatregeln
 HERSTELMAATREGELEN = [
     "",

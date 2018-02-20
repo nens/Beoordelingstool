@@ -47,6 +47,9 @@ import resources
 from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
 from beoordelingstool_download_dialog import BeoordelingstoolDownloadDialog
 
+# Import constants
+from .utils.constants import JSON_NAME
+
 class Beoordelingstool:
     """QGIS Plugin Implementation."""
 
@@ -252,6 +255,8 @@ class Beoordelingstool:
                 # DOWNLOAD
                 # Connect the search buttons with the search_file functions
                 # General tab
+                # Show project name on General tab
+                self.set_project_name()
                 self.dockwidget.pushbutton_upload_voortgang_json.clicked.connect(
                     self.convert_shps_to_json_temp)
                 # Manholes tab
@@ -302,6 +307,10 @@ class Beoordelingstool:
                 iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
                 self.download_dialog = BeoordelingstoolDownloadDialog()
                 self.download_dialog.show()
+
+    def set_project_name(self):
+        """Set the project name on the General tab of the dockwidget."""
+        self.dockwidget.label_project_name.setText("Project name")
 
     def get_selected_manhole(self):
         layer = iface.activeLayer()
@@ -658,13 +667,14 @@ class Beoordelingstool:
         """
         Convert the manholes, pipes and measuring points shapefiles to a json.
         """
-        # Get directory to save json in
-        json_path = save_json()
         # Check if the manholes, pipes and measuring_points layers exist
         manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
         pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
         measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
         if manholes_layerList and pipes_layerList and measuring_stations_layerList:
+            # Get directory to save json in
+            layer_dir = get_layer_dir(manholes_layerList[0])
+            json_path = os.path.join(layer_dir, JSON_NAME)
             # Check user login credentials ()
             # Pipes
             # Create pipes dict <- function (pipes and measuring point shapefiles as arg), returns pipes json
@@ -686,33 +696,28 @@ class Beoordelingstool:
             # pp.pprint(json_)
             # print json_
             # Create tempfolder to put json in# nodig?
-            with open("{}.json".format(json_path), 'w') as outfile:
+            with open("{}".format(json_path), 'w') as outfile:
                 json.dump(json_, outfile, indent=2)
             # Save json in tempfolder# nodig?
             # Upload json to server
+            iface.messageBar().pushMessage("Info", "JSON saved.", level=QgsMessageBar.INFO, duration=0)
         else:
             iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer.", level=QgsMessageBar.WARNING, duration=0)
 
 
-def save_json():
-    """Function to get a file."""
-    save_message = 'Save json'
-    settings = QSettings('beoordelingstool', 'qgisplugin')
+def get_layer_dir(layer):
+    """
+    Function to get the directory of a layer.
 
-    try:
-        init_path = settings.value('last_used_import_path', type=str)
-    except TypeError:
-        init_path = os.path.expanduser("~")
-    filename = QFileDialog.getSaveFileName(None,
-                                           save_message,
-                                           init_path,
-                                           'JSON (*.json)')
+    Args:
+       (QGIS layer) layer: A layer in QGIS.
 
-    if filename:
-        settings.setValue('last_used_import_path',
-                          os.path.dirname(filename))
-
-    return filename
+    Returns
+        (str) directory: The directory in which the layer is saved.
+    """
+    layer_path = iface.activeLayer().dataProvider().dataSourceUri()
+    (directory, shapefile_name) = os.path.split(layer_path)
+    return directory
 
 def create_manholes_json(manholes_layer):
     """
