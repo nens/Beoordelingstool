@@ -11,6 +11,7 @@ JSON_KEY_NAME = "name"
 JSON_KEY_URL = "url"
 JSON_KEY_URL_JSON = "url_json"
 JSON_KEY_URL_ZIP = "url_zip"
+JSON_KEY_USERNAME = "username"
 
 # Herstelmaatregeln
 HERSTELMAATREGELEN = [

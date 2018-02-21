@@ -55,6 +55,7 @@ from .utils.constants import JSON_KEY_NAME
 from .utils.constants import JSON_KEY_URL
 from .utils.constants import JSON_KEY_URL_JSON
 from .utils.constants import JSON_KEY_URL_ZIP
+from .utils.constants import JSON_KEY_USERNAME
 
 class Beoordelingstool:
     """QGIS Plugin Implementation."""
@@ -267,7 +268,8 @@ class Beoordelingstool:
                 # DOWNLOAD
                 # General tab
                 # Show project name on General tab
-                self.set_project_name()
+                self.set_project_properties()
+                # self.set_project_url()
                 self.dockwidget.pushbutton_upload_voortgang_json.clicked.connect(
                     self.show_login_dialog_voortgang)
                 self. dockwidget.pushbutton_upload_final_json.clicked.connect(
@@ -321,10 +323,10 @@ class Beoordelingstool:
                 self.download_dialog = BeoordelingstoolDownloadDialog()
                 self.download_dialog.show()
 
-    def set_project_name(self):
+    def set_project_properties(self):
         """
         Set the project name on the General tab of the dockwidget.
-        The name of the project_name property of the review.json in the same
+        The name of the project name property of the review.json in the same
         folder as the layer is used as the project name.
         """
         # Check if the manholes, pipes and measuring_points layers exist
@@ -341,8 +343,13 @@ class Beoordelingstool:
                     self.dockwidget.label_project_name.setText(data[JSON_KEY_PROJ][JSON_KEY_NAME])
                 else:
                     iface.messageBar().pushMessage("Warning", "No project name defined.", level=QgsMessageBar.WARNING, duration=0)
+                if data[JSON_KEY_PROJ][JSON_KEY_URL]:
+                    self.dockwidget.label_project_url.setText("{}".format(data[JSON_KEY_PROJ][JSON_KEY_URL]))
+                    # self.dockwidget.label_project_url.setText("<a href={}>{}</a>".format(data[JSON_KEY_PROJ][JSON_KEY_URL]))
+                else:
+                    iface.messageBar().pushMessage("Warning", "No project url defined.", level=QgsMessageBar.WARNING, duration=0)
             except:
-                iface.messageBar().pushMessage("Error", "No review.json found.", level=QgsMessageBar.CRITICAL, duration=0)
+                iface.messageBar().pushMessage("Error", "No {} found.".format(JSON_NAME), level=QgsMessageBar.CRITICAL, duration=0)
 
     def get_selected_manhole(self):
         layer = iface.activeLayer()
