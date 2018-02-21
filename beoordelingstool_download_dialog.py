@@ -62,8 +62,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         self.download_riool_search.clicked.connect(self.search_json_riool)
         # Save json in 3 shapefiles: manholes, pipes and measuring_points
         self.accepted.connect(self.save_shapefiles)
-        # # Show dockwidget after pressing OK with all 3 layers
-        # self.accepted.connect(self.show_dockwidget)
+        # Show dockwidget after pressing OK with all 3 layers
         self.json_path = ''
 
     def closeEvent(self, event):
@@ -210,7 +209,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         data_source = driver.CreateDataSource(pipes_path)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
-        srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
+        srs.ImportFromEPSG(28992)
         layer = data_source.CreateLayer(pipes_path, srs, ogr.wkbLineString)
         # data_source = None
 
@@ -221,7 +220,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         data_source_measuring_point = driver.CreateDataSource(measuring_points_path)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
-        srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
+        srs.ImportFromEPSG(28992)
         measuring_points_layer = data_source_measuring_point.CreateLayer(measuring_points_path, srs, ogr.wkbPoint)
 
         # Populate pipe shapefile
@@ -897,15 +896,3 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         feature = None
         return layer
-
-    # def show_dockwidget(self):
-    #     """Show the dockwidget if all 3 layers exist."""
-    #     manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
-    #     pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
-    #     measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
-
-    #     if manholes_layerList or pipes_layerList or measuring_stations_layerList:
-    #         # dockwidget = BeoordelingstoolDockWidget()
-    #         # dockwidget.closingPlugin.connect(dockwidget.closeEvent)
-    #         # iface.addDockWidget(Qt.RightDockWidgetArea, dockwidget)
-    #         # dockwidget.show()

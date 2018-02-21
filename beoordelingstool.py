@@ -258,14 +258,20 @@ class Beoordelingstool:
             else:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = BeoordelingstoolDockWidget()
-                self.login_dialog = BeoordelingstoolLoginDialog()
-                self.login_dialog.output.connect(self.convert_shps_to_json_temp)
+                # Create the login dialog for uploading the voortgang
+                self.login_dialog_voortgang = BeoordelingstoolLoginDialog()
+                self.login_dialog_voortgang.output.connect(self.upload_voortgang)
+                # Create the login dialog for uploading the final version
+                self.login_dialog_final = BeoordelingstoolLoginDialog()
+                self.login_dialog_final.output.connect(self.upload_final)
                 # DOWNLOAD
                 # General tab
                 # Show project name on General tab
                 self.set_project_name()
                 self.dockwidget.pushbutton_upload_voortgang_json.clicked.connect(
-                    self.show_login_dialog)
+                    self.show_login_dialog_voortgang)
+                self. dockwidget.pushbutton_upload_final_json.clicked.connect(
+                    self.show_login_dialog_final)
                 # Manholes tab
                 self.selected_manhole_id = 0
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
@@ -689,16 +695,40 @@ class Beoordelingstool:
         layer.commitChanges()
         layer.triggerRepaint()
 
-    def show_login_dialog(self):
+    def show_login_dialog_voortgang(self):
         """
         Show the login dialog.
 
         If the user data typed in the login dialog is correct, a json
         is created from the shapefiles and uploaded to the server.
         """
-        self.login_dialog.show()
+        self.login_dialog_voortgang.show()
 
-    def convert_shps_to_json_temp(self, user_data):
+    def show_login_dialog_final(self):
+        """
+        Show the login dialog.
+
+        If the user data typed in the login dialog is correct, a json
+        is created from the shapefiles and uploaded to the server.
+        """
+        self.login_dialog_final.show()
+
+    def upload_voortgang(self, user_data):
+        """Upload the voortgang (json)."""
+        print "voortgang"
+        self.convert_shps_to_json(user_data)
+        # upload json to server (get url from json)
+        iface.messageBar().pushMessage("Info", "JSON saved.", level=QgsMessageBar.INFO, duration=0)
+
+    def upload_final(self, user_data):
+        """Upload the final version (json + zip with shapefiles and qmls)."""
+        print "final"
+        self.convert_shps_to_json(user_data)
+        # save zip
+        # upload json and zip to server (get url from json)
+        iface.messageBar().pushMessage("Info", "JSON and ZIP? saved.", level=QgsMessageBar.INFO, duration=0)
+
+    def convert_shps_to_json(self, user_data):
         """
         Convert the manholes, pipes and measuring points shapefiles to a json.
 
@@ -713,7 +743,6 @@ class Beoordelingstool:
             # Check user login credentials ()
             username = user_data["username"]
             password = user_data["password"]
-            print username, password
             # Get directory to save json in
             layer_dir = get_layer_dir(manholes_layerList[0])
             json_path = os.path.join(layer_dir, JSON_NAME)
@@ -753,8 +782,6 @@ class Beoordelingstool:
             json_["manholes"] = manholes
             with open("{}".format(json_path), 'w') as outfile:
                 json.dump(json_, outfile, indent=2)
-            # Upload json to server
-            iface.messageBar().pushMessage("Info", "JSON saved.", level=QgsMessageBar.INFO, duration=0)
         else:
             iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer.", level=QgsMessageBar.WARNING, duration=0)
 
