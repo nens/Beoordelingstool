@@ -48,14 +48,7 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
         # # Set focus to uername lineedit
         # self.lineedit_username.setFocus()  # dows noet set input focus
-        # Get json
-        # self.download_riool_search.clicked.connect(self.search_json_riool)
-        # Save json in 3 shapefiles: manholes, pipes and measuring_points
         self.accepted.connect(self.get_user_data)
-        # # Show dockwidget after pressing OK with all 3 layers
-        # self.accepted.connect(self.show_dockwidget)
-        # self.json_path = ''
-        # user_data = self.get_user_data()
 
     def closeEvent(self, event):
         # self.closingPlugin.emit()
@@ -78,8 +71,8 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
             "password": password
         }
         # Check user credentials
+        # Emit the user data
+        self.output.emit(user_data)
         # Clear lineEdits
         self.lineedit_username.clear()
         self.lineedit_password.clear()
-        # Emit the user data
-        self.output.emit(user_data)

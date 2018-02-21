@@ -261,7 +261,6 @@ class Beoordelingstool:
                 self.login_dialog = BeoordelingstoolLoginDialog()
                 self.login_dialog.output.connect(self.convert_shps_to_json_temp)
                 # DOWNLOAD
-                # Connect the search buttons with the search_file functions
                 # General tab
                 # Show project name on General tab
                 self.set_project_name()
