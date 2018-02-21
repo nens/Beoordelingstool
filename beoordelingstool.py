@@ -46,6 +46,7 @@ import resources
 # Import the code for the DockWidget
 from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
 from beoordelingstool_download_dialog import BeoordelingstoolDownloadDialog
+from beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
 
 # Import constants
 from .utils.constants import JSON_NAME
@@ -257,13 +258,15 @@ class Beoordelingstool:
             else:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = BeoordelingstoolDockWidget()
+                self.login_dialog = BeoordelingstoolLoginDialog()
+                self.login_dialog.output.connect(self.convert_shps_to_json_temp)
                 # DOWNLOAD
                 # Connect the search buttons with the search_file functions
                 # General tab
                 # Show project name on General tab
                 self.set_project_name()
                 self.dockwidget.pushbutton_upload_voortgang_json.clicked.connect(
-                    self.convert_shps_to_json_temp)
+                    self.get_user_data)
                 # Manholes tab
                 self.selected_manhole_id = 0
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
@@ -327,11 +330,14 @@ class Beoordelingstool:
             # Get project name from the json saved in the same folder as the "manholes" layer
             layer_dir = get_layer_dir(manholes_layerList[0])
             json_path = os.path.join(layer_dir, JSON_NAME)
-            data = json.load(open(json_path))
-            if data[JSON_KEY_PROJ][JSON_KEY_NAME]:
-                self.dockwidget.label_project_name.setText(data[JSON_KEY_PROJ][JSON_KEY_NAME])
-            else:
-                iface.messageBar().pushMessage("Warning", "No project name defined.", level=QgsMessageBar.WARNING, duration=0)
+            try:
+                data = json.load(open(json_path))
+                if data[JSON_KEY_PROJ][JSON_KEY_NAME]:
+                    self.dockwidget.label_project_name.setText(data[JSON_KEY_PROJ][JSON_KEY_NAME])
+                else:
+                    iface.messageBar().pushMessage("Warning", "No project name defined.", level=QgsMessageBar.WARNING, duration=0)
+            except:
+                iface.messageBar().pushMessage("Error", "No review.json found.", level=QgsMessageBar.CRITICAL, duration=0)
 
     def get_selected_manhole(self):
         layer = iface.activeLayer()
@@ -684,9 +690,19 @@ class Beoordelingstool:
         layer.commitChanges()
         layer.triggerRepaint()
 
-    def convert_shps_to_json_temp(self):
+    def get_user_data(self):
+        """
+        Get the user data. If the user data is correct, a json is created
+        from the shapefiles and uploaded to the server.
+        """
+        self.login_dialog.show()
+
+    def convert_shps_to_json_temp(self, user_data):
         """
         Convert the manholes, pipes and measuring points shapefiles to a json.
+
+        Args:
+            (dict) user_data: A dict containing the username and password.
         """
         # Check if the manholes, pipes and measuring_points layers exist
         manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
@@ -694,6 +710,9 @@ class Beoordelingstool:
         measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
         if manholes_layerList and pipes_layerList and measuring_stations_layerList:
             # Check user login credentials ()
+            username = user_data["username"]
+            password = user_data["password"]
+            print username, password
             # Get directory to save json in
             layer_dir = get_layer_dir(manholes_layerList[0])
             json_path = os.path.join(layer_dir, JSON_NAME)
@@ -708,25 +727,25 @@ class Beoordelingstool:
                 if data[JSON_KEY_PROJ][JSON_KEY_NAME]:
                     json_project[JSON_KEY_NAME] = data[JSON_KEY_PROJ][JSON_KEY_NAME]
                 else:
-                    iface.messageBar().pushMessage("Error", "No project name found.", level=QgsMessageBar.ERROR, duration=0)
+                    iface.messageBar().pushMessage("Error", "No project name found.", level=QgsMessageBar.CRITICAL, duration=0)
                     return
                 if data[JSON_KEY_PROJ][JSON_KEY_URL]:
                     json_project[JSON_KEY_URL] = data[JSON_KEY_PROJ][JSON_KEY_URL]
                 else:
-                    iface.messageBar().pushMessage("Error", "No project url found.", level=QgsMessageBar.ERROR, duration=0)
+                    iface.messageBar().pushMessage("Error", "No project url found.", level=QgsMessageBar.CRITICAL, duration=0)
                     return
                 if data[JSON_KEY_PROJ][JSON_KEY_URL_JSON]:
                     json_project[JSON_KEY_URL_JSON] = data[JSON_KEY_PROJ][JSON_KEY_URL_JSON]
                 else:
-                    iface.messageBar().pushMessage("Error", "No upload url found for the JSON.", level=QgsMessageBar.ERROR, duration=0)
+                    iface.messageBar().pushMessage("Error", "No upload url found for the JSON.", level=QgsMessageBar.CRITICAL, duration=0)
                     return
                 if data[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]:
                     json_project[JSON_KEY_URL_ZIP] = data[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]
                 else:
-                    iface.messageBar().pushMessage("Error", "No upload url found for the zip-file.", level=QgsMessageBar.ERROR, duration=0)
+                    iface.messageBar().pushMessage("Error", "No upload url found for the zip-file.", level=QgsMessageBar.CRITICAL, duration=0)
                     return
             else:
-                iface.messageBar().pushMessage("Error", "No json found.", level=QgsMessageBar.ERROR, duration=0)
+                iface.messageBar().pushMessage("Error", "No json found.", level=QgsMessageBar.CRITICAL, duration=0)
                 return
             json_[JSON_KEY_PROJ] = json_project
             json_["pipes"] = pipes

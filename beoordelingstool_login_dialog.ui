@@ -50,7 +50,7 @@
    <property name="title">
     <string>Log in</string>
    </property>
-   <widget class="QLabel" name="label_user_name">
+   <widget class="QLabel" name="label_username">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -63,7 +63,7 @@
      <string>User name</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineedit_user_name">
+   <widget class="QLineEdit" name="lineedit_username">
     <property name="geometry">
      <rect>
       <x>140</x>
@@ -76,7 +76,7 @@
      <string/>
     </property>
     <property name="readOnly">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="placeholderText">
      <string/>
@@ -108,7 +108,7 @@
      <string/>
     </property>
     <property name="readOnly">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="placeholderText">
      <string/>
