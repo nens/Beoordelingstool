@@ -123,7 +123,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 json_origin = os.path.abspath(self.json_path)
                 json_dest = os.path.abspath(os.path.join(directory, JSON_NAME))
                 if json_origin != json_dest:
-                    shutil.copyfile(os.path.abspath(json_origin, json_dest))
+                    shutil.copyfile(os.path.abspath(json_origin), os.path.abspath(json_dest))
                 # Save shapefiles
                 self.save_shapefile_manholes(directory, manholes)
                 self.save_shapefiles_pipes_measuringpoints(directory, pipes)
