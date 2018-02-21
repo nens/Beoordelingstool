@@ -266,7 +266,7 @@ class Beoordelingstool:
                 # Show project name on General tab
                 self.set_project_name()
                 self.dockwidget.pushbutton_upload_voortgang_json.clicked.connect(
-                    self.get_user_data)
+                    self.show_login_dialog)
                 # Manholes tab
                 self.selected_manhole_id = 0
                 self.dockwidget.pushbutton_get_selected_manhole.clicked.connect(
@@ -690,10 +690,12 @@ class Beoordelingstool:
         layer.commitChanges()
         layer.triggerRepaint()
 
-    def get_user_data(self):
+    def show_login_dialog(self):
         """
-        Get the user data. If the user data is correct, a json is created
-        from the shapefiles and uploaded to the server.
+        Show the login dialog.
+
+        If the user data typed in the login dialog is correct, a json
+        is created from the shapefiles and uploaded to the server.
         """
         self.login_dialog.show()
 

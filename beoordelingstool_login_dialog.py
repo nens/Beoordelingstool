@@ -46,6 +46,8 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        # # Set focus to uername lineedit
+        # self.lineedit_username.setFocus()  # dows noet set input focus
         # Get json
         # self.download_riool_search.clicked.connect(self.search_json_riool)
         # Save json in 3 shapefiles: manholes, pipes and measuring_points
