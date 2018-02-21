@@ -76,5 +76,8 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
             "password": password
         }
         # Check user credentials
+        # Clear lineEdits
+        self.lineedit_username.clear()
+        self.lineedit_password.clear()
+        # Emit the user data
         self.output.emit(user_data)
-        # return user_data
