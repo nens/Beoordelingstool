@@ -693,22 +693,14 @@ class Beoordelingstool:
         pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
         measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
         if manholes_layerList and pipes_layerList and measuring_stations_layerList:
+            # Check user login credentials ()
             # Get directory to save json in
             layer_dir = get_layer_dir(manholes_layerList[0])
             json_path = os.path.join(layer_dir, JSON_NAME)
-            # Check user login credentials ()
             # Pipes
-            # Create pipes dict <- function (pipes and measuring point shapefiles as arg), returns pipes json
             pipes = create_pipes_json(pipes_layerList[0], measuring_stations_layerList[0])
-            # Loop through pipes shapefile and add features of shapefile to the json
-            # if "ZC" -> add measuring points with same pipe id to the json
-            # only add attributes that are not "None" of the measuring points shapefile (because they do no exist in the json)# / NULL/ empty
-            # x & y of measuring points json should be float!
             # Manholes
-            # Create manholes dict <- function (manholes shp as arg), returns manholes json
             manholes = create_manholes_json(manholes_layerList[0])
-            # Loop through manholes shapefile and add features of shapefile to the json
-            # Create json of pipes dict and manholes dict
             json_ = {}
             json_project = {}
             if json_path:
@@ -741,7 +733,6 @@ class Beoordelingstool:
             json_["manholes"] = manholes
             with open("{}".format(json_path), 'w') as outfile:
                 json.dump(json_, outfile, indent=2)
-            # Save json in tempfolder# nodig?
             # Upload json to server
             iface.messageBar().pushMessage("Info", "JSON saved.", level=QgsMessageBar.INFO, duration=0)
         else:
