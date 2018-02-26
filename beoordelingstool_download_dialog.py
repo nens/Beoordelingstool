@@ -632,9 +632,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         AXH = ogr.FieldDefn("AXH", ogr.OFTString)
         AXH.SetWidth(255)
         layer.CreateField(AXH)
-        ZC = ogr.FieldDefn("ZC", ogr.OFTString)
-        ZC.SetWidth(255)
-        layer.CreateField(ZC)
         herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
         herstelmaatregel.SetWidth(255)
         layer.CreateField(herstelmaatregel)
@@ -706,7 +703,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         AXF = pipe["AXF"]
         AXG = pipe["AXG"]
         AXH = pipe["AXH"]
-        ZC = pipe["ZC"]
         herstelmaatregel = pipe["Herstelmaatregel"]
         # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
         opmerking = pipe["Opmerking"]
@@ -762,7 +758,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         feature.SetField("AXF", str(AXF))
         feature.SetField("AXG", str(AXG))
         feature.SetField("AXH", str(AXH))
-        feature.SetField("ZC", str(ZC))
         feature.SetField("Herstelmaa", str(herstelmaatregel))
         feature.SetField("Opmerking", str(opmerking))
         layer.CreateFeature(feature)

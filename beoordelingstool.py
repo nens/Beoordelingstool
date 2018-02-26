@@ -466,7 +466,6 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_pipes.setItem(0, 42, QTableWidgetItem(f["AXF"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 43, QTableWidgetItem(f["AXG"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 44, QTableWidgetItem(f["AXH"]))
-            self.dockwidget.tablewidget_pipes.setItem(0, 45, QTableWidgetItem(f["ZC"]))
             self.selected_pipe_id = f.id()
 
     def save_beoordeling_leidingen(self):
@@ -650,7 +649,6 @@ class Beoordelingstool:
             self.dockwidget.tablewidget_pipes.setItem(0, 42, QTableWidgetItem(new_feature["AXF"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 43, QTableWidgetItem(new_feature["AXG"]))
             self.dockwidget.tablewidget_pipes.setItem(0, 44, QTableWidgetItem(new_feature["AXH"]))
-            self.dockwidget.tablewidget_pipes.setItem(0, 45, QTableWidgetItem(new_feature["ZC"]))
             iface.setActiveLayer(layer)
             layer.triggerRepaint()
             # Go to the pipe tab
@@ -1002,47 +1000,6 @@ def create_pipes_json(pipes_layer, measuring_stations_layer):
             expr = QgsExpression("\"PIPE_ID\" = '{}'".format(feature["ID"]))
             request = QgsFeatureRequest(expr)
             measuring_stations_layer_specific_pipe = measuring_stations_layer.getFeatures(request)
-            pipe["ZC"] = create_measuring_stations_list(measuring_stations_layer_specific_pipe)
         pipes_list.append(pipe)
 
     return pipes_list
-
-def create_measuring_stations_list(measuring_stations_layer):
-    """
-    Create a list from the measuring stations shapefile.
-    A list item is a json, representing a measuring station.
-
-    Args:
-        (shapefile) measuring_stations_shapefile: The measuring stations 
-            shapefile.
-
-    Returns:
-        (list) measuring_station_list: A list containing the information from
-            the measuring stations shapefile. A list item is a measuring
-            station, represented by a json.
-    """
-    measuring_stations_list = []
-    for feature in measuring_stations_layer:
-        measuring_station = {}
-        if feature["A"] and feature["A"] != "None": measuring_station["A"] = str(feature["A"])
-        if feature["B"] and feature["B"] != "None": measuring_station["B"] = str(feature["B"])
-        if feature["C"] and feature["C"] != "None": measuring_station["C"] = str(feature["C"])
-        if feature["D"] and feature["D"] != "None": measuring_station["D"] = str(feature["D"])
-        if feature["E"] and feature["E"] != "None": measuring_station["E"] = str(feature["E"])
-        if feature["F"] and feature["F"] != "None": measuring_station["F"] = str(feature["F"])
-        if feature["G"] and feature["G"] != "None": measuring_station["G"] = str(feature["G"])
-        if feature["I"] and feature["I"] != "None": measuring_station["I"] = str(feature["I"])
-        if feature["J"] and feature["J"] != "None": measuring_station["J"] = str(feature["J"])
-        if feature["K"] and feature["K"] != "None": measuring_station["K"] = str(feature["K"])
-        if feature["M"] and feature["M"] != "None": measuring_station["M"] = str(feature["M"])
-        if feature["N"] and feature["N"] != "None": measuring_station["N"] = str(feature["N"])
-        if feature["O"] and feature["O"] != "None": measuring_station["O"] = str(feature["O"])
-        herstelmaatregel = str(feature["Herstelmaa"]) if str(feature["Herstelmaa"]) is not "NULL" else ""
-        measuring_station["Herstelmaatregel"] = herstelmaatregel
-        opmerking = str(feature["Opmerking"]) if str(feature["Opmerking"]) is not "NULL" else ""
-        measuring_station["Opmerking"] = opmerking
-        # x & y of measuring points json are saved in the json as tuples  #  x': (146777.899562,)
-        measuring_station["y"] = float(feature.geometry().asPoint().y())
-        measuring_station["x"] = float(feature.geometry().asPoint().x())
-        measuring_stations_list.append(measuring_station)
-    return measuring_stations_list

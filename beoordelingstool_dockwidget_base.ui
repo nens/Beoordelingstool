@@ -790,11 +790,6 @@ p, li { white-space: pre-wrap; }
         <string>AXH</string>
        </property>
       </row>
-      <row>
-       <property name="text">
-        <string>ZC</string>
-       </property>
-      </row>
       <column>
        <property name="text">
         <string>Value</string>
