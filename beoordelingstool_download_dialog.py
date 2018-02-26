@@ -32,6 +32,7 @@ from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import QSettings
 from PyQt4.QtGui import QFileDialog
+from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
@@ -242,6 +243,10 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Copy qml as layer style
         shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "measuring_points.qml")), os.path.abspath(os.path.join(directory, "measuring_points.qml")))
         measuring_points_layer = iface.addVectorLayer(measuring_points_path, "measuring_points", "ogr")
+
+        # Set manholes as active layer
+        manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]
+        iface.setActiveLayer(manholes_layer)
 
     def fields_to_manholes_shp(self, layer, location):
         """
