@@ -23,8 +23,11 @@
 import base64
 import json
 import os.path
-import urllib2
 import re
+import urllib2
+import shutil
+import tempfile
+import zipfile
 
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QPyNullVariant
@@ -741,7 +744,7 @@ class Beoordelingstool:
         """Upload the voortgang (json)."""
         print "voortgang"
         review_json = self.convert_shps_to_json()
-        self.upload_json(review_json, user_data)
+        save_json_to_server(review_json, user_data)
         # upload json to server (get url from json)
         iface.messageBar().pushMessage("Info", "JSON saved.", level=QgsMessageBar.INFO, duration=0)
 
@@ -749,10 +752,15 @@ class Beoordelingstool:
         """Upload the final version (json + zip with shapefiles and qmls)."""
         print "final"
         review_json = self.convert_shps_to_json()
-        self.upload_json(review_json, user_data)
-        # save zip
-        # upload json and zip to server (get url_zip from json)
-        iface.messageBar().pushMessage("Info", "JSON and ZIP? saved.", level=QgsMessageBar.INFO, duration=0)
+        # Upload JSON
+        save_json_to_server(review_json, user_data)
+        # Upload zip
+        temp_dir = tempfile.mkdtemp(prefix="beoordelingstool")
+        project_name = review_json[JSON_KEY_PROJ][JSON_KEY_NAME]
+        zip_url = review_json[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]
+        create_zip(project_name, temp_dir)
+        save_zip_to_server(project_name, temp_dir, zip_url, user_data)
+        iface.messageBar().pushMessage("Info", "JSON and ZIP uploaded.", level=QgsMessageBar.INFO, duration=0)
 
     def convert_shps_to_json(self):
         """
@@ -818,42 +826,6 @@ class Beoordelingstool:
             iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer.", level=QgsMessageBar.WARNING, duration=0)
             json_ = {}
             return json_
-
-    def upload_json(self, review_json, user_data):
-        """Upload a json to the review_json["project"]["url_json"]"""
-        # Check user login credentials ()  # not needed, checked when json is uploaded
-        # username = user_data["username"]
-        # password = user_data["password"]
-        url = review_json["project"]["url_json"]
-        encoded_user = base64.b64encode(user_data)
-        req = urllib2.Request(url, review_json, encoded_user)
-        response = urllib2.urlopen(req)
-        the_page = reponse.read()  # nodig
-        # # GGMN  https://github.com/nens/ggmn-qgis/blob/master/lizard_downloader.py#L534
-        # form = urllib2_upload.MultiPartForm()
-        # form.add_field('title', title)
-        # form.add_field('organisation_id', str(self.selected_organisation))
-        # filename = os.path.basename(tiff_filename)
-        # form.add_file('raster_file', filename, fileHandle=open(tiff_filename, 'rb'))
-
-        # request = urllib2.Request('https://ggmn.un-igrac.org/upload_raster/')
-        # request.add_header('User-agent', 'qgis ggmn uploader')
-        # request.add_header('username', self.username)
-        # request.add_header('password', self.password)
-        # body = str(form)
-        # request.add_header('Content-type', form.get_content_type())
-        # request.add_header('Content-length', len(body))
-        # # print("content-length: %s" % len(body))
-        # request.add_data(body)
-
-        # fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-        # open(logfile, 'w').write(request.get_data())
-        # # print("Printed what we'll send to %s" % logfile)
-
-        # answer = urllib2.urlopen(request).read()
-        # # print(answer)
-        # # print("Uploaded geotiff to the server")
-        # pop_up_info("Uploaded geotiff to the server")
 
 def create_manholes_json(manholes_layer):
     """
@@ -1003,3 +975,102 @@ def create_pipes_json(pipes_layer, measuring_stations_layer):
         pipes_list.append(pipe)
 
     return pipes_list
+
+
+def create_zip(project_name, temp_dir):  # for zip_file_name in querysets
+    """
+    Create zipfile.
+    The zipfile is downloaded in the temp folder and contains the shapefiles and
+    an json-file.
+
+    Args:
+        (str) project)name: The name of the project, this will also become the
+            name of the zipfile.
+        (str) temp_dir: The name of the temp directory.
+    """
+    shapefile_names = ["manholes", "pipes", "measuring_points"]
+    # Add shapefiles
+    for name in shapefile_names:
+        dbf_path = os.path.join(temp_dir, "{}.dbf".format(name))
+        prj_path = os.path.join(temp_dir, "{}.prj".format(name))
+        qml_path = os.path.join(temp_dir, "{}.qml".format(name))
+        shp_path = os.path.join(temp_dir, "{}.shp".format(name))
+        shx_path = os.path.join(temp_dir, "{}.shx".format(name))
+        with zipfile.ZipFile(os.path.abspath(os.path.join(temp_dir, "{}.zip".format(project_name))), 'w') as myzip:
+            myzip.write(shp_path)
+            myzip.write(dbf_path)
+            myzip.write(prj_path)
+            myzip.write(shx_path)
+            myzip.write(qml_path)
+    # Add JSON
+    json_path = os.path.join(temp_dir, "{}".format(JSON_NAME))
+    with zipfile.ZipFile(os.path.abspath(os.path.join(temp_dir, "{}.zip".format(project_name))), 'w') as myzip:
+        myzip.write(json_path)
+
+
+def save_json_to_server(review_json, user_data):
+    """
+    Upload a json to the review_json[JSON_KEY_PROJ][JSON_KEY_URL_JSON].
+
+    Args:
+        (dict) review_json: A dict containing the json url and the json to save to the server
+        (dict) user_data: A dict containing the username and password.
+    """
+    # Check user login credentials ()  # not needed, checked when json is uploaded
+    # username = user_data["username"]
+    # password = user_data["password"]
+    if review_json[JSON_KEY_PROJ][JSON_KEY_URL_JSON] is None:
+        iface.messageBar().pushMessage("Error", "The json has no json url.", level=QgsMessageBar.CRITICAL, duration=0)
+        return
+    else:
+        url = review_json[JSON_KEY_PROJ][JSON_KEY_URL_JSON]
+        encoded_user = base64.b64encode(user_data)
+        req = urllib2.Request(url, review_json, encoded_user)
+        response = urllib2.urlopen(req)
+        the_page = reponse.read()  # nodig
+    # # GGMN  https://github.com/nens/ggmn-qgis/blob/master/lizard_downloader.py#L534
+    # form = urllib2_upload.MultiPartForm()
+    # form.add_field('title', title)
+    # form.add_field('organisation_id', str(self.selected_organisation))
+    # filename = os.path.basename(tiff_filename)
+    # form.add_file('raster_file', filename, fileHandle=open(tiff_filename, 'rb'))
+
+    # request = urllib2.Request('https://ggmn.un-igrac.org/upload_raster/')
+    # request.add_header('User-agent', 'qgis ggmn uploader')
+    # request.add_header('username', self.username)
+    # request.add_header('password', self.password)
+    # body = str(form)
+    # request.add_header('Content-type', form.get_content_type())
+    # request.add_header('Content-length', len(body))
+    # # print("content-length: %s" % len(body))
+    # request.add_data(body)
+
+    # fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
+    # open(logfile, 'w').write(request.get_data())
+    # # print("Printed what we'll send to %s" % logfile)
+
+    # answer = urllib2.urlopen(request).read()
+    # # print(answer)
+    # # print("Uploaded geotiff to the server")
+    # pop_up_info("Uploaded geotiff to the server")
+
+
+def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
+    """
+    Save a zip-file (containing an ESRI shapefile and accompanying ini-file) to the server (zip_url).
+
+    Args:
+        (str) project_name: The name of the zip-file to save to the server.
+        (str) temp_dir: The path to the temp directory.
+        (str) zip_url: The url to save the zip to.
+        (dict) user_data: A dict containing the username and password
+    """
+    if zip_url is None:
+        iface.messageBar().pushMessage("Error", "The json has no zip url.", level=QgsMessageBar.CRITICAL, duration=0)
+        return
+    else:
+        data = open(os.path.join(temp_dir, "{}.zip".format(project_name))).read()
+        encoded_user = base64.b64encode(user_data)
+        req = urllib2.Request(zip_url, data, encoded_user)
+        response = urllib2.urlopen(req)
+        the_page = reponse.read()  # nodig
