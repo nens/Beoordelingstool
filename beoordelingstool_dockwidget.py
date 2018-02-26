@@ -55,5 +55,5 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         """Add the herstelmaatregelen to the comboboxes"""
         self.field_combobox_manholes.addItems(HERSTELMAATREGELEN)
         self.field_combobox_pipes.addItems(HERSTELMAATREGELEN)
-        self.field_combobox_measuring_stations.addItems(HERSTELMAATREGELEN)
+        self.field_combobox_measuring_points.addItems(HERSTELMAATREGELEN)
 

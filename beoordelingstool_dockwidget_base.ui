@@ -461,7 +461,7 @@ p, li { white-space: pre-wrap; }
         <string>Get selected pipe</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_pipe_to_measuring_station">
+      <widget class="QPushButton" name="pushbutton_pipe_to_measuring_point">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -471,7 +471,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>Measuring stations</string>
+        <string>Measuring points</string>
        </property>
       </widget>
      </widget>
@@ -797,11 +797,11 @@ p, li { white-space: pre-wrap; }
       </column>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_measuring_stations">
+    <widget class="QWidget" name="tab_measuring_points">
      <attribute name="title">
-      <string>Measuring stations</string>
+      <string>Measuring points</string>
      </attribute>
-     <widget class="QGroupBox" name="groupbox_measuring_stations">
+     <widget class="QGroupBox" name="groupbox_measuring_points">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -811,9 +811,9 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="title">
-       <string>Measuring stations</string>
+       <string>Measuring points</string>
       </property>
-      <widget class="QPushButton" name="pushbutton_measuring_station_to_pipe">
+      <widget class="QPushButton" name="pushbutton_measuring_point_to_pipe">
        <property name="geometry">
         <rect>
          <x>160</x>
@@ -826,7 +826,7 @@ p, li { white-space: pre-wrap; }
         <string>Back to pipe</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_measuring_stations_previous">
+      <widget class="QPushButton" name="pushbutton_measuring_points_previous">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -842,7 +842,7 @@ p, li { white-space: pre-wrap; }
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_measuring_stations_next">
+      <widget class="QPushButton" name="pushbutton_measuring_points_next">
        <property name="geometry">
         <rect>
          <x>290</x>
@@ -855,7 +855,7 @@ p, li { white-space: pre-wrap; }
         <string>Next</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_get_selected_measuring_station">
+      <widget class="QPushButton" name="pushbutton_get_selected_measuring_point">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -865,11 +865,11 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>Get measuring station</string>
+        <string>Get measuring points</string>
        </property>
       </widget>
      </widget>
-     <widget class="QGroupBox" name="groupbox_attributes_measuring_stations">
+     <widget class="QGroupBox" name="groupbox_attributes_measuring_points">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -881,7 +881,7 @@ p, li { white-space: pre-wrap; }
       <property name="title">
        <string>Attributes</string>
       </property>
-      <widget class="QLabel" name="field_label_measuring_stations">
+      <widget class="QLabel" name="field_label_measuring_points">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -894,7 +894,7 @@ p, li { white-space: pre-wrap; }
         <string>Herstelmaatregel</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="field_combobox_measuring_stations">
+      <widget class="QComboBox" name="field_combobox_measuring_points">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -904,7 +904,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="value_label_measuring_stations">
+      <widget class="QLabel" name="value_label_measuring_points">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -917,7 +917,7 @@ p, li { white-space: pre-wrap; }
         <string>Opmerking</string>
        </property>
       </widget>
-      <widget class="QPlainTextEdit" name="value_plaintextedit_measuring_stations">
+      <widget class="QPlainTextEdit" name="value_plaintextedit_measuring_points">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -927,7 +927,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_save_attribute_measuring_stations">
+      <widget class="QPushButton" name="pushbutton_save_attribute_measuring_points">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -941,7 +941,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </widget>
-     <widget class="QTableWidget" name="tablewidget_measuring_stations">
+     <widget class="QTableWidget" name="tablewidget_measuring_points">
       <property name="geometry">
        <rect>
         <x>10</x>

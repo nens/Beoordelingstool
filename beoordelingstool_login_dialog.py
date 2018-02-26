@@ -69,8 +69,8 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
     	"""Set the username in the login dialog."""
         manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
         pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
-        measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
-        if manholes_layerList and pipes_layerList and measuring_stations_layerList:
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        if manholes_layerList and pipes_layerList and measuring_points_layerList:
             # Get directory to save json in
             layer_dir = get_layer_dir(manholes_layerList[0])
             json_path = os.path.join(layer_dir, JSON_NAME)
