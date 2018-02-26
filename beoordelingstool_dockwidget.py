@@ -25,8 +25,14 @@ import os
 
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
+from qgis.core import QgsMapLayerRegistry
+from qgis.utils import iface
 
+# import constants
 from .utils.constants import HERSTELMAATREGELEN
+from .utils.constants import SHP_NAME_MANHOLES
+from .utils.constants import SHP_NAME_PIPES
+from .utils.constants import SHP_NAME_MEASURING_POINTS
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'beoordelingstool_dockwidget_base.ui'))
@@ -46,10 +52,26 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
         self.add_herstelmaatregelen()
+        self.tabWidget.currentChanged.connect(self.tab_changed)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
         event.accept()
+
+    def tab_changed(self):
+        """Change the active layer upon selecting another tab."""
+        if self.tabWidget.currentIndex() == 1:
+            # Set manholes as active layer
+            manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)[0]
+            iface.setActiveLayer(manholes_layer)
+        elif self.tabWidget.currentIndex() == 2:
+            # Set pipes as active layer
+            pipes_layer = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)[0]
+            iface.setActiveLayer(pipes_layer)
+        elif self.tabWidget.currentIndex() == 3:
+            # Set measuring_points as active layer
+            measuring_points_layer = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)[0]
+            iface.setActiveLayer(measuring_points_layer)
 
     def add_herstelmaatregelen(self):
         """Add the herstelmaatregelen to the comboboxes"""

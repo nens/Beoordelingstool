@@ -34,6 +34,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'beoordelingstool_login_dialog.ui'))
 
 # Import constants
+from .utils.constants import SHP_NAME_MANHOLES
+from .utils.constants import SHP_NAME_PIPES
+from .utils.constants import SHP_NAME_MEASURING_POINTS
 from .utils.constants import JSON_NAME
 from .utils.constants import JSON_KEY_PROJ
 from .utils.constants import JSON_KEY_USERNAME
@@ -67,9 +70,9 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
 
     def set_username(self):
     	"""Set the username in the login dialog."""
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
         if manholes_layerList and pipes_layerList and measuring_points_layerList:
             # Get directory to save json in
             layer_dir = get_layer_dir(manholes_layerList[0])

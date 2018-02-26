@@ -4,6 +4,12 @@
 # Constants for file types
 FILE_TYPE_JSON = "json"
 
+# shapefile names
+SHP_NAME_MANHOLES = "manholes"
+SHP_NAME_PIPES = "pipes"
+SHP_NAME_MEASURING_POINTS = "measuring_points"
+SHAPEFILE_LIST = [SHP_NAME_MANHOLES, SHP_NAME_PIPES, SHP_NAME_MEASURING_POINTS]
+
 # json name and property
 JSON_NAME = "review.json"
 JSON_KEY_PROJ = "project"

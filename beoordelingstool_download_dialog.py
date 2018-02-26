@@ -38,6 +38,9 @@ from qgis.utils import iface
 
 from .utils.constants import FILE_TYPE_JSON
 from .utils.constants import JSON_NAME
+from .utils.constants import SHP_NAME_MANHOLES
+from .utils.constants import SHP_NAME_PIPES
+from .utils.constants import SHP_NAME_MEASURING_POINTS
 
 LAYER_STYLES_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layer_styles'))
 
@@ -174,7 +177,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         """
 
         # Manholes path
-        manholes_path = os.path.join(directory, "manholes.shp")
+        manholes_path = os.path.join(directory, "{}.shp".format(SHP_NAME_MANHOLES))
 
         # Create manhole shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
@@ -188,8 +191,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             layer = self.feature_to_manholes_shp(layer, manhole)
         data_source = None
         # Copy qml as layer style
-        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "manholes.qml")), os.path.abspath(os.path.join(directory, "manholes.qml")))
-        layer = iface.addVectorLayer(manholes_path, "manholes", "ogr")
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_MANHOLES))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_MANHOLES))))
+        layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
 
     def save_shapefiles_pipes_measuringpoints(self, directory, pipes):
         """
@@ -204,7 +207,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         """
         
         # Pipes path
-        pipes_path = os.path.join(directory, "pipes.shp")
+        pipes_path = os.path.join(directory, "{}.shp".format(SHP_NAME_PIPES))
         # Create pipes shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
         data_source = driver.CreateDataSource(pipes_path)
@@ -215,7 +218,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # data_source = None
 
         # Measuring points path
-        measuring_points_path = os.path.join(directory, "measuring_points.shp")
+        measuring_points_path = os.path.join(directory, "{}.shp".format(SHP_NAME_MEASURING_POINTS))
         # Create measuring points shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
         data_source_measuring_point = driver.CreateDataSource(measuring_points_path)
@@ -236,13 +239,13 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             pipe_id += 1
         data_source = None
         # Copy qml as layer style
-        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "pipes.qml")), os.path.abspath(os.path.join(directory, "pipes.qml")))
-        layer = iface.addVectorLayer(pipes_path, "pipes", "ogr")
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_PIPES))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_PIPES))))
+        layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
 
         data_source_measuring_point = None
         # Copy qml as layer style
-        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "measuring_points.qml")), os.path.abspath(os.path.join(directory, "measuring_points.qml")))
-        measuring_points_layer = iface.addVectorLayer(measuring_points_path, "measuring_points", "ogr")
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_MEASURING_POINTS))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_MEASURING_POINTS))))
+        measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
 
         # Set manholes as active layer
         manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]

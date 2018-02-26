@@ -51,13 +51,19 @@ from qgis.utils import iface
 import resources
 
 
-# Import the code for the DockWidget
+# Import the code for the DockWidget and dialogs
 from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
 from beoordelingstool_download_dialog import BeoordelingstoolDownloadDialog
 from beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
+
+# Import functions
 from .utils.layer import get_layer_dir
 
 # Import constants
+from .utils.constants import SHP_NAME_MANHOLES
+from .utils.constants import SHP_NAME_PIPES
+from .utils.constants import SHP_NAME_MEASURING_POINTS
+from .utils.constants import SHAPEFILE_LIST
 from .utils.constants import JSON_NAME
 from .utils.constants import JSON_KEY_PROJ
 from .utils.constants import JSON_KEY_NAME
@@ -250,9 +256,9 @@ class Beoordelingstool:
     def run(self):
         """Run method that loads and starts the plugin"""
 
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
         if not self.pluginIsActive:
 
             #print "** STARTING Beoordelingstool"
@@ -268,7 +274,6 @@ class Beoordelingstool:
             else:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = BeoordelingstoolDockWidget()
-                self.dockwidget.tabWidget.currentChanged.connect(self.tab_changed)
                 # Create the login dialog for uploading the voortgang
                 self.login_dialog_voortgang = BeoordelingstoolLoginDialog()
                 self.login_dialog_voortgang.output.connect(self.upload_voortgang)
@@ -333,21 +338,6 @@ class Beoordelingstool:
                 self.download_dialog = BeoordelingstoolDownloadDialog()
                 self.download_dialog.show()
 
-    def tab_changed(self):
-        """Change the active layer upon selecting another tab."""
-        if self.dockwidget.tabWidget.currentIndex() == 1:
-            # Set manholes as active layer
-            manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]
-            iface.setActiveLayer(manholes_layer)
-        elif self.dockwidget.tabWidget.currentIndex() == 2:
-            # Set pipes as active layer
-            pipes_layer = QgsMapLayerRegistry.instance().mapLayersByName('pipes')[0]
-            iface.setActiveLayer(pipes_layer)
-        elif self.dockwidget.tabWidget.currentIndex() == 3:
-            # Set measuring_points as active layer
-            measuring_points_layer = QgsMapLayerRegistry.instance().mapLayersByName('measuring_points')[0]
-            iface.setActiveLayer(measuring_points_layer)
-
 
     def set_project_properties(self):
         """
@@ -356,9 +346,9 @@ class Beoordelingstool:
         folder as the layer is used as the project name.
         """
         # Check if the manholes, pipes and measuring_points layers exist
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
         if manholes_layerList and pipes_layerList and measuring_points_layerList:
             # Get project name from the json saved in the same folder as the "manholes" layer
             layer_dir = get_layer_dir(manholes_layerList[0])
@@ -507,7 +497,7 @@ class Beoordelingstool:
         except:  # No measuring point selected
             current_measuring_point_pipe_id = -1
         # if current_measuring_point_pipe_id != self.selected_pipe_id:
-        layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
         if layerList:
             layer = layerList[0]
             expr = QgsExpression("\"PIPE_ID\" IS '{}'".format(self.selected_pipe_id))
@@ -617,7 +607,7 @@ class Beoordelingstool:
         """Show the pipe to which a measuring station belongs."""
         pipe_id = self.dockwidget.tablewidget_measuring_points.itemAt(0,0).text() if self.dockwidget.tablewidget_measuring_points.itemAt(0,0) else 1
         self.selected_pipe_id = pipe_id
-        layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
+        layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
         if layerList:
             layer = layerList[0]
             layer.setSelectedFeatures([int(self.selected_pipe_id)])
@@ -738,9 +728,9 @@ class Beoordelingstool:
         """
         # Check if the manholes, pipes and measuring_points layers exist
         self.login_dialog_voortgang.show()
-        # manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
-        # pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
-        # measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        # manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        # pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        # measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
         # if manholes_layerList and pipes_layerList and measuring_points_layerList:
         #     # Check user login credentials ()
         #     username = "Aagje_opdr_nemer"
@@ -790,9 +780,9 @@ class Beoordelingstool:
             (dict) json_: A dict containing the information about the project and the shapefiles.
         """
         # Check if the manholes, pipes and measuring_points layers exist
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
         if manholes_layerList and pipes_layerList and measuring_points_layerList:
             # Get directory to save json in
             layer_dir = get_layer_dir(manholes_layerList[0])
@@ -1005,9 +995,8 @@ def create_zip(project_name, temp_dir):  # for zip_file_name in querysets
             name of the zipfile.
         (str) temp_dir: The name of the temp directory.
     """
-    shapefile_names = ["manholes", "pipes", "measuring_points"]
     # Add shapefiles
-    for name in shapefile_names:
+    for name in SHAPEFILE_LIST:
         dbf_path = os.path.join(temp_dir, "{}.dbf".format(name))
         prj_path = os.path.join(temp_dir, "{}.prj".format(name))
         qml_path = os.path.join(temp_dir, "{}.qml".format(name))
