@@ -268,7 +268,7 @@ class Beoordelingstool:
             else:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = BeoordelingstoolDockWidget()
-                self.dockwidget.tabWidget.currentChanged.connect(self.tab_selected)
+                self.dockwidget.tabWidget.currentChanged.connect(self.tab_changed)
                 # Create the login dialog for uploading the voortgang
                 self.login_dialog_voortgang = BeoordelingstoolLoginDialog()
                 self.login_dialog_voortgang.output.connect(self.upload_voortgang)
@@ -333,8 +333,8 @@ class Beoordelingstool:
                 self.download_dialog = BeoordelingstoolDownloadDialog()
                 self.download_dialog.show()
 
-    def tab_selected(self):
-        """Change the active layer upon selected tab."""
+    def tab_changed(self):
+        """Change the active layer upon selecting another tab."""
         if self.dockwidget.tabWidget.currentIndex() == 1:
             # Set manholes as active layer
             manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]
