@@ -36,7 +36,6 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
-from PyQt4.QtGui import QDesktopServices
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QIcon
 from PyQt4.QtGui import QTableWidgetItem
@@ -283,7 +282,6 @@ class Beoordelingstool:
                 # DOWNLOAD
                 # General tab
                 # Show project name on General tab
-                self.set_project_properties()
                 # self.set_project_url()
                 self.dockwidget.pushbutton_upload_voortgang_json.clicked.connect(
                     self.show_login_dialog_voortgang)
@@ -337,35 +335,6 @@ class Beoordelingstool:
                 iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
                 self.download_dialog = BeoordelingstoolDownloadDialog()
                 self.download_dialog.show()
-
-
-    def set_project_properties(self):
-        """
-        Set the project name on the General tab of the dockwidget.
-        The name of the project name property of the review.json in the same
-        folder as the layer is used as the project name.
-        """
-        # Check if the manholes, pipes and measuring_points layers exist
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
-        if manholes_layerList and pipes_layerList and measuring_points_layerList:
-            # Get project name from the json saved in the same folder as the "manholes" layer
-            layer_dir = get_layer_dir(manholes_layerList[0])
-            json_path = os.path.join(layer_dir, JSON_NAME)
-            try:
-                data = json.load(open(json_path))
-                if data[JSON_KEY_PROJ][JSON_KEY_NAME]:
-                    self.dockwidget.label_project_name.setText(data[JSON_KEY_PROJ][JSON_KEY_NAME])
-                else:
-                    iface.messageBar().pushMessage("Warning", "No project name defined.", level=QgsMessageBar.WARNING, duration=0)
-                if data[JSON_KEY_PROJ][JSON_KEY_URL]:
-                    self.dockwidget.textedit_project_url.setText("<a href=google.com>{}</a>".format(data[JSON_KEY_PROJ][JSON_KEY_URL])).clicked(QDesktopServices.openUrl(QUrl(data[JSON_KEY_PROJ][JSON_KEY_URL], QUrl.TolerantMode)))
-                    # self.dockwidget.label_project_url.setText("<a href={}>{}</a>".format(data[JSON_KEY_PROJ][JSON_KEY_URL]))
-                else:
-                    iface.messageBar().pushMessage("Warning", "No project url defined.", level=QgsMessageBar.WARNING, duration=0)
-            except:
-                iface.messageBar().pushMessage("Error", "No {} found.".format(JSON_NAME), level=QgsMessageBar.CRITICAL, duration=0)
 
     def get_selected_manhole(self):
         layer = iface.activeLayer()
