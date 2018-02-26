@@ -22,12 +22,21 @@
 """
 
 import os
+import json
 
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
+from qgis.core import QgsMapLayerRegistry
+
+from .utils.layer import get_layer_dir
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'beoordelingstool_login_dialog.ui'))
+
+# Import constants
+from .utils.constants import JSON_NAME
+from .utils.constants import JSON_KEY_PROJ
+from .utils.constants import JSON_KEY_USERNAME
 
 
 class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
@@ -46,6 +55,7 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.set_username()
         # # Set focus to uername lineedit
         # self.lineedit_username.setFocus()  # dows noet set input focus
         self.accepted.connect(self.get_user_data)
@@ -54,6 +64,20 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
         # self.closingPlugin.emit()
         # event.accept()
         pass
+
+    def set_username(self):
+    	"""Set the username in the login dialog."""
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
+        measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
+        if manholes_layerList and pipes_layerList and measuring_stations_layerList:
+            # Get directory to save json in
+            layer_dir = get_layer_dir(manholes_layerList[0])
+            json_path = os.path.join(layer_dir, JSON_NAME)
+            review_json = json.load(open(json_path))
+            if review_json[JSON_KEY_PROJ][JSON_KEY_USERNAME]:
+	            username = review_json[JSON_KEY_PROJ][JSON_KEY_USERNAME]
+	            self.lineedit_username.setText(username)
 
     def get_user_data(self):
         """

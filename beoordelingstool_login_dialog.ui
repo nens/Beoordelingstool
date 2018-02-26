@@ -10,6 +10,9 @@
     <height>164</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Log in</string>
   </property>
@@ -72,6 +75,9 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -103,6 +109,9 @@
       <width>191</width>
       <height>27</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
     </property>
     <property name="text">
      <string/>

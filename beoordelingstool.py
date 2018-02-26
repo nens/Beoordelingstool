@@ -33,9 +33,10 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
+from PyQt4.QtGui import QDesktopServices
 from PyQt4.QtGui import QFileDialog
-from PyQt4.QtGui import QTableWidgetItem
 from PyQt4.QtGui import QIcon
+from PyQt4.QtGui import QTableWidgetItem
 import qgis.core
 from qgis.core import QgsExpression
 from qgis.core import QgsFeature
@@ -51,6 +52,7 @@ import resources
 from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
 from beoordelingstool_download_dialog import BeoordelingstoolDownloadDialog
 from beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
+from .utils.layer import get_layer_dir
 
 # Import constants
 from .utils.constants import JSON_NAME
@@ -348,7 +350,7 @@ class Beoordelingstool:
                 else:
                     iface.messageBar().pushMessage("Warning", "No project name defined.", level=QgsMessageBar.WARNING, duration=0)
                 if data[JSON_KEY_PROJ][JSON_KEY_URL]:
-                    self.dockwidget.label_project_url.setText("{}".format(data[JSON_KEY_PROJ][JSON_KEY_URL]))
+                    self.dockwidget.textedit_project_url.setText("<a href=google.com>{}</a>".format(data[JSON_KEY_PROJ][JSON_KEY_URL])).clicked(QDesktopServices.openUrl(QUrl(data[JSON_KEY_PROJ][JSON_KEY_URL], QUrl.TolerantMode)))
                     # self.dockwidget.label_project_url.setText("<a href={}>{}</a>".format(data[JSON_KEY_PROJ][JSON_KEY_URL]))
                 else:
                     iface.messageBar().pushMessage("Warning", "No project url defined.", level=QgsMessageBar.WARNING, duration=0)
@@ -854,21 +856,6 @@ class Beoordelingstool:
         # # print(answer)
         # # print("Uploaded geotiff to the server")
         # pop_up_info("Uploaded geotiff to the server")
-
-
-def get_layer_dir(layer):
-    """
-    Function to get the directory of a layer.
-
-    Args:
-       (QGIS layer) layer: A layer in QGIS.
-
-    Returns
-        (str) directory: The directory in which the layer is saved.
-    """
-    layer_path = iface.activeLayer().dataProvider().dataSourceUri()
-    (directory, shapefile_name) = os.path.split(layer_path)
-    return directory
 
 def create_manholes_json(manholes_layer):
     """
