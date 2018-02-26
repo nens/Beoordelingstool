@@ -268,6 +268,7 @@ class Beoordelingstool:
             else:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = BeoordelingstoolDockWidget()
+                self.dockwidget.tabWidget.currentChanged.connect(self.tab_selected)
                 # Create the login dialog for uploading the voortgang
                 self.login_dialog_voortgang = BeoordelingstoolLoginDialog()
                 self.login_dialog_voortgang.output.connect(self.upload_voortgang)
@@ -331,6 +332,22 @@ class Beoordelingstool:
                 iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
                 self.download_dialog = BeoordelingstoolDownloadDialog()
                 self.download_dialog.show()
+
+    def tab_selected(self):
+        """Change the active layer upon selected tab."""
+        if self.dockwidget.tabWidget.currentIndex() == 1:
+            # Set manholes as active layer
+            manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]
+            iface.setActiveLayer(manholes_layer)
+        elif self.dockwidget.tabWidget.currentIndex() == 2:
+            # Set pipes as active layer
+            pipes_layer = QgsMapLayerRegistry.instance().mapLayersByName('pipes')[0]
+            iface.setActiveLayer(pipes_layer)
+        elif self.dockwidget.tabWidget.currentIndex() == 3:
+            # Set measuring_points as active layer
+            measuring_points_layer = QgsMapLayerRegistry.instance().mapLayersByName('measuring_points')[0]
+            iface.setActiveLayer(measuring_points_layer)
+
 
     def set_project_properties(self):
         """
