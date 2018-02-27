@@ -209,12 +209,19 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         # Upload JSON
         # save_json_to_server(review_json, user_data)
         # Upload zip
-        temp_dir = tempfile.mkdtemp(prefix="beoordelingstool")
-        project_name = review_json[JSON_KEY_PROJ][JSON_KEY_NAME]
-        zip_url = review_json[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]
-        # create_zip(project_name, temp_dir)
-        # save_zip_to_server(project_name, temp_dir, zip_url, user_data)
-        iface.messageBar().pushMessage("Info", "JSON and ZIP uploaded.", level=QgsMessageBar.INFO, duration=0)
+        # Check if the manholes, pipes and measuring_points layers exist
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
+        if manholes_layerList and pipes_layerList and measuring_points_layerList:
+            # Get project name from the json saved in the same folder as the "manholes" layer
+            layer_dir = get_layer_dir(manholes_layerList[0])
+            temp_dir = tempfile.mkdtemp(prefix="beoordelingstool")
+            project_name = review_json[JSON_KEY_PROJ][JSON_KEY_NAME]
+            zip_url = review_json[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]
+            create_zip(project_name, layer_dir, temp_dir)
+            # save_zip_to_server(project_name, temp_dir, zip_url, user_data)
+            iface.messageBar().pushMessage("Info", "JSON and ZIP uploaded.", level=QgsMessageBar.INFO, duration=0)
 
     def convert_shps_to_json(self):
         """
@@ -806,7 +813,7 @@ def save_json_to_server(review_json, user_data):
         response = urllib2.urlopen(req)
         the_page = reponse.read()  # nodig
 
-def create_zip(project_name, temp_dir):  # for zip_file_name in querysets
+def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in querysets
     """
     Create zipfile.
     The zipfile is downloaded in the temp folder and contains the shapefiles and
@@ -815,24 +822,26 @@ def create_zip(project_name, temp_dir):  # for zip_file_name in querysets
     Args:
         (str) project)name: The name of the project, this will also become the
             name of the zipfile.
+        (str) layer_dir: The name of the directory where the manholes layer is saved.
         (str) temp_dir: The name of the temp directory.
     """
-    # Add shapefiles
-    for name in SHAPEFILE_LIST:
-        dbf_path = os.path.join(temp_dir, "{}.dbf".format(name))
-        prj_path = os.path.join(temp_dir, "{}.prj".format(name))
-        qml_path = os.path.join(temp_dir, "{}.qml".format(name))
-        shp_path = os.path.join(temp_dir, "{}.shp".format(name))
-        shx_path = os.path.join(temp_dir, "{}.shx".format(name))
-        with zipfile.ZipFile(os.path.abspath(os.path.join(temp_dir, "{}.zip".format(project_name))), 'w') as myzip:
+    with zipfile.ZipFile(os.path.join(temp_dir, "{}.zip".format(project_name)), 'w') as myzip:
+        # Add shapefiles
+        for name in SHAPEFILE_LIST:
+            # Set paths
+            dbf_path = os.path.join(layer_dir, "{}.dbf".format(name))
+            prj_path = os.path.join(layer_dir, "{}.prj".format(name))
+            qml_path = os.path.join(layer_dir, "{}.qml".format(name))
+            shp_path = os.path.join(layer_dir, "{}.shp".format(name))
+            shx_path = os.path.join(layer_dir, "{}.shx".format(name))
+            # Add to zipfile
             myzip.write(shp_path)
             myzip.write(dbf_path)
             myzip.write(prj_path)
             myzip.write(shx_path)
             myzip.write(qml_path)
-    # Add JSON
-    json_path = os.path.join(temp_dir, "{}".format(JSON_NAME))
-    with zipfile.ZipFile(os.path.abspath(os.path.join(temp_dir, "{}.zip".format(project_name))), 'w') as myzip:
+        # Add JSON
+        json_path = os.path.join(layer_dir, "{}".format(JSON_NAME))
         myzip.write(json_path)
 
 
