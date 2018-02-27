@@ -23,6 +23,7 @@
 import base64
 import json
 import os
+import shutil
 import tempfile
 import urllib2
 import zipfile
@@ -825,24 +826,8 @@ def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in query
         (str) layer_dir: The name of the directory where the manholes layer is saved.
         (str) temp_dir: The name of the temp directory.
     """
-    with zipfile.ZipFile(os.path.join(temp_dir, "{}.zip".format(project_name)), 'w') as myzip:
-        # Add shapefiles
-        for name in SHAPEFILE_LIST:
-            # Set paths
-            dbf_path = os.path.join(layer_dir, "{}.dbf".format(name))
-            prj_path = os.path.join(layer_dir, "{}.prj".format(name))
-            qml_path = os.path.join(layer_dir, "{}.qml".format(name))
-            shp_path = os.path.join(layer_dir, "{}.shp".format(name))
-            shx_path = os.path.join(layer_dir, "{}.shx".format(name))
-            # Add to zipfile
-            myzip.write(shp_path)
-            myzip.write(dbf_path)
-            myzip.write(prj_path)
-            myzip.write(shx_path)
-            myzip.write(qml_path)
-        # Add JSON
-        json_path = os.path.join(layer_dir, "{}".format(JSON_NAME))
-        myzip.write(json_path)
+    dest_filename = os.path.join(temp_dir, project_name)
+    shutil.make_archive(dest_filename, 'zip', layer_dir)  # 'zip' is added as '.zip' as extension
 
 
 def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
