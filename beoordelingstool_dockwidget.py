@@ -407,8 +407,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         herstelmaatregel = str(self.field_combobox_pipes.currentText())
         opmerking = str(self.value_plaintextedit_pipes.toPlainText())
         layer.startEditing()
-        layer.changeAttributeValue(fid, 47, herstelmaatregel)  # Herstelmaatregel
-        layer.changeAttributeValue(fid, 48, opmerking)  # Opmerking
+        layer.changeAttributeValue(fid, 46, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(fid, 47, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
 
