@@ -527,12 +527,12 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
     def show_pipe(self):
         """Show the pipe to which a measuring station belongs."""
-        pipe_id = self.tablewidget_measuring_points.itemAt(0,0).text() if self.tablewidget_measuring_points.itemAt(0,0) else 1
+        pipe_id = int(self.tablewidget_measuring_points.itemAt(0,0).text()) if self.tablewidget_measuring_points.itemAt(0,0) else 1
         self.selected_pipe_id = pipe_id
         layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
         if layerList:
             layer = layerList[0]
-            layer.setSelectedFeatures([int(self.selected_pipe_id)])
+            layer.setSelectedFeatures([self.selected_pipe_id])
             new_feature = layer.selectedFeatures()[0]
             self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(new_feature["Herstelmaa"]))) if self.field_combobox_pipes.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
             self.value_plaintextedit_pipes.setPlainText(str(new_feature["Opmerking"]) if type(new_feature["Opmerking"]) is not QPyNullVariant else "")
