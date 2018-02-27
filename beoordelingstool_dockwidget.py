@@ -183,15 +183,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         """
         # Check if the manholes, pipes and measuring_points layers exist
         self.login_dialog_voortgang.show()
-        # manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
-        # pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
-        # measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
-        # if manholes_layerList and pipes_layerList and measuring_points_layerList:
-        #     # Check user login credentials ()
-        #     username = "Aagje_opdr_nemer"
-        #     self.login_dialog_voortgang = BeoordelingstoolLoginDialog()
-        #     self.login_dialog_voortgang.lineedit_username.setText(username)
-        #     self.login_dialog_voortgang.show()
 
     def show_login_dialog_final(self):
         """
@@ -813,31 +804,6 @@ def save_json_to_server(review_json, user_data):
         req = urllib2.Request(url, review_json, encoded_user)
         response = urllib2.urlopen(req)
         the_page = reponse.read()  # nodig
-    # # GGMN  https://github.com/nens/ggmn-qgis/blob/master/lizard_downloader.py#L534
-    # form = urllib2_upload.MultiPartForm()
-    # form.add_field('title', title)
-    # form.add_field('organisation_id', str(self.selected_organisation))
-    # filename = os.path.basename(tiff_filename)
-    # form.add_file('raster_file', filename, fileHandle=open(tiff_filename, 'rb'))
-
-    # request = urllib2.Request('https://ggmn.un-igrac.org/upload_raster/')
-    # request.add_header('User-agent', 'qgis ggmn uploader')
-    # request.add_header('username', self.username)
-    # request.add_header('password', self.password)
-    # body = str(form)
-    # request.add_header('Content-type', form.get_content_type())
-    # request.add_header('Content-length', len(body))
-    # # print("content-length: %s" % len(body))
-    # request.add_data(body)
-
-    # fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-    # open(logfile, 'w').write(request.get_data())
-    # # print("Printed what we'll send to %s" % logfile)
-
-    # answer = urllib2.urlopen(request).read()
-    # # print(answer)
-    # # print("Uploaded geotiff to the server")
-    # pop_up_info("Uploaded geotiff to the server")
 
 def create_zip(project_name, temp_dir):  # for zip_file_name in querysets
     """
