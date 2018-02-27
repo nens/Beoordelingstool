@@ -4,6 +4,9 @@
 ----------------
 
 - The JSON is saved in the same folder as the active manholes layer
+- Users are asked for their username and password (username is entered by default) when uploading voortgang or final version.
+- The name and url of the project are added to the General tab.
+- When switching between tabs, the active layers are also switched.
 
 
 0.2 (2018-02-12)
