@@ -31,6 +31,7 @@ import zipfile
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtCore import QPyNullVariant
+from PyQt4.QtCore import QSettings
 from PyQt4.QtGui import QDesktopServices
 from PyQt4.QtGui import QTableWidgetItem
 from qgis.core import QgsExpression
@@ -81,12 +82,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.tabWidget.currentChanged.connect(self.tab_changed)
 
         # General tab
-        # Create the login dialog for uploading the voortgang
-        self.login_dialog_voortgang = BeoordelingstoolLoginDialog()
-        self.login_dialog_voortgang.output.connect(self.upload_voortgang)
-        # Create the login dialog for uploading the final version
-        self.login_dialog_final = BeoordelingstoolLoginDialog()
-        self.login_dialog_final.output.connect(self.upload_final)
         self.set_project_properties()
         self.pushbutton_upload_voortgang_json.clicked.connect(
             self.show_login_dialog_voortgang)
@@ -184,7 +179,9 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         is created from the shapefiles and uploaded to the server.
         """
         # Check if the manholes, pipes and measuring_points layers exist
-        self.login_dialog_voortgang.show()
+        self.login_dialog = BeoordelingstoolLoginDialog()
+        self.login_dialog.show()
+        self.login_dialog.output.connect(self.upload_voortgang)
 
     def show_login_dialog_final(self):
         """
@@ -193,7 +190,9 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         If the user data typed in the login dialog is correct, a json
         is created from the shapefiles and uploaded to the server.
         """
-        self.login_dialog_final.show()
+        self.login_dialog = BeoordelingstoolLoginDialog()
+        self.login_dialog.show()
+        self.login_dialog.output.connect(self.upload_final)
 
     def upload_voortgang(self, user_data):
         """Upload the voortgang (json)."""

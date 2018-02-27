@@ -26,6 +26,7 @@ import json
 
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtCore import QSettings
 from qgis.core import QgsMapLayerRegistry
 
 from .utils.layer import get_layer_dir
@@ -58,8 +59,14 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        self.set_username()
-        # # Set focus to uername lineedit
+        # Set the username
+        settings = QSettings('beoordelingstool', 'qgisplugin')
+        try:
+            username = settings.value('username', type=str)
+        except TypeError:
+            username = ''
+        self.lineedit_username.setText(username)
+        # # Set focus to username lineedit
         # self.lineedit_username.setFocus()  # dows noet set input focus
         self.accepted.connect(self.get_user_data)
 
@@ -67,20 +74,6 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
         # self.closingPlugin.emit()
         # event.accept()
         pass
-
-    def set_username(self):
-    	"""Set the username in the login dialog."""
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
-        if manholes_layerList and pipes_layerList and measuring_points_layerList:
-            # Get directory to save json in
-            layer_dir = get_layer_dir(manholes_layerList[0])
-            json_path = os.path.join(layer_dir, JSON_NAME)
-            review_json = json.load(open(json_path))
-            if review_json[JSON_KEY_PROJ][JSON_KEY_USERNAME]:
-	            username = review_json[JSON_KEY_PROJ][JSON_KEY_USERNAME]
-	            self.lineedit_username.setText(username)
 
     def get_user_data(self):
         """
@@ -90,13 +83,17 @@ class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
             (dict) user_data: A dict containing the keys username and password
                 with their data from the line edit.
         """
-
         username = self.lineedit_username.text()
         password = self.lineedit_password.text()
         user_data = {
             "username": username,
             "password": password
         }
+        settings = QSettings('beoordelingstool', 'qgisplugin')
+        if username:
+            settings.setValue('username', username)
+        else:
+            settings.setValue('username', "")
         # Check user credentials
         # Emit the user data
         self.output.emit(user_data)
