@@ -52,9 +52,6 @@ from .utils.constants import JSON_NAME
 from .utils.constants import JSON_KEY_PROJ
 from .utils.constants import JSON_KEY_NAME
 from .utils.constants import JSON_KEY_URL
-from .utils.constants import JSON_KEY_URL_JSON
-from .utils.constants import JSON_KEY_URL_ZIP
-from .utils.constants import JSON_KEY_USERNAME
 # Shapefile names
 from .utils.constants import SHAPEFILE_LIST
 from .utils.constants import SHP_NAME_MANHOLES
@@ -218,7 +215,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             layer_dir = get_layer_dir(manholes_layerList[0])
             temp_dir = tempfile.mkdtemp(prefix="beoordelingstool")
             project_name = review_json[JSON_KEY_PROJ][JSON_KEY_NAME]
-            zip_url = review_json[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]
+            zip_url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
             create_zip(project_name, layer_dir, temp_dir)
             # save_zip_to_server(project_name, temp_dir, zip_url, user_data)
             iface.messageBar().pushMessage("Info", "JSON and ZIP uploaded.", level=QgsMessageBar.INFO, duration=0)
@@ -254,25 +251,10 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 else:
                     iface.messageBar().pushMessage("Error", "No project name found.", level=QgsMessageBar.CRITICAL, duration=0)
                     return json_
-                if data[JSON_KEY_PROJ][JSON_KEY_USERNAME]:
-                    json_project[JSON_KEY_USERNAME] = data[JSON_KEY_PROJ][JSON_KEY_USERNAME]
-                else:
-                    iface.messageBar().pushMessage("Error", "No username found.", level=QgsMessageBar.CRITICAL, duration=0)
-                    return json_
                 if data[JSON_KEY_PROJ][JSON_KEY_URL]:
                     json_project[JSON_KEY_URL] = data[JSON_KEY_PROJ][JSON_KEY_URL]
                 else:
                     iface.messageBar().pushMessage("Error", "No project url found.", level=QgsMessageBar.CRITICAL, duration=0)
-                    return json_
-                if data[JSON_KEY_PROJ][JSON_KEY_URL_JSON]:
-                    json_project[JSON_KEY_URL_JSON] = data[JSON_KEY_PROJ][JSON_KEY_URL_JSON]
-                else:
-                    iface.messageBar().pushMessage("Error", "No upload url found for the JSON.", level=QgsMessageBar.CRITICAL, duration=0)
-                    return json_
-                if data[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]:
-                    json_project[JSON_KEY_URL_ZIP] = data[JSON_KEY_PROJ][JSON_KEY_URL_ZIP]
-                else:
-                    iface.messageBar().pushMessage("Error", "No upload url found for the zip-file.", level=QgsMessageBar.CRITICAL, duration=0)
                     return json_
             else:
                 iface.messageBar().pushMessage("Error", "No json found.", level=QgsMessageBar.CRITICAL, duration=0)
@@ -834,7 +816,7 @@ def create_measuring_points_list(measuring_points_layer):
 
 def save_json_to_server(review_json, user_data):
     """
-    Upload a json to the review_json[JSON_KEY_PROJ][JSON_KEY_URL_JSON].
+    Upload a json to the review_json[JSON_KEY_PROJ][JSON_KEY_URL].
 
     Args:
         (dict) review_json: A dict containing the json url and the json to save to the server
@@ -843,11 +825,11 @@ def save_json_to_server(review_json, user_data):
     # Check user login credentials ()  # not needed, checked when json is uploaded
     # username = user_data["username"]
     # password = user_data["password"]
-    if review_json[JSON_KEY_PROJ][JSON_KEY_URL_JSON] is None:
-        iface.messageBar().pushMessage("Error", "The json has no json url.", level=QgsMessageBar.CRITICAL, duration=0)
+    if review_json[JSON_KEY_PROJ][JSON_KEY_URL] is None:
+        iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
-        url = review_json[JSON_KEY_PROJ][JSON_KEY_URL_JSON]
+        url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
         encoded_user = base64.b64encode(user_data)
         req = urllib2.Request(url, review_json, encoded_user)
         response = urllib2.urlopen(req)
@@ -880,7 +862,7 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
         (dict) user_data: A dict containing the username and password
     """
     if zip_url is None:
-        iface.messageBar().pushMessage("Error", "The json has no zip url.", level=QgsMessageBar.CRITICAL, duration=0)
+        iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
         data = open(os.path.join(temp_dir, "{}.zip".format(project_name))).read()

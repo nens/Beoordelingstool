@@ -40,7 +40,6 @@ from .utils.constants import SHP_NAME_PIPES
 from .utils.constants import SHP_NAME_MEASURING_POINTS
 from .utils.constants import JSON_NAME
 from .utils.constants import JSON_KEY_PROJ
-from .utils.constants import JSON_KEY_USERNAME
 
 
 class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):
