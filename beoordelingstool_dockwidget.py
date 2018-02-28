@@ -835,6 +835,8 @@ def save_json_to_server(review_json, user_data):
         iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
+        # Add error handling
+        # Give a key to the url that shows that a json is uploaded
         url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
         encoded_user = base64.b64encode(user_data)
         req = urllib2.Request(url, review_json, encoded_user)
@@ -871,6 +873,8 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
         iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
+        # Add error handling
+        # Give a key to the url that shows that a json is uploaded
         data = open(os.path.join(temp_dir, "{}.zip".format(project_name))).read()
         encoded_user = base64.b64encode(user_data)
         req = urllib2.Request(zip_url, data, encoded_user)
