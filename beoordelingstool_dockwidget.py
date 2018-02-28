@@ -40,7 +40,7 @@ from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
-from beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
+from .beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
 
 # Import functions
 from .utils.layer import get_layer_dir
