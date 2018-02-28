@@ -281,7 +281,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
-            self.field_combobox_manholes.setCurrentIndex(self.field_combobox_manholes.findText(str(f["Herstelmaa"]))) if self.field_combobox_manholes.findText(str(f["Herstelmaa"])) else self.field_combobox_manholes.setCurrentIndex(0)
+            self.field_combobox_manholes.setCurrentIndex(self.field_combobox_manholes.findText(str(f["Herstelmaa"]))) \
+                if self.field_combobox_manholes.findText(str(f["Herstelmaa"])) else self.field_combobox_manholes.setCurrentIndex(0)
             self.value_plaintextedit_manholes.setPlainText(f["Opmerking"] if type(f["Opmerking"]) is not QPyNullVariant else "")
             self.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f["CAA"]))
             self.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAJ"]))
@@ -339,7 +340,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
-            self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(f["Herstelmaa"]))) if self.field_combobox_pipes.findText(str(f["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
+            self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(f["Herstelmaa"]))) \
+                if self.field_combobox_pipes.findText(str(f["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
             self.value_plaintextedit_pipes.setPlainText(str(f["Opmerking"]) if type(f["Opmerking"]) is not QPyNullVariant else "")
             self.tablewidget_pipes.setItem(0, 0, QTableWidgetItem(f["AAA"]))
             self.tablewidget_pipes.setItem(0, 1, QTableWidgetItem(f["AAB"]))
@@ -425,7 +427,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             new_feature = layer.selectedFeatures()[0]
 
             # Set values
-            self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
+            self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) \
+                if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
             opmerking = new_feature["Opmerking"] if new_feature["Opmerking"] and type(new_feature["Opmerking"]) is not QPyNullVariant else ''
             self.value_plaintextedit_measuring_points.setPlainText(opmerking)
             self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
@@ -451,7 +454,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         layer = iface.activeLayer()
         fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
-            self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(f["Herstelmaa"]))) if self.field_combobox_measuring_points.findText(str(f["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
+            self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(f["Herstelmaa"]))) \
+                if self.field_combobox_measuring_points.findText(str(f["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
             self.value_plaintextedit_measuring_points.setPlainText(str(f["Opmerking"]) if type(f["Opmerking"]) is not QPyNullVariant else "")
             self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(f["PIPE_ID"]))
             self.tablewidget_measuring_points.setItem(0, 1, QTableWidgetItem(f["A"]))
@@ -490,7 +494,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 # Set values
                 self.selected_measuring_point_id = measuring_point_id_new
                 # Update Measuring points tab and tablewidget
-                self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
+                self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) \
+                    if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
                 opmerking = new_feature["Opmerking"] if new_feature["Opmerking"] and type(new_feature["Opmerking"]) is not QPyNullVariant else ''
                 self.value_plaintextedit_measuring_points.setPlainText(opmerking)
                 self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
@@ -522,7 +527,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             layer = layerList[0]
             layer.setSelectedFeatures([self.selected_pipe_id])
             new_feature = layer.selectedFeatures()[0]
-            self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(new_feature["Herstelmaa"]))) if self.field_combobox_pipes.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
+            self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(new_feature["Herstelmaa"]))) \
+                if self.field_combobox_pipes.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
             self.value_plaintextedit_pipes.setPlainText(str(new_feature["Opmerking"]) if type(new_feature["Opmerking"]) is not QPyNullVariant else "")
             self.tablewidget_pipes.setItem(0, 0, QTableWidgetItem(new_feature["AAA"]))
             self.tablewidget_pipes.setItem(0, 1, QTableWidgetItem(new_feature["AAB"]))
@@ -595,7 +601,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 self.selected_measuring_point_id = measuring_point_id_new
                 # Update Measuring points tab and tablewidget
 
-                self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
+                self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) \
+                    if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
                 opmerking = new_feature["Opmerking"] if new_feature["Opmerking"] and type(new_feature["Opmerking"]) is not QPyNullVariant else ''
                 self.value_plaintextedit_measuring_points.setPlainText(opmerking)
                 self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
