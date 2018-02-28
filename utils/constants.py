@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
 """Module containing the constants."""
 
-# Constants for buttons and textboxes
-BUTTON_DOWNLOAD_PUTTEN = "download_rioolputten_search"
-TEXTBOX_DOWNLOAD_PUTTEN = "download_rioolputten_text"
-
 # Constants for file types
 FILE_TYPE_JSON = "json"
+
+# shapefile names
+SHP_NAME_MANHOLES = "manholes"
+SHP_NAME_PIPES = "pipes"
+SHP_NAME_MEASURING_POINTS = "measuring_points"
+SHAPEFILE_LIST = [SHP_NAME_MANHOLES, SHP_NAME_PIPES, SHP_NAME_MEASURING_POINTS]
+
+# json name and property
+JSON_NAME = "review.json"
+JSON_KEY_PROJ = "project"
+JSON_KEY_NAME = "name"
+JSON_KEY_URL = "url"
+JSON_KEY_SLUG = "slug"
 
 # Herstelmaatregeln
 HERSTELMAATREGELEN = [

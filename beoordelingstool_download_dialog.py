@@ -32,20 +32,15 @@ from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import QSettings
 from PyQt4.QtGui import QFileDialog
-# from qgis.core import QgsMapLayerRegistry
+from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
-# from beoordelingstool_dockwidget import BeoordelingstoolDockWidget
-
-BUTTON_DOWNLOAD_RIOOL = "download_riool_search"
-TEXTBOX_DOWNLOAD_RIOOL = "download_riool_text"
-# from .utils.constants import BUTTON_DOWNLOAD_PUTTEN
-# from .utils.constants import TEXTBOX_DOWNLOAD_PUTTEN
-FILE_TYPE_JSON = "json"
-# HERSTELMAATREGEL_DEFAULT = 1
-# from .utils.constants import FILE_TYPE_JSON
-# from .utils.get_data import get_file
+from .utils.constants import FILE_TYPE_JSON
+from .utils.constants import JSON_NAME
+from .utils.constants import SHP_NAME_MANHOLES
+from .utils.constants import SHP_NAME_PIPES
+from .utils.constants import SHP_NAME_MEASURING_POINTS
 
 LAYER_STYLES_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layer_styles'))
 
@@ -70,35 +65,37 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Get json
         self.download_riool_search.clicked.connect(self.search_json_riool)
         # Save json in 3 shapefiles: manholes, pipes and measuring_points
-        self.save_shapefiles_button.clicked.connect(
-            self.save_shapefiles)
-        # # Show dockwidget after pressing OK with all 3 layers
-        # self.accepted.connect(self.show_dockwidget)
+        self.accepted.connect(self.save_shapefiles)
+        # Show dockwidget after pressing OK with all 3 layers
+        self.json_path = ''
 
     def closeEvent(self, event):
         # self.closingPlugin.emit()
         # event.accept()
         pass
 
-    def set_filename(self, TEXTBOX, filename):
-        """Set the filename in the proper textbox."""
-        if TEXTBOX == TEXTBOX_DOWNLOAD_PUTTEN:
-            self.download_rioolputten_text.setText(filename)
-
     def search_json_riool(self):
         """Get the json of 'Rioolputten'."""
-        self.search_file(BUTTON_DOWNLOAD_RIOOL)
-
-    def search_file(self, BUTTON):
-        """Function to search a file."""
-        if BUTTON == BUTTON_DOWNLOAD_RIOOL:
-            textbox = TEXTBOX_DOWNLOAD_RIOOL
         file_type = FILE_TYPE_JSON
+        self.search_file(file_type)
+
+    def search_file(self, file_type):
+        """
+        Function to search a file.
+
+        Args:
+            (str) file_type: The type of file.
+        """
         filename = self.get_file(file_type)
-        self.set_filename(textbox, filename)
+        self.json_path = filename
 
     def get_file(self, file_type):
-        """Function to get a file."""
+        """
+        Function to get a file.
+
+        Args:
+            (str) file_type: The type of file.
+        """
         settings = QSettings('beoordelingstool', 'qgisplugin')
 
         try:
@@ -106,8 +103,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         except TypeError:
             init_path = os.path.expanduser("~")
         if file_type == FILE_TYPE_JSON:
-          filename = QFileDialog.getOpenFileName(None,
-                                                 'Select import file',
+            filename = QFileDialog.getOpenFileName(None,
+                                                 'Open json file',
                                                  init_path,
                                                  'JSON (*.json)')
 
@@ -117,21 +114,27 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         return filename
 
-    def set_filename(self, TEXTBOX, filename):
-            """Set the filename in the proper textbox."""
-            if TEXTBOX == TEXTBOX_DOWNLOAD_RIOOL:
-                self.download_riool_text.setText(filename)
-
     def save_shapefiles(self):
-        """Save the manholes, pipes and measuring stations shapefiles."""
-        directory = self.get_shapefiles_directory()
+        """Save the manholes, pipes and measuring points shapefiles."""
+        if self.json_path != '':
+            directory = self.get_shapefiles_directory()
 
-        # Get json
-        filename_json = self.download_riool_text.text()
-        manholes, pipes = self.get_json(filename_json)
-
-        self.save_shapefile_manholes(directory, manholes)
-        self.save_shapefiles_pipes_measuringpoints(directory, pipes)
+            if directory != '':
+                # Get json
+                filename_json = self.json_path
+                manholes, pipes = self.get_json_manholes_and_pipes(filename_json)
+                # Save json as review.json
+                json_origin = os.path.abspath(self.json_path)
+                json_dest = os.path.abspath(os.path.join(directory, JSON_NAME))
+                if json_origin != json_dest:
+                    shutil.copyfile(os.path.abspath(json_origin), os.path.abspath(json_dest))
+                # Save shapefiles
+                self.save_shapefile_manholes(directory, manholes)
+                self.save_shapefiles_pipes_measuringpoints(directory, pipes)
+            else:
+                iface.messageBar().pushMessage("Warning", "No shapefile directory found.", level=QgsMessageBar.WARNING, duration=0)
+        else:
+            iface.messageBar().pushMessage("Warning", "No json found.", level=QgsMessageBar.WARNING, duration=0)
 
     def get_shapefiles_directory(self):
         """Get the directory to save the shapefiles in."""
@@ -142,7 +145,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         except TypeError:
             init_path = os.path.expanduser("~")
         directory = QFileDialog.getExistingDirectory(None,
-                                                     'Select directory',
+                                                     'Select directory for saving shapefiles',
                                                      init_path)
 
         if directory:
@@ -150,6 +153,18 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                               os.path.dirname(directory))
 
         return str(directory)
+
+    def get_json_manholes_and_pipes(self, filename):
+        """Function to get a JSON."""
+        manholes = []
+        pipes = []
+        with open(filename) as json_file:
+            json_data = json.load(json_file)
+            for manhole in json_data["manholes"]:
+                manholes.append(manhole)
+            for pipe in json_data["pipes"]:
+                pipes.append(pipe)
+        return (manholes, pipes)
 
     def save_shapefile_manholes(self, directory, manholes):
         """
@@ -162,7 +177,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         """
 
         # Manholes path
-        manholes_path = os.path.join(directory, "manholes.shp")
+        manholes_path = os.path.join(directory, "{}.shp".format(SHP_NAME_MANHOLES))
 
         # Create manhole shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
@@ -176,8 +191,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             layer = self.feature_to_manholes_shp(layer, manhole)
         data_source = None
         # Copy qml as layer style
-        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "manholes.qml")), os.path.abspath(os.path.join(directory, "manholes.qml")))
-        layer = iface.addVectorLayer(manholes_path, "manholes", "ogr")
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_MANHOLES))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_MANHOLES))))
+        layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
 
     def save_shapefiles_pipes_measuringpoints(self, directory, pipes):
         """
@@ -188,28 +203,28 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (str) directory: The directory to save the shapefiles in.
             (json) pipes: The pipes to save in the shapefiles.
                 The pipes json can have nested assets, known as measuring
-                    stations.
+                    points.
         """
         
         # Pipes path
-        pipes_path = os.path.join(directory, "pipes.shp")
+        pipes_path = os.path.join(directory, "{}.shp".format(SHP_NAME_PIPES))
         # Create pipes shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
         data_source = driver.CreateDataSource(pipes_path)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
-        srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
+        srs.ImportFromEPSG(28992)
         layer = data_source.CreateLayer(pipes_path, srs, ogr.wkbLineString)
         # data_source = None
 
         # Measuring points path
-        measuring_points_path = os.path.join(directory, "measuring_points.shp")
+        measuring_points_path = os.path.join(directory, "{}.shp".format(SHP_NAME_MEASURING_POINTS))
         # Create measuring points shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
         data_source_measuring_point = driver.CreateDataSource(measuring_points_path)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
-        srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
+        srs.ImportFromEPSG(28992)
         measuring_points_layer = data_source_measuring_point.CreateLayer(measuring_points_path, srs, ogr.wkbPoint)
 
         # Populate pipe shapefile
@@ -224,26 +239,17 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             pipe_id += 1
         data_source = None
         # Copy qml as layer style
-        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "pipes.qml")), os.path.abspath(os.path.join(directory, "pipes.qml")))
-        layer = iface.addVectorLayer(pipes_path, "pipes", "ogr")
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_PIPES))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_PIPES))))
+        layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
 
         data_source_measuring_point = None
         # Copy qml as layer style
-        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "measuring_points.qml")), os.path.abspath(os.path.join(directory, "measuring_points.qml")))
-        measuring_points_layer = iface.addVectorLayer(measuring_points_path, "measuring_points", "ogr")
+        shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_MEASURING_POINTS))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_MEASURING_POINTS))))
+        measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
 
-
-    def get_json(self, filename):
-        """Function to get a JSON."""
-        manholes = []
-        pipes = []
-        with open(filename) as json_file:
-            json_data = json.load(json_file)
-            for manhole in json_data["manholes"]:
-                manholes.append(manhole)
-            for pipe in json_data["pipes"]:
-                pipes.append(pipe)
-        return (manholes, pipes)
+        # Set manholes as active layer
+        manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]
+        iface.setActiveLayer(manholes_layer)
 
     def fields_to_manholes_shp(self, layer, location):
         """
@@ -634,15 +640,15 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         AXH = ogr.FieldDefn("AXH", ogr.OFTString)
         AXH.SetWidth(255)
         layer.CreateField(AXH)
-        ZC = ogr.FieldDefn("ZC", ogr.OFTString)
-        ZC.SetWidth(255)
-        layer.CreateField(ZC)
         herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
         herstelmaatregel.SetWidth(255)
         layer.CreateField(herstelmaatregel)
         opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
         opmerking.SetWidth(255)
         layer.CreateField(opmerking)
+        ZC = ogr.FieldDefn("ZC", ogr.OFTString)
+        ZC.SetWidth(255)
+        layer.CreateField(ZC)
         return layer
 
     def feature_to_pipes_shp(self, layer, id_nr, pipe):
@@ -708,10 +714,10 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         AXF = pipe["AXF"]
         AXG = pipe["AXG"]
         AXH = pipe["AXH"]
-        ZC = pipe["ZC"]
         herstelmaatregel = pipe["Herstelmaatregel"]
         # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
         opmerking = pipe["Opmerking"]
+        ZC = pipe["ZC"]
 
         # Set values
         feature = ogr.Feature(layer.GetLayerDefn())
@@ -764,9 +770,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         feature.SetField("AXF", str(AXF))
         feature.SetField("AXG", str(AXG))
         feature.SetField("AXH", str(AXH))
-        feature.SetField("ZC", str(ZC))
         feature.SetField("Herstelmaa", str(herstelmaatregel))
         feature.SetField("Opmerking", str(opmerking))
+        feature.SetField("ZC", str(ZC))
         layer.CreateFeature(feature)
 
         feature = None
@@ -852,8 +858,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (shapefile layer) layer: A shapefile layer.
         """
         # Get values
-        x = measuring_point["x"] if measuring_point["x"] else 0.0
-        y = measuring_point["y"] if measuring_point["y"] else 0.0
+        x = float(measuring_point["x"]) if measuring_point["x"] else 0.0
+        y = float(measuring_point["y"]) if measuring_point["y"] else 0.0
         A = measuring_point.get("A", None)
         B = measuring_point.get("B", None)
         C = measuring_point.get("C", None)
@@ -898,15 +904,3 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         feature = None
         return layer
-
-    # def show_dockwidget(self):
-    #     """Show the dockwidget if all 3 layers exist."""
-    #     manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("manholes")
-    #     pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName("pipes")
-    #     measuring_stations_layerList = QgsMapLayerRegistry.instance().mapLayersByName("measuring_points")
-
-    #     if manholes_layerList or pipes_layerList or measuring_stations_layerList:
-    #         # dockwidget = BeoordelingstoolDockWidget()
-    #         # dockwidget.closingPlugin.connect(dockwidget.closeEvent)
-    #         # iface.addDockWidget(Qt.RightDockWidgetArea, dockwidget)
-    #         # dockwidget.show()

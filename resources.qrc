@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/SewerAssessor" >
+    <qresource prefix="/plugins/Beoordelingstool" >
         <file>icon.png</file>
     </qresource>
 </RCC>

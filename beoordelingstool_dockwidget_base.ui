@@ -53,7 +53,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>50</y>
+        <y>120</y>
         <width>411</width>
         <height>81</height>
        </rect>
@@ -79,7 +79,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>130</y>
+        <y>200</y>
         <width>411</width>
         <height>81</height>
        </rect>
@@ -100,6 +100,29 @@
         <string>Upload json</string>
        </property>
       </widget>
+     </widget>
+     <widget class="QTextEdit" name="textedit_project_url">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>411</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Project url&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_manholes">
@@ -438,7 +461,7 @@
         <string>Get selected pipe</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_pipe_to_measuring_station">
+      <widget class="QPushButton" name="pushbutton_pipe_to_measuring_point">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -448,7 +471,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Measuring stations</string>
+        <string>Measuring points</string>
        </property>
       </widget>
      </widget>
@@ -767,11 +790,6 @@
         <string>AXH</string>
        </property>
       </row>
-      <row>
-       <property name="text">
-        <string>ZC</string>
-       </property>
-      </row>
       <column>
        <property name="text">
         <string>Value</string>
@@ -779,11 +797,11 @@
       </column>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_measuring_stations">
+    <widget class="QWidget" name="tab_measuring_points">
      <attribute name="title">
-      <string>Measuring stations</string>
+      <string>Measuring points</string>
      </attribute>
-     <widget class="QGroupBox" name="groupbox_measuring_stations">
+     <widget class="QGroupBox" name="groupbox_measuring_points">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -793,9 +811,9 @@
        </rect>
       </property>
       <property name="title">
-       <string>Measuring stations</string>
+       <string>Measuring points</string>
       </property>
-      <widget class="QPushButton" name="pushbutton_measuring_station_to_pipe">
+      <widget class="QPushButton" name="pushbutton_measuring_point_to_pipe">
        <property name="geometry">
         <rect>
          <x>160</x>
@@ -808,7 +826,7 @@
         <string>Back to pipe</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_measuring_stations_previous">
+      <widget class="QPushButton" name="pushbutton_measuring_points_previous">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -824,7 +842,7 @@
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_measuring_stations_next">
+      <widget class="QPushButton" name="pushbutton_measuring_points_next">
        <property name="geometry">
         <rect>
          <x>290</x>
@@ -837,7 +855,7 @@
         <string>Next</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_get_selected_measuring_station">
+      <widget class="QPushButton" name="pushbutton_get_selected_measuring_point">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -847,11 +865,11 @@
         </rect>
        </property>
        <property name="text">
-        <string>Get measuring station</string>
+        <string>Get measuring points</string>
        </property>
       </widget>
      </widget>
-     <widget class="QGroupBox" name="groupbox_attributes_measuring_stations">
+     <widget class="QGroupBox" name="groupbox_attributes_measuring_points">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -863,7 +881,7 @@
       <property name="title">
        <string>Attributes</string>
       </property>
-      <widget class="QLabel" name="field_label_measuring_stations">
+      <widget class="QLabel" name="field_label_measuring_points">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -876,7 +894,7 @@
         <string>Herstelmaatregel</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="field_combobox_measuring_stations">
+      <widget class="QComboBox" name="field_combobox_measuring_points">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -886,7 +904,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="value_label_measuring_stations">
+      <widget class="QLabel" name="value_label_measuring_points">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -899,7 +917,7 @@
         <string>Opmerking</string>
        </property>
       </widget>
-      <widget class="QPlainTextEdit" name="value_plaintextedit_measuring_stations">
+      <widget class="QPlainTextEdit" name="value_plaintextedit_measuring_points">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -909,7 +927,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushbutton_save_attribute_measuring_stations">
+      <widget class="QPushButton" name="pushbutton_save_attribute_measuring_points">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -923,7 +941,7 @@
        </property>
       </widget>
      </widget>
-     <widget class="QTableWidget" name="tablewidget_measuring_stations">
+     <widget class="QTableWidget" name="tablewidget_measuring_points">
       <property name="geometry">
        <rect>
         <x>10</x>
