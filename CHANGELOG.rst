@@ -1,6 +1,6 @@
 # Changelog
 
-0.3 (unreleased)
+0.3 (2018-02-28)
 ----------------
 
 - The JSON is saved in the same folder as the active manholes layer.
