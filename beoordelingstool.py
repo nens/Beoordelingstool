@@ -246,7 +246,7 @@ class Beoordelingstool:
             #    removed on close (see self.onClosePlugin method)
             # Check if the layers manholes, pipes and measuring_points are active
             if not manholes_layerList or not pipes_layerList or not measuring_points_layerList:
-                iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
+                iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=20)
                 self.download_dialog = BeoordelingstoolDownloadDialog()
                 self.download_dialog.show()
             else:
@@ -272,6 +272,6 @@ class Beoordelingstool:
                 self.iface.removeDockWidget(self.dockwidget)
                 self.dockwidget = None
                 self.pluginIsActive = False
-                iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=0)
+                iface.messageBar().pushMessage("Warning", "You don't have a manholes, pipes and measuring_points layer. \n Upload a json.", level=QgsMessageBar.WARNING, duration=20)
                 self.download_dialog = BeoordelingstoolDownloadDialog()
                 self.download_dialog.show()

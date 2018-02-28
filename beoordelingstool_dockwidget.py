@@ -787,7 +787,7 @@ def create_pipes_json(pipes_layer, measuring_points_layer):
             expr = QgsExpression("\"PIPE_ID\" = '{}'".format(feature["ID"]))
             request = QgsFeatureRequest(expr)
             measuring_points_layer_specific_pipe = measuring_points_layer.getFeatures(request)
-            pipe["ZC"] = create_measuring_stations_list(measuring_stations_layer_specific_pipe)
+            pipe["ZC"] = create_measuring_stations_list(measuring_points_layer_specific_pipe)
         pipes_list.append(pipe)
 
     return pipes_list
