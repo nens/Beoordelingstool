@@ -38,8 +38,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 from .utils.constants import SHP_NAME_MANHOLES
 from .utils.constants import SHP_NAME_PIPES
 from .utils.constants import SHP_NAME_MEASURING_POINTS
-from .utils.constants import JSON_NAME
-from .utils.constants import JSON_KEY_PROJ
 
 
 class BeoordelingstoolLoginDialog(QtGui.QDialog, FORM_CLASS):

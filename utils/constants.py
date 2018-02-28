@@ -15,6 +15,7 @@ JSON_NAME = "review.json"
 JSON_KEY_PROJ = "project"
 JSON_KEY_NAME = "name"
 JSON_KEY_URL = "url"
+JSON_KEY_SLUG = "slug"
 
 # Herstelmaatregeln
 HERSTELMAATREGELEN = [

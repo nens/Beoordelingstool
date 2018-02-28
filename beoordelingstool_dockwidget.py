@@ -52,6 +52,7 @@ from .utils.constants import JSON_NAME
 from .utils.constants import JSON_KEY_PROJ
 from .utils.constants import JSON_KEY_NAME
 from .utils.constants import JSON_KEY_URL
+from .utils.constants import JSON_KEY_SLUG
 # Shapefile names
 from .utils.constants import SHAPEFILE_LIST
 from .utils.constants import SHP_NAME_MANHOLES
@@ -255,6 +256,11 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                     json_project[JSON_KEY_URL] = data[JSON_KEY_PROJ][JSON_KEY_URL]
                 else:
                     iface.messageBar().pushMessage("Error", "No project url found.", level=QgsMessageBar.CRITICAL, duration=0)
+                    return json_
+                if data[JSON_KEY_PROJ][JSON_KEY_SLUG]:
+                    json_project[JSON_KEY_SLUG] = data[JSON_KEY_PROJ][JSON_KEY_SLUG]
+                else:
+                    iface.messageBar().pushMessage("Error", "No project slug found.", level=QgsMessageBar.CRITICAL, duration=0)
                     return json_
             else:
                 iface.messageBar().pushMessage("Error", "No json found.", level=QgsMessageBar.CRITICAL, duration=0)
