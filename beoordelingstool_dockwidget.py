@@ -861,7 +861,8 @@ def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in query
 
 def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
     """
-    Save a zip-file (containing an ESRI shapefile and accompanying ini-file) to the server (zip_url).
+    Save a zip-file (containing three ESRI shapefiles and a review.json) to
+    the server (zip_url).
 
     Args:
         (str) project_name: The name of the zip-file to save to the server.
