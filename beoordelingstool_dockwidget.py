@@ -415,40 +415,45 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             expr = QgsExpression("\"PIPE_ID\" IS '{}'".format(self.selected_pipe_id))
             measuring_points = layer.getFeatures(QgsFeatureRequest(expr))  #.next()
             ids = [measuring_point.id() for measuring_point in measuring_points]  # select only the features for which the expression is true
-            first_id = ids[0]
-            last_id = ids[-1]
-            # Show selected measuring point if it belongs to the selected pipe
-            if self.selected_measuring_point_id >= first_id and self.selected_measuring_point_id <= last_id:
-                pass
-            # Show first measuring point that belongs to the selected pipe:
-            else:
-                self.selected_measuring_point_id = first_id
-            layer.setSelectedFeatures([int(self.selected_measuring_point_id)])
-            new_feature = layer.selectedFeatures()[0]
+            if ids:
+                first_id = ids[0]
+                last_id = ids[-1]
+                # Show selected measuring point if it belongs to the selected pipe
+                if self.selected_measuring_point_id >= first_id and self.selected_measuring_point_id <= last_id:
+                    pass
+                # Show first measuring point that belongs to the selected pipe:
+                else:
+                    self.selected_measuring_point_id = first_id
+                layer.setSelectedFeatures([int(self.selected_measuring_point_id)])
+                new_feature = layer.selectedFeatures()[0]
 
-            # Set values
-            self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) \
-                if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
-            opmerking = new_feature["Opmerking"] if new_feature["Opmerking"] and type(new_feature["Opmerking"]) is not QPyNullVariant else ''
-            self.value_plaintextedit_measuring_points.setPlainText(opmerking)
-            self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
-            self.tablewidget_measuring_points.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
-            self.tablewidget_measuring_points.setItem(0, 2, QTableWidgetItem(new_feature["B"]))
-            self.tablewidget_measuring_points.setItem(0, 3, QTableWidgetItem(new_feature["C"]))
-            self.tablewidget_measuring_points.setItem(0, 4, QTableWidgetItem(new_feature["D"]))
-            self.tablewidget_measuring_points.setItem(0, 5, QTableWidgetItem(new_feature["E"]))
-            self.tablewidget_measuring_points.setItem(0, 6, QTableWidgetItem(new_feature["F"]))
-            self.tablewidget_measuring_points.setItem(0, 7, QTableWidgetItem(new_feature["G"]))
-            self.tablewidget_measuring_points.setItem(0, 8, QTableWidgetItem(new_feature["I"]))
-            self.tablewidget_measuring_points.setItem(0, 9, QTableWidgetItem(new_feature["J"]))
-            self.tablewidget_measuring_points.setItem(0, 10, QTableWidgetItem(new_feature["K"] if new_feature["K"] else None))
-            self.tablewidget_measuring_points.setItem(0, 11, QTableWidgetItem(new_feature["M"]))
-            self.tablewidget_measuring_points.setItem(0, 12, QTableWidgetItem(new_feature["N"]))
-            self.tablewidget_measuring_points.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
-            iface.setActiveLayer(layer)
-            layer.triggerRepaint()
-            # Go to measuring points tab
-            self.tabWidget.setCurrentIndex(3)
+                # Set values
+                self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) \
+                    if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
+                opmerking = new_feature["Opmerking"] if new_feature["Opmerking"] and type(new_feature["Opmerking"]) is not QPyNullVariant else ''
+                self.value_plaintextedit_measuring_points.setPlainText(opmerking)
+                self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
+                self.tablewidget_measuring_points.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
+                self.tablewidget_measuring_points.setItem(0, 2, QTableWidgetItem(new_feature["B"]))
+                self.tablewidget_measuring_points.setItem(0, 3, QTableWidgetItem(new_feature["C"]))
+                self.tablewidget_measuring_points.setItem(0, 4, QTableWidgetItem(new_feature["D"]))
+                self.tablewidget_measuring_points.setItem(0, 5, QTableWidgetItem(new_feature["E"]))
+                self.tablewidget_measuring_points.setItem(0, 6, QTableWidgetItem(new_feature["F"]))
+                self.tablewidget_measuring_points.setItem(0, 7, QTableWidgetItem(new_feature["G"]))
+                self.tablewidget_measuring_points.setItem(0, 8, QTableWidgetItem(new_feature["I"]))
+                self.tablewidget_measuring_points.setItem(0, 9, QTableWidgetItem(new_feature["J"]))
+                self.tablewidget_measuring_points.setItem(0, 10, QTableWidgetItem(new_feature["K"] if new_feature["K"] else None))
+                self.tablewidget_measuring_points.setItem(0, 11, QTableWidgetItem(new_feature["M"]))
+                self.tablewidget_measuring_points.setItem(0, 12, QTableWidgetItem(new_feature["N"]))
+                self.tablewidget_measuring_points.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
+                iface.setActiveLayer(layer)
+                layer.triggerRepaint()
+                # Go to measuring points tab
+                self.tabWidget.setCurrentIndex(3)
+            else:
+                iface.messageBar().pushMessage("Warning", "There are no measuring points connected to this pipe.", level=QgsMessageBar.WARNING, duration=0)
+        else:
+            iface.messageBar().pushMessage("Error", "There is no measuring points layer.", level=QgsMessageBar.CRITICAL, duration=0)
 
     def get_selected_measuring_point(self):
         layer = iface.activeLayer()
