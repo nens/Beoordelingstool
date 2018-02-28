@@ -104,7 +104,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.pushbutton_pipe_to_measuring_point.clicked.connect(
             self.show_measuring_point)
 
-        # Measuring stations tab
+        # Measuring points tab
         self.selected_measuring_point_id = 0
         self.pushbutton_get_selected_measuring_point.clicked.connect(
             self.get_selected_measuring_point)
@@ -413,7 +413,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         layer.triggerRepaint()
 
     def show_measuring_point(self):
-        """Show the measuring station that belongs to a certain pipe."""
+        """Show the measuring point that belongs to a certain pipe."""
         try:
             current_measuring_point_pipe_id = self.tablewidget_measuring_points.itemAt(0,0).text()
         except:  # No measuring point selected
@@ -427,10 +427,10 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             ids = [measuring_point.id() for measuring_point in measuring_points]  # select only the features for which the expression is true
             first_id = ids[0]
             last_id = ids[-1] if ids[-1] else ids[0]
-            # Show selected measuring station if it belongs to the selected pipe
+            # Show selected measuring point if it belongs to the selected pipe
             if self.selected_measuring_point_id >= first_id and self.selected_measuring_point_id <= last_id:
                 pass
-            # Show first measuring station that belongs to the selected pipe:
+            # Show first measuring point that belongs to the selected pipe:
             else:
                 self.selected_measuring_point_id = first_id
             layer.setSelectedFeatures([int(self.selected_measuring_point_id)])
@@ -456,7 +456,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             self.tablewidget_measuring_points.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
             iface.setActiveLayer(layer)
             layer.triggerRepaint()
-            # Go to measuring stations tab
+            # Go to measuring points tab
             self.tabWidget.setCurrentIndex(3)
 
     def get_selected_measuring_point(self):
@@ -482,9 +482,9 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             self.selected_measuring_point_id = f.id()
 
     def show_previous_measuring_point(self):
-        """Show the next measuring station."""
+        """Show the next measuring point."""
         if self.selected_measuring_point_id <= 0:
-            iface.messageBar().pushMessage("Info", "This pipe has no previous measuring station.", level=QgsMessageBar.INFO, duration=0)
+            iface.messageBar().pushMessage("Info", "This pipe has no previous measuring point.", level=QgsMessageBar.INFO, duration=0)
             return
         current_measuring_point_id = self.selected_measuring_point_id
         current_pipe_id = self.selected_pipe_id
@@ -496,12 +496,12 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             layer.setSelectedFeatures([int(measuring_point_id_new)])
             new_feature = layer.selectedFeatures()[0]
             pipe_id_new = int(new_feature["PIPE_ID"])
-            # Only show the new measuring station if it belongs to the same
+            # Only show the new measuring point if it belongs to the same
             # pipe
             if current_pipe_id == pipe_id_new:
                 # Set values
                 self.selected_measuring_point_id = measuring_point_id_new
-                # Update Measuring stations tab and tablewidget
+                # Update Measuring points tab and tablewidget
                 self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
                 opmerking = new_feature["Opmerking"] if new_feature["Opmerking"] and type(new_feature["Opmerking"]) is not QPyNullVariant else ''
                 self.value_plaintextedit_measuring_points.setPlainText(opmerking)
@@ -522,11 +522,11 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 layer.triggerRepaint()
             else:
                 layer.setSelectedFeatures([int(self.selected_measuring_point_id)])
-                iface.messageBar().pushMessage("Info", "This pipe has no previous measuring station.", level=QgsMessageBar.INFO, duration=0)
+                iface.messageBar().pushMessage("Info", "This pipe has no previous measuring point.", level=QgsMessageBar.INFO, duration=0)
 
 
     def show_pipe(self):
-        """Show the pipe to which a measuring station belongs."""
+        """Show the pipe to which a measuring point belongs."""
         pipe_id = int(self.tablewidget_measuring_points.itemAt(0,0).text()) if self.tablewidget_measuring_points.itemAt(0,0) else 1
         self.selected_pipe_id = pipe_id
         layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
@@ -587,7 +587,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             self.tabWidget.setCurrentIndex(2)
 
     def show_next_measuring_point(self):
-        """Show the next measuring station."""
+        """Show the next measuring point."""
         # Only show if still same pipe
         # Show message if first id and clicked on again (can't go further)
         current_measuring_point_id = self.selected_measuring_point_id
@@ -600,12 +600,12 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             layer.setSelectedFeatures([int(self.selected_measuring_point_id) + 1])
             new_feature = layer.selectedFeatures()[0]
             pipe_id_new = int(new_feature["PIPE_ID"])
-            # Only show the new measuring station if it belongs to the same
+            # Only show the new measuring point if it belongs to the same
             # pipe
             if current_pipe_id == pipe_id_new:
                 # Set values
                 self.selected_measuring_point_id = measuring_point_id_new
-                # Update Measuring stations tab and tablewidget
+                # Update Measuring points tab and tablewidget
 
                 self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
                 opmerking = new_feature["Opmerking"] if new_feature["Opmerking"] and type(new_feature["Opmerking"]) is not QPyNullVariant else ''
@@ -627,7 +627,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 layer.triggerRepaint()
             else:
                 layer.setSelectedFeatures([int(self.selected_measuring_point_id)])
-                iface.messageBar().pushMessage("Info", "This pipe has no next measuring station.", level=QgsMessageBar.INFO, duration=0)
+                iface.messageBar().pushMessage("Info", "This pipe has no next measuring point.", level=QgsMessageBar.INFO, duration=0)
 
     def save_beoordeling_measuring_points(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
@@ -708,16 +708,16 @@ def create_manholes_json(manholes_layer):
 
 def create_pipes_json(pipes_layer, measuring_points_layer):
     """
-    Create a pipes dict from the pipes and measuring stations shapefile.
-    One pipe can have 0/> measuring stations.
+    Create a pipes dict from the pipes and measuring points shapefile.
+    One pipe can have 0/> measuring points.
 
     Args:
         (shapefile) pipes_shapefile: The pipes shapefile.
-        (shapefile) measuring_points_shapefile: The measuring stations shapefile.
+        (shapefile) measuring_points_shapefile: The measuring points shapefile.
 
     Returns:
         (dict) pipes: A dict containing the information from the
-            pipes and measuring stations shapefile.
+            pipes and measuring points shapefile.
     """
     idx = measuring_points_layer.fieldNameIndex("PIPE_ID")
     values = measuring_points_layer.uniqueValues(idx)
@@ -781,56 +781,56 @@ def create_pipes_json(pipes_layer, measuring_points_layer):
             "ACA": str(feature["ACA"]),
             "ADC": str(feature["ADC"]),
         }
-        # Add measuring stations to the pipe, if the pipe has measuring
-        # stations
+        # Add measuring points to the pipe, if the pipe has measuring
+        # points
         if feature["ID"] in values:
             expr = QgsExpression("\"PIPE_ID\" = '{}'".format(feature["ID"]))
             request = QgsFeatureRequest(expr)
             measuring_points_layer_specific_pipe = measuring_points_layer.getFeatures(request)
-            pipe["ZC"] = create_measuring_stations_list(measuring_points_layer_specific_pipe)
+            pipe["ZC"] = create_measuring_points_list(measuring_points_layer_specific_pipe)
         pipes_list.append(pipe)
 
     return pipes_list
 
-def create_measuring_stations_list(measuring_stations_layer):
+def create_measuring_points_list(measuring_points_layer):
     """
-    Create a list from the measuring stations shapefile.
-    A list item is a json, representing a measuring station.
+    Create a list from the measuring points shapefile.
+    A list item is a json, representing a measuring points.
 
     Args:
-        (shapefile) measuring_stations_shapefile: The measuring stations 
+        (shapefile) measuring_points_layer: The measuring points 
             shapefile.
 
     Returns:
-        (list) measuring_station_list: A list containing the information from
-            the measuring stations shapefile. A list item is a measuring
-            station, represented by a json.
+        (list) measuring_points_list: A list containing the information from
+            the measuring points shapefile. A list item is a measuring
+            point, represented by a json.
     """
-    measuring_stations_list = []
-    for feature in measuring_stations_layer:
-        measuring_station = {}
-        if feature["A"] and feature["A"] != "None": measuring_station["A"] = str(feature["A"])
-        if feature["B"] and feature["B"] != "None": measuring_station["B"] = str(feature["B"])
-        if feature["C"] and feature["C"] != "None": measuring_station["C"] = str(feature["C"])
-        if feature["D"] and feature["D"] != "None": measuring_station["D"] = str(feature["D"])
-        if feature["E"] and feature["E"] != "None": measuring_station["E"] = str(feature["E"])
-        if feature["F"] and feature["F"] != "None": measuring_station["F"] = str(feature["F"])
-        if feature["G"] and feature["G"] != "None": measuring_station["G"] = str(feature["G"])
-        if feature["I"] and feature["I"] != "None": measuring_station["I"] = str(feature["I"])
-        if feature["J"] and feature["J"] != "None": measuring_station["J"] = str(feature["J"])
-        if feature["K"] and feature["K"] != "None": measuring_station["K"] = str(feature["K"])
-        if feature["M"] and feature["M"] != "None": measuring_station["M"] = str(feature["M"])
-        if feature["N"] and feature["N"] != "None": measuring_station["N"] = str(feature["N"])
-        if feature["O"] and feature["O"] != "None": measuring_station["O"] = str(feature["O"])
+    measuring_points_list = []
+    for feature in measuring_points_layer:
+        measuring_point = {}
+        if feature["A"] and feature["A"] != "None": measuring_point["A"] = str(feature["A"])
+        if feature["B"] and feature["B"] != "None": measuring_point["B"] = str(feature["B"])
+        if feature["C"] and feature["C"] != "None": measuring_point["C"] = str(feature["C"])
+        if feature["D"] and feature["D"] != "None": measuring_point["D"] = str(feature["D"])
+        if feature["E"] and feature["E"] != "None": measuring_point["E"] = str(feature["E"])
+        if feature["F"] and feature["F"] != "None": measuring_point["F"] = str(feature["F"])
+        if feature["G"] and feature["G"] != "None": measuring_point["G"] = str(feature["G"])
+        if feature["I"] and feature["I"] != "None": measuring_point["I"] = str(feature["I"])
+        if feature["J"] and feature["J"] != "None": measuring_point["J"] = str(feature["J"])
+        if feature["K"] and feature["K"] != "None": measuring_point["K"] = str(feature["K"])
+        if feature["M"] and feature["M"] != "None": measuring_point["M"] = str(feature["M"])
+        if feature["N"] and feature["N"] != "None": measuring_point["N"] = str(feature["N"])
+        if feature["O"] and feature["O"] != "None": measuring_point["O"] = str(feature["O"])
         herstelmaatregel = str(feature["Herstelmaa"]) if str(feature["Herstelmaa"]) is not "NULL" else ""
-        measuring_station["Herstelmaatregel"] = herstelmaatregel
+        measuring_point["Herstelmaatregel"] = herstelmaatregel
         opmerking = str(feature["Opmerking"]) if str(feature["Opmerking"]) is not "NULL" else ""
-        measuring_station["Opmerking"] = opmerking
+        measuring_point["Opmerking"] = opmerking
         # x & y of measuring points json are saved in the json as tuples  #  x': (146777.899562,)
-        measuring_station["y"] = float(feature.geometry().asPoint().y())
-        measuring_station["x"] = float(feature.geometry().asPoint().x())
-        measuring_stations_list.append(measuring_station)
-    return measuring_stations_list
+        measuring_point["y"] = float(feature.geometry().asPoint().y())
+        measuring_point["x"] = float(feature.geometry().asPoint().x())
+        measuring_points_list.append(measuring_point)
+    return measuring_points_list
 
 def save_json_to_server(review_json, user_data):
     """

@@ -115,7 +115,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         return filename
 
     def save_shapefiles(self):
-        """Save the manholes, pipes and measuring stations shapefiles."""
+        """Save the manholes, pipes and measuring points shapefiles."""
         if self.json_path != '':
             directory = self.get_shapefiles_directory()
 
@@ -203,7 +203,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (str) directory: The directory to save the shapefiles in.
             (json) pipes: The pipes to save in the shapefiles.
                 The pipes json can have nested assets, known as measuring
-                    stations.
+                    points.
         """
         
         # Pipes path
