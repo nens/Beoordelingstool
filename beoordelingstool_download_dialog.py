@@ -103,7 +103,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         except TypeError:
             init_path = os.path.expanduser("~")
         if file_type == FILE_TYPE_JSON:
-          filename = QFileDialog.getOpenFileName(None,
+            filename = QFileDialog.getOpenFileName(None,
                                                  'Open json file',
                                                  init_path,
                                                  'JSON (*.json)')
