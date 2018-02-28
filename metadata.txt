@@ -10,7 +10,7 @@
 name=Beoordelingstool
 qgisMinimumVersion=2.0
 description=The Beoordelingstool is a QGIS plugin for judging the quality of the manholes and pipes of a sewer.
-version=0.3
+version=0.4
 author=Nelen & Schuurmans
 email=madeleine.vanwinkel@nelen-schuurmans.nl
 
