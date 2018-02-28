@@ -852,7 +852,11 @@ def save_json_to_server(review_json, user_data):
         encoded_user = base64.b64encode(user_data)
         # Put the key 'Upload reviews' in the POST request
         # Give a key to the url that shows that a json is uploaded
-        req = urllib2.Request(url, review_json, encoded_user, reviews=review_json)
+        data = {
+            'reviews': review_json,
+            'Upload reviews': ''
+        }
+        req = urllib2.Request(url, data, encoded_user)
         response = urllib2.urlopen(req)
         the_page = reponse.read()  # nodig
 
@@ -888,10 +892,13 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
         return
     else:
         # Add error handling
-        data = open(os.path.join(temp_dir, "{}.zip".format(project_name))).read()
         encoded_user = base64.b64encode(user_data)
         # Put the key 'Upload reviews' in the POST request
         # Give a key to the url that shows that a zip is uploaded
-        req = urllib2.Request(zip_url, data, encoded_user, shape_files=data)
+        data = {
+            'shape_files': open(os.path.join(temp_dir, "{}.zip".format(project_name))).read(),
+            'Upload reviews': ''
+        }
+        req = urllib2.Request(zip_url, data, encoded_user)
         response = urllib2.urlopen(req)
         the_page = reponse.read()  # nodig
