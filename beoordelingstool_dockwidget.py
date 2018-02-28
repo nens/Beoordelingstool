@@ -416,7 +416,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             measuring_points = layer.getFeatures(QgsFeatureRequest(expr))  #.next()
             ids = [measuring_point.id() for measuring_point in measuring_points]  # select only the features for which the expression is true
             first_id = ids[0]
-            last_id = ids[-1] if ids[-1] else ids[0]
+            last_id = ids[-1]
             # Show selected measuring point if it belongs to the selected pipe
             if self.selected_measuring_point_id >= first_id and self.selected_measuring_point_id <= last_id:
                 pass
