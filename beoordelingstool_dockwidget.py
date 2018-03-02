@@ -284,7 +284,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             self.field_combobox_manholes.setCurrentIndex(self.field_combobox_manholes.findText(str(f["Herstelmaa"]))) \
                 if self.field_combobox_manholes.findText(str(f["Herstelmaa"])) else self.field_combobox_manholes.setCurrentIndex(0)
             self.value_plaintextedit_manholes.setPlainText(f["Opmerking"] if type(f["Opmerking"]) is not QPyNullVariant else "")
-            self.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f["CAA"]))
+            self.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f"CAA"]))
             self.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAJ"]))
             self.tablewidget_manholes.setItem(0, 2, QTableWidgetItem(f["CAL"]))
             self.tablewidget_manholes.setItem(0, 3, QTableWidgetItem(f["CAM"]))
@@ -798,7 +798,7 @@ def create_measuring_points_list(measuring_points_layer):
     A list item is a json, representing a measuring points.
 
     Args:
-        (shapefile) measuring_points_layer: The measuring points 
+        (shapefile) measuring_points_layer: The measuring points
             shapefile.
 
     Returns:
