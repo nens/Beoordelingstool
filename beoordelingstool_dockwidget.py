@@ -167,6 +167,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 else:
                     iface.messageBar().pushMessage("Warning", "No project url defined.", level=QgsMessageBar.WARNING, duration=0)
             except:
+                # TODO: bare except. Also fails when there's a json if it is without project url.
                 iface.messageBar().pushMessage("Error", "No {} found.".format(JSON_NAME), level=QgsMessageBar.CRITICAL, duration=0)
 
     def show_login_dialog_voortgang(self):
@@ -284,44 +285,48 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             self.field_combobox_manholes.setCurrentIndex(self.field_combobox_manholes.findText(str(f["Herstelmaa"]))) \
                 if self.field_combobox_manholes.findText(str(f["Herstelmaa"])) else self.field_combobox_manholes.setCurrentIndex(0)
             self.value_plaintextedit_manholes.setPlainText(f["Opmerking"] if type(f["Opmerking"]) is not QPyNullVariant else "")
-            self.tablewidget_manholes.setItem(0, 0, QTableWidgetItem(f["CAA"]))
-            self.tablewidget_manholes.setItem(0, 1, QTableWidgetItem(f["CAJ"]))
-            self.tablewidget_manholes.setItem(0, 2, QTableWidgetItem(f["CAL"]))
-            self.tablewidget_manholes.setItem(0, 3, QTableWidgetItem(f["CAM"]))
-            self.tablewidget_manholes.setItem(0, 4, QTableWidgetItem(f["CAN"]))
-            self.tablewidget_manholes.setItem(0, 5, QTableWidgetItem(f["CAO"]))
-            self.tablewidget_manholes.setItem(0, 6, QTableWidgetItem(f["CAQ"]))
-            self.tablewidget_manholes.setItem(0, 7, QTableWidgetItem(f["CAR"]))
-            self.tablewidget_manholes.setItem(0, 8, QTableWidgetItem(f["CBA"]))
-            self.tablewidget_manholes.setItem(0, 9, QTableWidgetItem(f["CBB"]))
-            self.tablewidget_manholes.setItem(0, 10, QTableWidgetItem(f["CBC"]))
-            self.tablewidget_manholes.setItem(0, 11, QTableWidgetItem(f["CBD"]))
-            self.tablewidget_manholes.setItem(0, 12, QTableWidgetItem(f["CBE"]))
-            self.tablewidget_manholes.setItem(0, 13, QTableWidgetItem(f["CBF"]))
-            self.tablewidget_manholes.setItem(0, 14, QTableWidgetItem(f["CBH"]))
-            self.tablewidget_manholes.setItem(0, 15, QTableWidgetItem(f["CBI"]))
-            self.tablewidget_manholes.setItem(0, 16, QTableWidgetItem(f["CBJ"]))
-            self.tablewidget_manholes.setItem(0, 17, QTableWidgetItem(f["CBK"]))
-            self.tablewidget_manholes.setItem(0, 18, QTableWidgetItem(f["CBL"]))
-            self.tablewidget_manholes.setItem(0, 19, QTableWidgetItem(f["CBM"]))
-            self.tablewidget_manholes.setItem(0, 20, QTableWidgetItem(f["CBO"]))
-            self.tablewidget_manholes.setItem(0, 21, QTableWidgetItem(f["CBP"]))
-            self.tablewidget_manholes.setItem(0, 22, QTableWidgetItem(f["CCA"]))
-            self.tablewidget_manholes.setItem(0, 23, QTableWidgetItem(f["CCB"]))
-            self.tablewidget_manholes.setItem(0, 24, QTableWidgetItem(f["CCC"]))
-            self.tablewidget_manholes.setItem(0, 25, QTableWidgetItem(f["CCD"]))
-            self.tablewidget_manholes.setItem(0, 26, QTableWidgetItem(f["CCK"]))
-            self.tablewidget_manholes.setItem(0, 27, QTableWidgetItem(f["CCM"]))
-            self.tablewidget_manholes.setItem(0, 28, QTableWidgetItem(f["CCN"]))
-            self.tablewidget_manholes.setItem(0, 29, QTableWidgetItem(f["CCO"]))
-            self.tablewidget_manholes.setItem(0, 30, QTableWidgetItem(f["CCP"]))
-            self.tablewidget_manholes.setItem(0, 31, QTableWidgetItem(f["CCQ"]))
-            self.tablewidget_manholes.setItem(0, 32, QTableWidgetItem(f["CCR"]))
-            self.tablewidget_manholes.setItem(0, 33, QTableWidgetItem(f["CCS"]))
-            self.tablewidget_manholes.setItem(0, 34, QTableWidgetItem(f["CDA"]))
-            self.tablewidget_manholes.setItem(0, 35, QTableWidgetItem(f["CDB"]))
-            self.tablewidget_manholes.setItem(0, 36, QTableWidgetItem(f["CDC"]))
-            self.tablewidget_manholes.setItem(0, 37, QTableWidgetItem(f["CDD"]))
+
+            for index, field in enumerate(["CAA",
+                                           "CAJ",
+                                           "CAL",
+                                           "CAM",
+                                           "CAN",
+                                           "CAO",
+                                           "CAQ",
+                                           "CAR",
+                                           "CBA",
+                                           "CBB",
+                                           "CBC",
+                                           "CBD",
+                                           "CBE",
+                                           "CBF",
+                                           "CBH",
+                                           "CBI",
+                                           "CBJ",
+                                           "CBK",
+                                           "CBL",
+                                           "CBM",
+                                           "CBO",
+                                           "CBP",
+                                           "CCA",
+                                           "CCB",
+                                           "CCC",
+                                           "CCD",
+                                           "CCK",
+                                           "CCM",
+                                           "CCN",
+                                           "CCO",
+                                           "CCP",
+                                           "CCQ",
+                                           "CCR",
+                                           "CCS",
+                                           "CDA",
+                                           "CDB",
+                                           "CDC",
+                                           "CDD"]):
+                value = f[field] if type(f[field]) is not QPyNullVariant else ""
+                self.tablewidget_manholes.setItem(0, index, QTableWidgetItem(value))
+
             self.selected_manhole_id = f.id()
 
     def save_beoordeling_putten(self):
@@ -343,51 +348,54 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(f["Herstelmaa"]))) \
                 if self.field_combobox_pipes.findText(str(f["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
             self.value_plaintextedit_pipes.setPlainText(str(f["Opmerking"]) if type(f["Opmerking"]) is not QPyNullVariant else "")
-            self.tablewidget_pipes.setItem(0, 0, QTableWidgetItem(f["AAA"]))
-            self.tablewidget_pipes.setItem(0, 1, QTableWidgetItem(f["AAB"]))
-            self.tablewidget_pipes.setItem(0, 2, QTableWidgetItem(f["AAD"]))
-            self.tablewidget_pipes.setItem(0, 3, QTableWidgetItem(f["AAE"]))
-            self.tablewidget_pipes.setItem(0, 4, QTableWidgetItem(f["AAF"]))
-            self.tablewidget_pipes.setItem(0, 5, QTableWidgetItem(f["AAG"]))
-            self.tablewidget_pipes.setItem(0, 6, QTableWidgetItem(f["AAJ"]))
-            self.tablewidget_pipes.setItem(0, 7, QTableWidgetItem(f["AAK"]))
-            self.tablewidget_pipes.setItem(0, 8, QTableWidgetItem(f["AAL"]))
-            self.tablewidget_pipes.setItem(0, 9, QTableWidgetItem(f["AAM"]))
-            self.tablewidget_pipes.setItem(0, 10, QTableWidgetItem(f["AAN"]))
-            self.tablewidget_pipes.setItem(0, 11, QTableWidgetItem(f["AAO"]))
-            self.tablewidget_pipes.setItem(0, 12, QTableWidgetItem(f["AAP"]))
-            self.tablewidget_pipes.setItem(0, 13, QTableWidgetItem(f["AAQ"]))
-            self.tablewidget_pipes.setItem(0, 14, QTableWidgetItem(f["ABA"]))
-            self.tablewidget_pipes.setItem(0, 15, QTableWidgetItem(f["ABB"]))
-            self.tablewidget_pipes.setItem(0, 16, QTableWidgetItem(f["ABC"]))
-            self.tablewidget_pipes.setItem(0, 17, QTableWidgetItem(f["ABE"]))
-            self.tablewidget_pipes.setItem(0, 18, QTableWidgetItem(f["ABF"]))
-            self.tablewidget_pipes.setItem(0, 19, QTableWidgetItem(f["ABH"]))
-            self.tablewidget_pipes.setItem(0, 20, QTableWidgetItem(f["ABI"]))
-            self.tablewidget_pipes.setItem(0, 21, QTableWidgetItem(f["ABJ"]))
-            self.tablewidget_pipes.setItem(0, 22, QTableWidgetItem(f["ABK"]))
-            self.tablewidget_pipes.setItem(0, 23, QTableWidgetItem(f["ABL"]))
-            self.tablewidget_pipes.setItem(0, 24, QTableWidgetItem(f["ABM"]))
-            self.tablewidget_pipes.setItem(0, 25, QTableWidgetItem(f["ABP"]))
-            self.tablewidget_pipes.setItem(0, 26, QTableWidgetItem(f["ABQ"]))
-            self.tablewidget_pipes.setItem(0, 27, QTableWidgetItem(f["ABS"]))
-            self.tablewidget_pipes.setItem(0, 28, QTableWidgetItem(f["ACA"]))
-            self.tablewidget_pipes.setItem(0, 29, QTableWidgetItem(f["ACB"]))
-            self.tablewidget_pipes.setItem(0, 30, QTableWidgetItem(f["ACC"]))
-            self.tablewidget_pipes.setItem(0, 31, QTableWidgetItem(f["ACD"]))
-            self.tablewidget_pipes.setItem(0, 32, QTableWidgetItem(f["ACG"]))
-            self.tablewidget_pipes.setItem(0, 33, QTableWidgetItem(f["ACJ"]))
-            self.tablewidget_pipes.setItem(0, 34, QTableWidgetItem(f["ACK"]))
-            self.tablewidget_pipes.setItem(0, 35, QTableWidgetItem(f["ACM"]))
-            self.tablewidget_pipes.setItem(0, 36, QTableWidgetItem(f["ACN"]))
-            self.tablewidget_pipes.setItem(0, 37, QTableWidgetItem(f["ADA"]))
-            self.tablewidget_pipes.setItem(0, 38, QTableWidgetItem(f["ADB"]))
-            self.tablewidget_pipes.setItem(0, 39, QTableWidgetItem(f["ADC"]))
-            self.tablewidget_pipes.setItem(0, 40, QTableWidgetItem(f["AXA"]))
-            self.tablewidget_pipes.setItem(0, 41, QTableWidgetItem(f["AXB"]))
-            self.tablewidget_pipes.setItem(0, 42, QTableWidgetItem(f["AXF"]))
-            self.tablewidget_pipes.setItem(0, 43, QTableWidgetItem(f["AXG"]))
-            self.tablewidget_pipes.setItem(0, 44, QTableWidgetItem(f["AXH"]))
+
+            for index, field in enumerate(["AAA",
+                                           "AAB",
+                                           "AAD",
+                                           "AAE",
+                                           "AAF",
+                                           "AAG",
+                                           "AAJ",
+                                           "AAK",
+                                           "AAL",
+                                           "AAM",
+                                           "AAN",
+                                           "AAO",
+                                           "AAP",
+                                           "AAQ",
+                                           "ABA",
+                                           "ABB",
+                                           "ABC",
+                                           "ABE",
+                                           "ABF",
+                                           "ABH",
+                                           "ABI",
+                                           "ABJ",
+                                           "ABK",
+                                           "ABL",
+                                           "ABM",
+                                           "ABP",
+                                           "ABQ",
+                                           "ABS",
+                                           "ACA",
+                                           "ACB",
+                                           "ACC",
+                                           "ACD",
+                                           "ACG",
+                                           "ACJ",
+                                           "ACK",
+                                           "ACM",
+                                           "ACN",
+                                           "ADA",
+                                           "ADB",
+                                           "ADC",
+                                           "AXA",
+                                           "AXB",
+                                           "AXF",
+                                           "AXG",
+                                           "AXH"]):
+                value = f[field] if type(f[field]) is not QPyNullVariant else ""
+                self.tablewidget_pipes.setItem(0, index, QTableWidgetItem(value))
             self.selected_pipe_id = f.id()
 
     def save_beoordeling_leidingen(self):
@@ -798,7 +806,7 @@ def create_measuring_points_list(measuring_points_layer):
     A list item is a json, representing a measuring points.
 
     Args:
-        (shapefile) measuring_points_layer: The measuring points 
+        (shapefile) measuring_points_layer: The measuring points
             shapefile.
 
     Returns:
