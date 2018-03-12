@@ -175,17 +175,27 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (str) directory: The directory to save the shapefiles in.
             (json) manholes: The manholes to save in the shapefile.
         """
-
         # Manholes path
-        manholes_path = os.path.join(directory, "{}.shp".format(SHP_NAME_MANHOLES))
+        manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
+        manholes_path = os.path.join(directory, manholes_filename)
 
         # Create manhole shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
-        data_source = driver.CreateDataSource(manholes_path)
+        # try /except for data_source?
+        data_source = driver.CreateDataSource(directory)
+        if data_source is None:
+            iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+            return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
         srs = osr.SpatialReference()
         # manholes[0]["CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
-        layer = data_source.CreateLayer(manholes_path, srs, ogr.wkbPoint)
+        if os.path.exists(manholes_path):
+            # open dialog to give user the option to either overwrite the shapefile/ or load the shapefile as layer
+            # # on accept() --> create and show layer
+            # # on reject() --> show layer
+            driver.DeleteDataSource(manholes_path)
+            print "{} deleted.".format(manholes_path)
+        layer = data_source.CreateLayer(SHP_NAME_MANHOLES, srs, ogr.wkbPoint)
         layer = self.fields_to_manholes_shp(layer, manholes)
         for manhole in manholes:
             layer = self.feature_to_manholes_shp(layer, manhole)
@@ -207,25 +217,48 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         """
 
         # Pipes path
-        pipes_path = os.path.join(directory, "{}.shp".format(SHP_NAME_PIPES))
+        pipes_filename = "{}.shp".format(SHP_NAME_PIPES)
+        pipes_path = os.path.join(directory, pipes_filename)
+
         # Create pipes shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
-        data_source = driver.CreateDataSource(pipes_path)
+        # print pipes_path
+        # try:
+        data_source = driver.CreateDataSource(directory)
+        if data_source is None:
+            iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+            return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)
-        layer = data_source.CreateLayer(pipes_path, srs, ogr.wkbLineString)
+        if os.path.exists(pipes_path):
+            # open dialog to give user the option to either overwrite the shapefile/ or load the shapefile as layer
+            # # on accept() --> create and show layer
+            # # on reject() --> show layer
+            driver.DeleteDataSource(pipes_path)
+            print "{} deleted.".format(pipes_path)
+        layer = data_source.CreateLayer(SHP_NAME_PIPES, srs, ogr.wkbLineString)
         # data_source = None
 
         # Measuring points path
-        measuring_points_path = os.path.join(directory, "{}.shp".format(SHP_NAME_MEASURING_POINTS))
+        measuring_points_filename = "{}.shp".format(SHP_NAME_MEASURING_POINTS)
+        measuring_points_path = os.path.join(directory, measuring_points_filename)
         # Create measuring points shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
-        data_source_measuring_point = driver.CreateDataSource(measuring_points_path)
+        data_source_measuring_point = driver.CreateDataSource(directory)
+        if data_source_measuring_point is None:
+            iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+            return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)
-        measuring_points_layer = data_source_measuring_point.CreateLayer(measuring_points_path, srs, ogr.wkbPoint)
+        if os.path.exists(measuring_points_path):
+            # open dialog to give user the option to either overwrite the shapefile/ or load the shapefile as layer
+            # # on accept() --> create and show layer
+            # # on reject() --> show layer
+            driver.DeleteDataSource(measuring_points_path)
+            print "{} deleted.".format(measuring_points_path)
+        measuring_points_layer = data_source_measuring_point.CreateLayer(SHP_NAME_MEASURING_POINTS, srs, ogr.wkbPoint)
 
         # Populate pipe shapefile
         layer = self.fields_to_pipes_shp(layer, pipes)
@@ -250,6 +283,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Set manholes as active layer
         manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]
         iface.setActiveLayer(manholes_layer)
+        # except Exception as e:
+        #     print e
 
     def fields_to_manholes_shp(self, layer, location):
         """
