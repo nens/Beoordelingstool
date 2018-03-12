@@ -1,6 +1,6 @@
 # Changelog
 
-0.4 (unreleased)
+0.4 (2018-03-12)
 ----------------
 
 - Nothing changed yet.
