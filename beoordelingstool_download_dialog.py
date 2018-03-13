@@ -184,8 +184,15 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # try /except for data_source?
         data_source = driver.CreateDataSource(directory)
         if data_source is None:
-            iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
-            return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
+            if os.path.exists(manholes_path):
+                # open dialog to give user the option to either overwrite the shapefile/ or load the shapefile as layer
+                # # on accept() --> create and show layer
+                # # on reject() --> show layer
+                driver.DeleteDataSource(manholes_path)
+                print "{} deleted.".format(manholes_path)
+            else:
+                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
         srs = osr.SpatialReference()
         # manholes[0]["CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
@@ -226,8 +233,15 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # try:
         data_source = driver.CreateDataSource(directory)
         if data_source is None:
-            iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
-            return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
+            if os.path.exists(pipes_path):
+                # open dialog to give user the option to either overwrite the shapefile/ or load the shapefile as layer
+                # # on accept() --> create and show layer
+                # # on reject() --> show layer
+                driver.DeleteDataSource(pipes_path)
+                print "{} deleted.".format(pipes_path)
+            else:
+                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)
@@ -247,8 +261,15 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         driver = ogr.GetDriverByName("ESRI Shapefile")
         data_source_measuring_point = driver.CreateDataSource(directory)
         if data_source_measuring_point is None:
-            iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
-            return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
+            if os.path.exists(measuring_points_path):
+                # open dialog to give user the option to either overwrite the shapefile/ or load the shapefile as layer
+                # # on accept() --> create and show layer
+                # # on reject() --> show layer
+                driver.DeleteDataSource(measuring_points_path)
+                print "{} deleted.".format(measuring_points_path)
+            else:
+                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                return  # or better yet: show dialog for if user wants to overwrite shapefile(s)
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)
