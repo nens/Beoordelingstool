@@ -210,7 +210,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         print "final"
         review_json = self.convert_shps_to_json()
         # Upload JSON
-        # save_json_to_server(review_json, user_data)
+        save_json_to_server(review_json, user_data)
         # Upload zip
         # Check if the manholes, pipes and measuring_points layers exist
         manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
@@ -223,7 +223,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             project_name = review_json[JSON_KEY_PROJ][JSON_KEY_NAME]
             zip_url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
             create_zip(project_name, layer_dir, temp_dir)
-            # save_zip_to_server(project_name, temp_dir, zip_url, user_data)
+            save_zip_to_server(project_name, temp_dir, zip_url, user_data)
             iface.messageBar().pushMessage("Info", "JSON and ZIP uploaded.", level=QgsMessageBar.INFO, duration=0)
 
     def convert_shps_to_json(self):
@@ -860,7 +860,6 @@ def save_json_to_server(review_json, user_data):
         iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
-        # Optionally TODO: grab title from dialog.
         manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
         pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
         measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
@@ -868,9 +867,6 @@ def save_json_to_server(review_json, user_data):
             # Get project name from the json saved in the same folder as the "manholes" layer
             layer_dir = get_layer_dir(manholes_layerList[0])
             json_path = os.path.join(layer_dir, JSON_NAME)
-
-            title = "Uploaded by the qgis plugin on %s" % (
-                datetime.datetime.now().isoformat())
 
             form = MultiPartForm()
             filename = os.path.basename(json_path)
@@ -925,17 +921,35 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
         iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
-        # Add error handling
-        encoded_user = base64.b64encode(user_data)
-        # Put the key 'Upload reviews' in the POST request
-        # Give a key to the url that shows that a zip is uploaded
-        data = {
-            'shape_files': open(os.path.join(temp_dir, "{}.zip".format(project_name))).read(),
-            'Upload reviews': ''
-        }
-        req = urllib2.Request(zip_url, data, encoded_user)
-        response = urllib2.urlopen(req)
-        the_page = response.read()  # nodig
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
+        if manholes_layerList and pipes_layerList and measuring_points_layerList:
+            # Get project name from the json saved in the same folder as the "manholes" layer
+            layer_dir = get_layer_dir(manholes_layerList[0])
+            zip_path = os.path.join(layer_dir, "{}.zip".format(project_name))
+
+            form = MultiPartForm()
+            filename = os.path.basename(zip_path)
+            form.add_field('Upload reviews', 'Upload reviews')
+            form.add_file('shape_files', filename, fileHandle=open(zip_path, 'rb'))
+
+            url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
+            request = urllib2.Request(url)
+            request.add_header('User-agent', 'beoordelingstool')
+            request.add_header('username', username)
+            request.add_header('password', password)
+            body = str(form)
+            request.add_header('Content-type', form.get_content_type())
+            request.add_header('Content-length', len(body))
+            request.add_data(body)
+
+            fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
+            open(logfile, 'w').write(request.get_data())
+
+            answer = urllib2.urlopen(request).read()
+            iface.messageBar().pushMessage("Info", "JSON uploaded.",
+                level=QgsMessageBar.INFO, duration=20)
 
 
 class MultiPartForm(object):
