@@ -865,7 +865,7 @@ def save_json_to_server(review_json, user_data):
         }
         req = urllib2.Request(url, data, encoded_user)
         response = urllib2.urlopen(req)
-        the_page = reponse.read() # nodig
+        the_page = response.read() # nodig
 
 def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in querysets
     """
