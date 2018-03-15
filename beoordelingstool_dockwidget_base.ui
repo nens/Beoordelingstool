@@ -97,7 +97,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Upload json</string>
+        <string>Upload zip and json</string>
        </property>
       </widget>
      </widget>
