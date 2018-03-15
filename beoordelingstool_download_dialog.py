@@ -120,7 +120,11 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         return filename
 
     def check_for_existing_shapefiles(self):
-        """Save the manholes, pipes and measuring points shapefiles."""
+        """
+        Check whether the json, direcotry and shapefiles already exist.
+        If the shapefiles exist, let the user choose to overwrite them
+        with the BeoordelingstoolOverwriteShapefilesDialog.
+        """
         if self.json_path != '':
             self.directory = self.get_shapefiles_directory()
             manholes_path = os.path.join(self.directory, "{}.shp".format(SHP_NAME_MANHOLES))
@@ -140,7 +144,13 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             iface.messageBar().pushMessage("Warning", "No json found.", level=QgsMessageBar.WARNING, duration=0)
 
     def get_shapefiles_directory(self):
-        """Get the directory to save the shapefiles in."""
+        """
+        Get the directory to save the shapefiles in.
+
+
+        Returns:
+            (string) directory: The absolute path to save the shapefiles in.
+        """
         settings = QSettings('beoordelingstool', 'qgisplugin')
 
         try:
@@ -159,8 +169,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
     def get_overwrite_shapefiles(self, overwrite_shapefiles):
         """
-        Get from the overwrite shapefiles dialog whether the user wants to
-        overwrite existing shapefiles.
+        Get from the BeoordelingstoolOverwriteShapefilesDialog whether the
+        user wants to overwrite existing shapefiles.
 
         Arguments:
             (boolean) overwrite_shapefiles: Whether the user wants to
@@ -194,7 +204,16 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         show_shapefile_layers()
 
     def get_json_manholes_and_pipes(self, filename):
-        """Function to get a JSON."""
+        """
+        Function to get a JSON.
+
+        Arguments:
+            (string) filename: The absolute path to the JSON.
+
+        Returns:
+            (tuple) manholes, pipes: A manhole containing manholes and pipes,
+                both containing a JSON.
+        """
         manholes = []
         pipes = []
         with open(filename) as json_file:
@@ -208,11 +227,14 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
     def save_shapefile_manholes(self, directory, manholes, overwrite_shapefiles=False):
         """
         Function to save the manholes of the json.
-        This function also shows the shapefile on the map.
 
         Args:
-            (str) directory: The directory to save the shapefiles in.
+            (string) directory: The directory to save the shapefiles in.
             (json) manholes: The manholes to save in the shapefile.
+            (boolean) overwrite_shapefiles: An optional parameter, telling
+                whether or not possible existing shapefiles should be 
+                overwritten. The default is set to False, to not
+                accidentally overwrite shapefiles.
         """
         # Manholes path
         manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
@@ -258,7 +280,11 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (str) directory: The directory to save the shapefiles in.
             (json) pipes: The pipes to save in the shapefiles.
                 The pipes json can have nested assets, known as measuring
-                    points.
+                points.
+            (boolean) overwrite_shapefiles: An optional parameter, telling
+                whether or not possible existing shapefiles should be 
+                overwritten. The default is set to False, to not
+                accidentally overwrite shapefiles.
         """
 
         # Pipes path
@@ -995,7 +1021,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 def show_shapefile_layers():
     """
     Show the manholes, pipes and measuring points layer.
-    Set the manholes layer as active layer.
+    Set the manholes layer as active layer to be the same layer as the active
+    tab.
     """
     # Manholes
     manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
