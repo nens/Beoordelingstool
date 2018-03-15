@@ -20,7 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import base64
+import itertools
+import mimetypes
+import mimetools
+import datetime
 import json
 import os
 import shutil
@@ -197,16 +202,15 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         """Upload the voortgang (json)."""
         print "voortgang"
         review_json = self.convert_shps_to_json()
-        # save_json_to_server(review_json, user_data)
         # upload json to server (get url from json)
-        iface.messageBar().pushMessage("Info", "JSON saved.", level=QgsMessageBar.INFO, duration=0)
+        save_json_to_server(review_json, user_data)
 
     def upload_final(self, user_data):
         """Upload the final version (json + zip with shapefiles and qmls)."""
         print "final"
         review_json = self.convert_shps_to_json()
         # Upload JSON
-        # save_json_to_server(review_json, user_data)
+        save_json_to_server(review_json, user_data)
         # Upload zip
         # Check if the manholes, pipes and measuring_points layers exist
         manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
@@ -219,7 +223,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             project_name = review_json[JSON_KEY_PROJ][JSON_KEY_NAME]
             zip_url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
             create_zip(project_name, layer_dir, temp_dir)
-            # save_zip_to_server(project_name, temp_dir, zip_url, user_data)
+            save_zip_to_server(project_name, temp_dir, zip_url, user_data)
             iface.messageBar().pushMessage("Info", "JSON and ZIP uploaded.", level=QgsMessageBar.INFO, duration=0)
 
     def convert_shps_to_json(self):
@@ -849,24 +853,41 @@ def save_json_to_server(review_json, user_data):
         (dict) user_data: A dict containing the username and password.
     """
     # Check user login credentials ()  # not needed, checked when json is uploaded
-    # username = user_data["username"]
-    # password = user_data["password"]
+    username = user_data["username"]
+    password = user_data["password"]
     if review_json[JSON_KEY_PROJ][JSON_KEY_URL] is None:
         iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
-        # Add error handling
-        url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
-        encoded_user = base64.b64encode(user_data)
-        # Put the key 'Upload reviews' in the POST request
-        # Give a key to the url that shows that a json is uploaded
-        data = {
-            'reviews': review_json,
-            'Upload reviews': ''
-        }
-        req = urllib2.Request(url, data, encoded_user)
-        response = urllib2.urlopen(req)
-        the_page = reponse.read()  # nodig
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
+        if manholes_layerList and pipes_layerList and measuring_points_layerList:
+            # Get project name from the json saved in the same folder as the "manholes" layer
+            layer_dir = get_layer_dir(manholes_layerList[0])
+            json_path = os.path.join(layer_dir, JSON_NAME)
+
+            form = MultiPartForm()
+            filename = os.path.basename(json_path)
+            form.add_field('Upload reviews', 'Upload reviews')
+            form.add_file('reviews', filename, fileHandle=open(json_path, 'rb'))
+
+            url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
+            request = urllib2.Request(url)
+            request.add_header('User-agent', 'beoordelingstool')
+            request.add_header('username', username)
+            request.add_header('password', password)
+            body = str(form)
+            request.add_header('Content-type', form.get_content_type())
+            request.add_header('Content-length', len(body))
+            request.add_data(body)
+
+            fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
+            open(logfile, 'w').write(request.get_data())
+
+            answer = urllib2.urlopen(request).read()
+            iface.messageBar().pushMessage("Info", "JSON uploaded.",
+                level=QgsMessageBar.INFO, duration=20)
 
 def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in querysets
     """
@@ -895,18 +916,103 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
         (str) zip_url: The url to save the zip to.
         (dict) user_data: A dict containing the username and password
     """
+    # Check user login credentials ()  # not needed, checked when json is uploaded
+    username = user_data["username"]
+    password = user_data["password"]
     if zip_url is None:
         iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
-        # Add error handling
-        encoded_user = base64.b64encode(user_data)
-        # Put the key 'Upload reviews' in the POST request
-        # Give a key to the url that shows that a zip is uploaded
-        data = {
-            'shape_files': open(os.path.join(temp_dir, "{}.zip".format(project_name))).read(),
-            'Upload reviews': ''
-        }
-        req = urllib2.Request(zip_url, data, encoded_user)
-        response = urllib2.urlopen(req)
-        the_page = reponse.read()  # nodig
+        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
+        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
+        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
+        if manholes_layerList and pipes_layerList and measuring_points_layerList:
+            # Get project name from the json saved in the same folder as the "manholes" layer
+            layer_dir = get_layer_dir(manholes_layerList[0])
+            zip_path = os.path.join(layer_dir, "{}.zip".format(project_name))
+
+            form = MultiPartForm()
+            filename = os.path.basename(zip_path)
+            form.add_field('Upload reviews', 'Upload reviews')
+            form.add_file('shape_files', filename, fileHandle=open(zip_path, 'rb'))
+
+            url = zip_url
+            request = urllib2.Request(url)
+            request.add_header('User-agent', 'beoordelingstool')
+            request.add_header('username', username)
+            request.add_header('password', password)
+            body = str(form)
+            request.add_header('Content-type', form.get_content_type())
+            request.add_header('Content-length', len(body))
+            request.add_data(body)
+
+            fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
+            open(logfile, 'w').write(request.get_data())
+
+            answer = urllib2.urlopen(request).read()
+            iface.messageBar().pushMessage("Info", "JSON and zip uploaded.",
+                level=QgsMessageBar.INFO, duration=20)
+
+
+class MultiPartForm(object):
+    """Accumulate the data to be used when posting a form."""
+
+    def __init__(self):
+        self.form_fields = []
+        self.files = []
+        self.boundary = mimetools.choose_boundary()
+        return
+
+    def get_content_type(self):
+        return 'multipart/form-data; boundary=%s' % self.boundary
+
+    def add_field(self, name, value):
+        """Add a simple field to the form data."""
+        self.form_fields.append((name, value))
+        return
+
+    def add_file(self, fieldname, filename, fileHandle, mimetype=None):
+        """Add a file to be uploaded."""
+        body = fileHandle.read()
+        if mimetype is None:
+            mimetype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+        self.files.append((fieldname, filename, mimetype, body))
+        return
+
+    def __str__(self):
+        """Return a string representing the form data, including attached files."""
+        # Build a list of lists, each containing "lines" of the
+        # request.  Each part is separated by a boundary string.
+        # Once the list is built, return a string where each
+        # line is separated by '\r\n'.
+        parts = []
+        part_boundary = '--' + self.boundary
+
+        # Add the form fields
+        parts.extend(
+            [ part_boundary,
+              'Content-Disposition: form-data; name="%s"' % name,
+              '',
+              value,
+            ]
+            for name, value in self.form_fields
+            )
+
+        # Add the files to upload
+        parts.extend(
+            [ part_boundary,
+              'Content-Disposition: file; name="%s"; filename="%s"' % \
+                 (field_name, filename),
+              'Content-Type: %s' % content_type,
+              '',
+              body,
+            ]
+            for field_name, filename, content_type, body in self.files
+            )
+
+        # Flatten the list and add closing boundary marker,
+        # then return CR+LF separated data
+        flattened = list(itertools.chain(*parts))
+        flattened.append('--' + self.boundary + '--')
+        flattened.append('')
+        return '\r\n'.join(flattened)

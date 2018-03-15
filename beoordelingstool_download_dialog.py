@@ -36,6 +36,8 @@ from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
+from .beoordelingstool_overwrite_shapefiles_dialog import BeoordelingstoolOverwriteShapefilesDialog
+
 from .utils.constants import FILE_TYPE_JSON
 from .utils.constants import JSON_NAME
 from .utils.constants import SHP_NAME_MANHOLES
@@ -65,9 +67,12 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Get json
         self.download_riool_search.clicked.connect(self.search_json_riool)
         # Save json in 3 shapefiles: manholes, pipes and measuring_points
-        self.accepted.connect(self.save_shapefiles)
+        self.accepted.connect(self.check_for_existing_shapefiles)
         # Show dockwidget after pressing OK with all 3 layers
         self.json_path = ''
+        self.directory = ""
+        self.overwrite_shapefiles_dialog = BeoordelingstoolOverwriteShapefilesDialog()
+        self.overwrite_shapefiles_dialog.output.connect(self.get_overwrite_shapefiles)
 
     def closeEvent(self, event):
         # self.closingPlugin.emit()
@@ -114,30 +119,38 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         return filename
 
-    def save_shapefiles(self):
-        """Save the manholes, pipes and measuring points shapefiles."""
+    def check_for_existing_shapefiles(self):
+        """
+        Check whether the json, direcotry and shapefiles already exist.
+        If the shapefiles exist, let the user choose to overwrite them
+        with the BeoordelingstoolOverwriteShapefilesDialog.
+        """
         if self.json_path != '':
-            directory = self.get_shapefiles_directory()
+            self.directory = self.get_shapefiles_directory()
+            manholes_path = os.path.join(self.directory, "{}.shp".format(SHP_NAME_MANHOLES))
+            pipes_path = os.path.join(self.directory, "{}.shp".format(SHP_NAME_PIPES))
+            measuring_stations_path = os.path.join(self.directory, "{}.shp".format(SHP_NAME_MEASURING_POINTS))
 
-            if directory != '':
-                # Get json
-                filename_json = self.json_path
-                manholes, pipes = self.get_json_manholes_and_pipes(filename_json)
-                # Save json as review.json
-                json_origin = os.path.abspath(self.json_path)
-                json_dest = os.path.abspath(os.path.join(directory, JSON_NAME))
-                if json_origin != json_dest:
-                    shutil.copyfile(os.path.abspath(json_origin), os.path.abspath(json_dest))
-                # Save shapefiles
-                self.save_shapefile_manholes(directory, manholes)
-                self.save_shapefiles_pipes_measuringpoints(directory, pipes)
+            if self.directory != '':
+                if os.path.exists(manholes_path) or os.path.exists(pipes_path) or os.path.exists(pipes_path):
+                    self.overwrite_shapefiles_dialog = BeoordelingstoolOverwriteShapefilesDialog()
+                    self.overwrite_shapefiles_dialog.show()
+                    self.overwrite_shapefiles_dialog.output.connect(self.get_overwrite_shapefiles)
+                else:
+                    self.save_shapefiles(overwrite_shapefiles=True)
             else:
                 iface.messageBar().pushMessage("Warning", "No shapefile directory found.", level=QgsMessageBar.WARNING, duration=0)
         else:
             iface.messageBar().pushMessage("Warning", "No json found.", level=QgsMessageBar.WARNING, duration=0)
 
     def get_shapefiles_directory(self):
-        """Get the directory to save the shapefiles in."""
+        """
+        Get the directory to save the shapefiles in.
+
+
+        Returns:
+            (string) directory: The absolute path to save the shapefiles in.
+        """
         settings = QSettings('beoordelingstool', 'qgisplugin')
 
         try:
@@ -154,8 +167,53 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         return str(directory)
 
+    def get_overwrite_shapefiles(self, overwrite_shapefiles):
+        """
+        Get from the BeoordelingstoolOverwriteShapefilesDialog whether the
+        user wants to overwrite existing shapefiles.
+
+        Arguments:
+            (boolean) overwrite_shapefiles: Whether the user wants to
+                overwrite existing shapefiles.
+
+        Returns:
+            (boolean) overwrite_shapefiles: Whether the user wants to
+                overwrite existing shapefiles.
+        """
+        print "Overwrite shapefiles: {}.".format(overwrite_shapefiles)
+        self.save_shapefiles(overwrite_shapefiles)
+
+
+    def save_shapefiles(self, overwrite_shapefiles=True):
+        """
+        Save the manholes, pipes and measuring stations shapefiles and show them as layers
+        on the map.
+        """
+        if overwrite_shapefiles is True:
+            # Get json
+            filename_json = self.json_path
+            manholes, pipes = self.get_json_manholes_and_pipes(filename_json)
+            # Save json as review.json
+            json_origin = os.path.abspath(self.json_path)
+            json_dest = os.path.abspath(os.path.join(self.directory, JSON_NAME))
+            if json_origin != json_dest:
+                shutil.copyfile(os.path.abspath(json_origin), os.path.abspath(json_dest))
+            # Save shapefiles
+            self.save_shapefile_manholes(self.directory, manholes, overwrite_shapefiles)
+            self.save_shapefiles_pipes_measuringpoints(self.directory, pipes, overwrite_shapefiles)
+        show_shapefile_layers()
+
     def get_json_manholes_and_pipes(self, filename):
-        """Function to get a JSON."""
+        """
+        Function to get a JSON.
+
+        Arguments:
+            (string) filename: The absolute path to the JSON.
+
+        Returns:
+            (tuple) manholes, pipes: A manhole containing manholes and pipes,
+                both containing a JSON.
+        """
         manholes = []
         pipes = []
         with open(filename) as json_file:
@@ -166,35 +224,54 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 pipes.append(pipe)
         return (manholes, pipes)
 
-    def save_shapefile_manholes(self, directory, manholes):
+    def save_shapefile_manholes(self, directory, manholes, overwrite_shapefiles=False):
         """
         Function to save the manholes of the json.
-        This function also shows the shapefile on the map.
 
         Args:
-            (str) directory: The directory to save the shapefiles in.
+            (string) directory: The directory to save the shapefiles in.
             (json) manholes: The manholes to save in the shapefile.
+            (boolean) overwrite_shapefiles: An optional parameter, telling
+                whether or not possible existing shapefiles should be 
+                overwritten. The default is set to False, to not
+                accidentally overwrite shapefiles.
         """
-
         # Manholes path
-        manholes_path = os.path.join(directory, "{}.shp".format(SHP_NAME_MANHOLES))
+        manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
+        manholes_path = os.path.join(directory, manholes_filename)
 
         # Create manhole shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
-        data_source = driver.CreateDataSource(manholes_path)
+        # try /except for data_source?
+        data_source = driver.CreateDataSource(directory)
+        if data_source is None:
+            if os.path.exists(manholes_path) or overwrite_shapefiles is True:
+                try:
+                    driver.DeleteDataSource(manholes_path)
+                    print "{} deleted.".format(manholes_path)
+                except Exception as e:
+                    print "{} not found.".format(manholes_path)
+            else:
+                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                return
         srs = osr.SpatialReference()
         # manholes[0]["CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)  # 4326  4289 RIBx 3857 GoogleMaps
-        layer = data_source.CreateLayer(manholes_path, srs, ogr.wkbPoint)
+        if os.path.exists(manholes_path) or overwrite_shapefiles is True:
+            try:
+                driver.DeleteDataSource(manholes_path)
+                print "{} deleted.".format(manholes_path)
+            except Exception as e:
+                print "{} not found.".format(manholes_path)
+        layer = data_source.CreateLayer(SHP_NAME_MANHOLES, srs, ogr.wkbPoint)
         layer = self.fields_to_manholes_shp(layer, manholes)
         for manhole in manholes:
             layer = self.feature_to_manholes_shp(layer, manhole)
         data_source = None
         # Copy qml as layer style
         shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_MANHOLES))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_MANHOLES))))
-        layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
 
-    def save_shapefiles_pipes_measuringpoints(self, directory, pipes):
+    def save_shapefiles_pipes_measuringpoints(self, directory, pipes, overwrite_shapefiles=False):
         """
         Function to save the pipes of the json.
         This function also shows this shapefile on the map.
@@ -203,29 +280,69 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (str) directory: The directory to save the shapefiles in.
             (json) pipes: The pipes to save in the shapefiles.
                 The pipes json can have nested assets, known as measuring
-                    points.
+                points.
+            (boolean) overwrite_shapefiles: An optional parameter, telling
+                whether or not possible existing shapefiles should be 
+                overwritten. The default is set to False, to not
+                accidentally overwrite shapefiles.
         """
 
         # Pipes path
-        pipes_path = os.path.join(directory, "{}.shp".format(SHP_NAME_PIPES))
+        pipes_filename = "{}.shp".format(SHP_NAME_PIPES)
+        pipes_path = os.path.join(directory, pipes_filename)
+
         # Create pipes shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
-        data_source = driver.CreateDataSource(pipes_path)
+        # try:
+        data_source = driver.CreateDataSource(directory)
+        if data_source is None:
+            if os.path.exists(pipes_path) or overwrite_shapefiles is True:
+                try:
+                    driver.DeleteDataSource(pipes_path)
+                    print "{} deleted.".format(pipes_path)
+                except Exception as e:
+                    print "{} not found.".format(pipes_path)
+            else:
+                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                return
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)
-        layer = data_source.CreateLayer(pipes_path, srs, ogr.wkbLineString)
+        if os.path.exists(pipes_path) or overwrite_shapefiles is True:
+            try:
+                driver.DeleteDataSource(pipes_path)
+                print "{} deleted.".format(pipes_path)
+            except Exception as e:
+                print "{} not found.".format(pipes_path)
+        layer = data_source.CreateLayer(SHP_NAME_PIPES, srs, ogr.wkbLineString)
         # data_source = None
 
         # Measuring points path
-        measuring_points_path = os.path.join(directory, "{}.shp".format(SHP_NAME_MEASURING_POINTS))
+        measuring_points_filename = "{}.shp".format(SHP_NAME_MEASURING_POINTS)
+        measuring_points_path = os.path.join(directory, measuring_points_filename)
         # Create measuring points shapefile
         driver = ogr.GetDriverByName("ESRI Shapefile")
-        data_source_measuring_point = driver.CreateDataSource(measuring_points_path)
+        data_source_measuring_point = driver.CreateDataSource(directory)
+        if data_source_measuring_point is None:
+            if os.path.exists(measuring_points_path) or overwrite_shapefiles is True:
+                try:
+                    driver.DeleteDataSource(measuring_points_path)
+                    print "{} deleted.".format(measuring_points_path)
+                except Exception as e:
+                    print "{} not found.".format(measuring_points_path)
+            else:
+                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                return
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
         srs.ImportFromEPSG(28992)
-        measuring_points_layer = data_source_measuring_point.CreateLayer(measuring_points_path, srs, ogr.wkbPoint)
+        if os.path.exists(measuring_points_path) or overwrite_shapefiles is True:
+            try:
+                driver.DeleteDataSource(measuring_points_path)
+                print "{} deleted.".format(measuring_points_path)
+            except Exception as e:
+                print "{} not found.".format(measuring_points_path)
+        measuring_points_layer = data_source_measuring_point.CreateLayer(SHP_NAME_MEASURING_POINTS, srs, ogr.wkbPoint)
 
         # Populate pipe shapefile
         layer = self.fields_to_pipes_shp(layer, pipes)
@@ -240,16 +357,12 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         data_source = None
         # Copy qml as layer style
         shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_PIPES))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_PIPES))))
-        layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
 
         data_source_measuring_point = None
         # Copy qml as layer style
         shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_MEASURING_POINTS))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_MEASURING_POINTS))))
-        measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
-
-        # Set manholes as active layer
-        manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]
-        iface.setActiveLayer(manholes_layer)
+        # except Exception as e:
+        #     print e
 
     def fields_to_manholes_shp(self, layer, location):
         """
@@ -904,3 +1017,24 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         feature = None
         return layer
+
+def show_shapefile_layers():
+    """
+    Show the manholes, pipes and measuring points layer.
+    Set the manholes layer as active layer to be the same layer as the active
+    tab.
+    """
+    # Manholes
+    manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
+    manholes_path = os.path.join(self.directory, manholes_filename)
+    manholes_layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
+    # Pipes
+    pipes_filename = "{}.shp".format(SHP_NAME_PIPES)
+    pipes_path = os.path.join(self.directory, pipes_filename)
+    pipes_layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
+    # Measuring stations
+    measuring_points_filename = "{}.shp".format(SHP_NAME_MEASURING_POINTS)
+    measuring_points_path = os.path.join(self.directory, measuring_points_filename)
+    measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
+    # Set manholes layer as active layer
+    iface.setActiveLayer(manholes_layer)
