@@ -936,7 +936,7 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
             form.add_field('Upload reviews', 'Upload reviews')
             form.add_file('shape_files', filename, fileHandle=open(zip_path, 'rb'))
 
-            url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
+            url = zip_url
             request = urllib2.Request(url)
             request.add_header('User-agent', 'beoordelingstool')
             request.add_header('username', username)
@@ -950,7 +950,7 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
             open(logfile, 'w').write(request.get_data())
 
             answer = urllib2.urlopen(request).read()
-            iface.messageBar().pushMessage("Info", "JSON uploaded.",
+            iface.messageBar().pushMessage("Info", "JSON and zip uploaded.",
                 level=QgsMessageBar.INFO, duration=20)
 
 
