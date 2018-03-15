@@ -891,7 +891,6 @@ def save_json_to_server(review_json, user_data):
             open(logfile, 'w').write(request.get_data())
 
             answer = urllib2.urlopen(request).read()
-            print(answer)
 
 def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in querysets
     """
@@ -998,5 +997,4 @@ class MultiPartForm(object):
         flattened = list(itertools.chain(*parts))
         flattened.append('--' + self.boundary + '--')
         flattened.append('')
-        print flattened[3]
         return '\r\n'.join(flattened)
