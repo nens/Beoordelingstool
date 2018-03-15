@@ -197,9 +197,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         """Upload the voortgang (json)."""
         print "voortgang"
         review_json = self.convert_shps_to_json()
-        # save_json_to_server(review_json, user_data)
         # upload json to server (get url from json)
-        iface.messageBar().pushMessage("Info", "JSON saved.", level=QgsMessageBar.INFO, duration=0)
+        save_json_to_server(review_json, user_data)
 
     def upload_final(self, user_data):
         """Upload the final version (json + zip with shapefiles and qmls)."""
@@ -866,7 +865,7 @@ def save_json_to_server(review_json, user_data):
         }
         req = urllib2.Request(url, data, encoded_user)
         response = urllib2.urlopen(req)
-        the_page = reponse.read()  # nodig
+        the_page = reponse.read() # nodig
 
 def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in querysets
     """
@@ -909,4 +908,4 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
         }
         req = urllib2.Request(zip_url, data, encoded_user)
         response = urllib2.urlopen(req)
-        the_page = reponse.read()  # nodig
+        the_page = response.read()  # nodig
