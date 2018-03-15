@@ -877,7 +877,7 @@ def save_json_to_server(review_json, user_data):
             form.add_field('Upload reviews', 'Upload reviews')
             form.add_file('reviews', filename, fileHandle=open(json_path, 'rb'))
 
-            url = "http://localhost:5000/us/reviews/2/"  #  "http://localhost:5000/accounts/login/?next=/us/reviews/2/"  # "http://localhost:5000/us/reviews/2/" # review_json[JSON_KEY_PROJ][JSON_KEY_URL]
+            url = review_json[JSON_KEY_PROJ][JSON_KEY_URL]
             request = urllib2.Request(url)
             request.add_header('User-agent', 'beoordelingstool')
             request.add_header('username', username)
