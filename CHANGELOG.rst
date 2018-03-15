@@ -1,6 +1,6 @@
 # Changelog
 
-0.5 (unreleased)
+0.5 (2018-03-15)
 ----------------
 
 - Upload json to server.
