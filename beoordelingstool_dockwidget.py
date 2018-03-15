@@ -853,7 +853,6 @@ def save_json_to_server(review_json, user_data):
         (dict) user_data: A dict containing the username and password.
     """
     # Check user login credentials ()  # not needed, checked when json is uploaded
-    # username = user_data["username"]
     username = user_data["username"]
     password = user_data["password"]
     if review_json[JSON_KEY_PROJ][JSON_KEY_URL] is None:
@@ -917,6 +916,9 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
         (str) zip_url: The url to save the zip to.
         (dict) user_data: A dict containing the username and password
     """
+    # Check user login credentials ()  # not needed, checked when json is uploaded
+    username = user_data["username"]
+    password = user_data["password"]
     if zip_url is None:
         iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
         return
