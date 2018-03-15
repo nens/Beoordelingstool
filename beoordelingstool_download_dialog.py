@@ -67,7 +67,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Get json
         self.download_riool_search.clicked.connect(self.search_json_riool)
         # Save json in 3 shapefiles: manholes, pipes and measuring_points
-        self.accepted.connect(self.save_shapefiles)
+        self.accepted.connect(self.check_for_existing_shapefiles)
         # Show dockwidget after pressing OK with all 3 layers
         self.json_path = ''
         self.directory = ""
@@ -119,7 +119,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         return filename
 
-    def save_shapefiles(self):
+    def check_for_existing_shapefiles(self):
         """Save the manholes, pipes and measuring points shapefiles."""
         if self.json_path != '':
             self.directory = self.get_shapefiles_directory()
@@ -133,7 +133,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                     self.overwrite_shapefiles_dialog.show()
                     self.overwrite_shapefiles_dialog.output.connect(self.get_overwrite_shapefiles)
                 else:
-                    self.get_json(overwrite_shapefiles=True)
+                    self.save_shapefiles(overwrite_shapefiles=True)
             else:
                 iface.messageBar().pushMessage("Warning", "No shapefile directory found.", level=QgsMessageBar.WARNING, duration=0)
         else:
@@ -171,28 +171,15 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 overwrite existing shapefiles.
         """
         print "Overwrite shapefiles: {}.".format(overwrite_shapefiles)
-        self.get_json(overwrite_shapefiles)
+        self.save_shapefiles(overwrite_shapefiles)
 
 
-    def get_json(self, overwrite_shapefiles=True):
-        """"""
-        if overwrite_shapefiles is False:
-            # Manholes
-            manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
-            manholes_path = os.path.join(self.directory, manholes_filename)
-            manholes_layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
-            # Pipes
-            pipes_filename = "{}.shp".format(SHP_NAME_PIPES)
-            pipes_path = os.path.join(self.directory, pipes_filename)
-            pipes_layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
-            # Measuring stations
-            measuring_points_filename = "{}.shp".format(SHP_NAME_MEASURING_POINTS)
-            measuring_points_path = os.path.join(self.directory, measuring_points_filename)
-            measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
-            # Set manholes as active layer
-            iface.setActiveLayer(manholes_layer)
-            return
-        elif overwrite_shapefiles is True:
+    def save_shapefiles(self, overwrite_shapefiles=True):
+        """
+        Save the manholes, pipes and measuring stations shapefiles and show them as layers
+        on the map.
+        """
+        if overwrite_shapefiles is True:
             # Get json
             filename_json = self.json_path
             manholes, pipes = self.get_json_manholes_and_pipes(filename_json)
@@ -204,6 +191,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             # Save shapefiles
             self.save_shapefile_manholes(self.directory, manholes, overwrite_shapefiles)
             self.save_shapefiles_pipes_measuringpoints(self.directory, pipes, overwrite_shapefiles)
+        show_shapefile_layers()
 
     def get_json_manholes_and_pipes(self, filename):
         """Function to get a JSON."""
@@ -260,7 +248,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         data_source = None
         # Copy qml as layer style
         shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_MANHOLES))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_MANHOLES))))
-        layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
 
     def save_shapefiles_pipes_measuringpoints(self, directory, pipes, overwrite_shapefiles=False):
         """
@@ -344,16 +331,10 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         data_source = None
         # Copy qml as layer style
         shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_PIPES))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_PIPES))))
-        layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
 
         data_source_measuring_point = None
         # Copy qml as layer style
         shutil.copyfile(os.path.abspath(os.path.join(LAYER_STYLES_DIR, "{}.qml".format(SHP_NAME_MEASURING_POINTS))), os.path.abspath(os.path.join(directory, "{}.qml".format(SHP_NAME_MEASURING_POINTS))))
-        measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
-
-        # Set manholes as active layer
-        manholes_layer = QgsMapLayerRegistry.instance().mapLayersByName('manholes')[0]
-        iface.setActiveLayer(manholes_layer)
         # except Exception as e:
         #     print e
 
@@ -1010,3 +991,23 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
         feature = None
         return layer
+
+def show_shapefile_layers():
+    """
+    Show the manholes, pipes and measuring points layer.
+    Set the manholes layer as active layer.
+    """
+    # Manholes
+    manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
+    manholes_path = os.path.join(self.directory, manholes_filename)
+    manholes_layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
+    # Pipes
+    pipes_filename = "{}.shp".format(SHP_NAME_PIPES)
+    pipes_path = os.path.join(self.directory, pipes_filename)
+    pipes_layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
+    # Measuring stations
+    measuring_points_filename = "{}.shp".format(SHP_NAME_MEASURING_POINTS)
+    measuring_points_path = os.path.join(self.directory, measuring_points_filename)
+    measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
+    # Set manholes layer as active layer
+    iface.setActiveLayer(manholes_layer)
