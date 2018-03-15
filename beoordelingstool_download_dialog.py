@@ -178,7 +178,20 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
     def get_json(self, overwrite_shapefiles=True):
         """"""
         if overwrite_shapefiles is False:
-            # Show shapefiles
+            # Manholes
+            manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
+            manholes_path = os.path.join(self.directory, manholes_filename)
+            manholes_layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
+            # Pipes
+            pipes_filename = "{}.shp".format(SHP_NAME_PIPES)
+            pipes_path = os.path.join(self.directory, pipes_filename)
+            pipes_layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
+            # Measuring stations
+            measuring_points_filename = "{}.shp".format(SHP_NAME_MEASURING_POINTS)
+            measuring_points_path = os.path.join(self.directory, measuring_points_filename)
+            measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
+            # Set manholes as active layer
+            iface.setActiveLayer(manholes_layer)
             return
         elif overwrite_shapefiles is True:
             # Get json
