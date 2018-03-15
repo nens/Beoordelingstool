@@ -3,13 +3,15 @@
 0.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Upload json to server.
+- Upload json and zip to server.
+- Fix no datasource error.
 
 
 0.4 (2018-03-12)
 ----------------
 
-- Nothing changed yet.
+- More robustness.
 
 
 0.3 (2018-02-28)
