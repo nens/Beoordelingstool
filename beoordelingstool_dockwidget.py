@@ -890,6 +890,11 @@ def save_json_to_server(review_json, user_data):
             answer = urllib2.urlopen(request).read()
             iface.messageBar().pushMessage("Info", "JSON uploaded.",
                 level=QgsMessageBar.INFO, duration=20)
+        else:
+            iface.messageBar().pushMessage("Error", "Shapefiles missing. You \
+                should have a manholes, pipes and measuring stations layer.",
+                level=QgsMessageBar.INFO, duration=20)
+
 
 def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in querysets
     """
