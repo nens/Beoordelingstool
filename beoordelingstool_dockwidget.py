@@ -88,7 +88,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.set_project_properties()
         self.pushbutton_upload_voortgang_json.clicked.connect(
             self.show_login_dialog_voortgang)
-        self.pushbutton_upload_final_json.clicked.connect(
+        self.pushbutton_upload_zip_json.clicked.connect(
             self.show_login_dialog_final)
 
         # Manholes tab
@@ -193,6 +193,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         If the user data typed in the login dialog is correct, a json
         is created from the shapefiles and uploaded to the server.
+        A zip is also created from these shapefiles and json and uploaded
+        to the server.
         """
         self.login_dialog = BeoordelingstoolLoginDialog()
         self.login_dialog.show()
