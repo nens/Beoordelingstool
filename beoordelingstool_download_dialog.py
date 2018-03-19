@@ -252,7 +252,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 except Exception as e:
                     print "{} not found.".format(manholes_path)
             else:
-                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                iface.messageBar().pushMessage("Error", "Shapefiles already exist.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
                 return
         srs = osr.SpatialReference()
         # manholes[0]["CRS"]  # "Netherlands-RD"
