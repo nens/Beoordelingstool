@@ -36,8 +36,6 @@ from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
-from .beoordelingstool_overwrite_shapefiles_dialog import BeoordelingstoolOverwriteShapefilesDialog
-
 from .utils.constants import FILE_TYPE_JSON
 from .utils.constants import JSON_NAME
 from .utils.constants import SHP_NAME_MANHOLES
@@ -71,8 +69,6 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Show dockwidget after pressing OK with all 3 layers
         self.json_path = ''
         self.directory = ""
-        self.overwrite_shapefiles_dialog = BeoordelingstoolOverwriteShapefilesDialog()
-        self.overwrite_shapefiles_dialog.output.connect(self.get_overwrite_shapefiles)
 
     def closeEvent(self, event):
         # self.closingPlugin.emit()
@@ -133,9 +129,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
             if self.directory != '':
                 if os.path.exists(manholes_path) or os.path.exists(pipes_path) or os.path.exists(pipes_path):
-                    self.overwrite_shapefiles_dialog = BeoordelingstoolOverwriteShapefilesDialog()
-                    self.overwrite_shapefiles_dialog.show()
-                    self.overwrite_shapefiles_dialog.output.connect(self.get_overwrite_shapefiles)
+                    iface.messageBar().pushMessage("Warning", "Manholes, \
+                        pipes or measuring stations shapefile already exists.",
+                        level=QgsMessageBar.WARNING, duration=20)
                 else:
                     self.save_shapefiles(overwrite_shapefiles=True)
             else:
