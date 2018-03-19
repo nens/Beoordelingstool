@@ -927,38 +927,35 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
     username = user_data["username"]
     password = user_data["password"]
     if zip_url is None:
-        iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
+        iface.messageBar().pushMessage("Error", "The json has no url.",
+            level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
-        if manholes_layerList and pipes_layerList and measuring_points_layerList:
-            # Get project name from the json saved in the same folder as the "manholes" layer
-            layer_dir = get_layer_dir(manholes_layerList[0])
-            zip_path = os.path.join(layer_dir, "{}.zip".format(project_name))
+        zip_path = os.path.join(temp_dir, "{}.zip".format(project_name))
 
-            form = MultiPartForm()
-            filename = os.path.basename(zip_path)
-            form.add_field('Upload shapefiles', 'Upload shapefiles')
-            form.add_file('shape_files', filename, fileHandle=open(zip_path, 'rb'))
+        print zip_path
+        form = MultiPartForm()
+        filename = os.path.basename(zip_path)
+        form.add_field('Upload shapefiles', 'Upload shapefiles')
+        form.add_file('shape_files', filename, fileHandle=open(zip_path,
+            'rb'))
 
-            url = zip_url
-            request = urllib2.Request(url)
-            request.add_header('User-agent', 'beoordelingstool')
-            request.add_header('username', username)
-            request.add_header('password', password)
-            body = str(form)
-            request.add_header('Content-type', form.get_content_type())
-            request.add_header('Content-length', len(body))
-            request.add_data(body)
+        url = zip_url
+        request = urllib2.Request(url)
+        request.add_header('User-agent', 'beoordelingstool')
+        request.add_header('username', username)
+        request.add_header('password', password)
+        body = str(form)
+        request.add_header('Content-type', form.get_content_type())
+        request.add_header('Content-length', len(body))
+        request.add_data(body)
 
-            fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-            open(logfile, 'w').write(request.get_data())
+        fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
+        open(logfile, 'w').write(request.get_data())
 
-            answer = urllib2.urlopen(request).read()
-            iface.messageBar().pushMessage("Info", "JSON and zip uploaded.",
-                level=QgsMessageBar.INFO, duration=20)
+        answer = urllib2.urlopen(request).read()
+        iface.messageBar().pushMessage("Info", "JSON and zip uploaded.",
+            level=QgsMessageBar.INFO, duration=20)
 
 
 class MultiPartForm(object):
