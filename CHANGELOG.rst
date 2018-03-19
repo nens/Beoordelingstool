@@ -1,5 +1,4 @@
-# Changelo
-
+# Changelog
 
 0.6 (unreleased)
 ----------------
