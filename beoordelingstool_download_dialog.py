@@ -201,7 +201,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             # Save shapefiles
             self.save_shapefile_manholes(self.directory, manholes, overwrite_shapefiles)
             self.save_shapefiles_pipes_measuringpoints(self.directory, pipes, overwrite_shapefiles)
-        show_shapefile_layers()
+        show_shapefile_layers(self.directory)
 
     def get_json_manholes_and_pipes(self, filename):
         """
@@ -1018,23 +1018,27 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         feature = None
         return layer
 
-def show_shapefile_layers():
+def show_shapefile_layers(directory):
     """
     Show the manholes, pipes and measuring points layer.
     Set the manholes layer as active layer to be the same layer as the active
     tab.
+
+    Arguments:
+        (string) directory: Directory where the shapefiles are.
+            These shapefiles are shown as layers.
     """
     # Manholes
     manholes_filename = "{}.shp".format(SHP_NAME_MANHOLES)
-    manholes_path = os.path.join(self.directory, manholes_filename)
+    manholes_path = os.path.join(directory, manholes_filename)
     manholes_layer = iface.addVectorLayer(manholes_path, SHP_NAME_MANHOLES, "ogr")
     # Pipes
     pipes_filename = "{}.shp".format(SHP_NAME_PIPES)
-    pipes_path = os.path.join(self.directory, pipes_filename)
+    pipes_path = os.path.join(directory, pipes_filename)
     pipes_layer = iface.addVectorLayer(pipes_path, SHP_NAME_PIPES, "ogr")
     # Measuring stations
     measuring_points_filename = "{}.shp".format(SHP_NAME_MEASURING_POINTS)
-    measuring_points_path = os.path.join(self.directory, measuring_points_filename)
+    measuring_points_path = os.path.join(directory, measuring_points_filename)
     measuring_points_layer = iface.addVectorLayer(measuring_points_path, SHP_NAME_MEASURING_POINTS, "ogr")
     # Set manholes layer as active layer
     iface.setActiveLayer(manholes_layer)
