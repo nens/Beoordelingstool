@@ -933,7 +933,7 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
 
             form = MultiPartForm()
             filename = os.path.basename(zip_path)
-            form.add_field('Upload reviews', 'Upload reviews')
+            form.add_field('Upload shapefiles', 'Upload shapefiles')
             form.add_file('shape_files', filename, fileHandle=open(zip_path, 'rb'))
 
             url = zip_url
