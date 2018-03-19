@@ -1,6 +1,15 @@
-# Changelog
+# Changelo
 
-0.5 (unreleased)
+
+0.6 (unreleased)
+----------------
+
+- User can no longer choose to overwrite existing shapefiles when opening a json to prevent accidentally overwriting shapefiles.
+- Improve user messages.
+- Change button text of General tab into Upload voortgang and Upload zip.
+
+
+0.5 (2018-03-15)
 ----------------
 
 - Upload json to server.
