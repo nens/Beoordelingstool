@@ -6,6 +6,7 @@
 
 - User can no longer choose to overwrite existing shapefiles when opening a json to prevent accidentally overwriting shapefiles.
 - Improve user messages.
+- Bug fix: zip can now also be uploaded.
 - Change button text of General tab into Upload voortgang and Upload zip.
 
 
