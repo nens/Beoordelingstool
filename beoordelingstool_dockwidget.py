@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  BeoordelingstoolDockWidget
@@ -88,7 +87,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.set_project_properties()
         self.pushbutton_upload_voortgang_json.clicked.connect(
             self.show_login_dialog_voortgang)
-        self.pushbutton_upload_final_json.clicked.connect(
+        self.pushbutton_upload_zip_json.clicked.connect(
             self.show_login_dialog_final)
 
         # Manholes tab
@@ -193,6 +192,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         If the user data typed in the login dialog is correct, a json
         is created from the shapefiles and uploaded to the server.
+        A zip is also created from these shapefiles and json and uploaded
+        to the server.
         """
         self.login_dialog = BeoordelingstoolLoginDialog()
         self.login_dialog.show()
@@ -204,6 +205,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         review_json = self.convert_shps_to_json()
         # upload json to server (get url from json)
         save_json_to_server(review_json, user_data)
+        iface.messageBar().pushMessage("Info", "JSON uploaded.", level=QgsMessageBar.INFO, duration=0)
 
     def upload_final(self, user_data):
         """Upload the final version (json + zip with shapefiles and qmls)."""
@@ -882,12 +884,12 @@ def save_json_to_server(review_json, user_data):
             request.add_header('Content-length', len(body))
             request.add_data(body)
 
-            fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-            open(logfile, 'w').write(request.get_data())
-
             answer = urllib2.urlopen(request).read()
-            iface.messageBar().pushMessage("Info", "JSON uploaded.",
+        else:
+            iface.messageBar().pushMessage("Error", "Shapefiles missing. You \
+                should have a manholes, pipes and measuring stations layer.",
                 level=QgsMessageBar.INFO, duration=20)
+
 
 def create_zip(project_name, layer_dir, temp_dir):  # for zip_file_name in querysets
     """
@@ -920,38 +922,27 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
     username = user_data["username"]
     password = user_data["password"]
     if zip_url is None:
-        iface.messageBar().pushMessage("Error", "The json has no url.", level=QgsMessageBar.CRITICAL, duration=0)
+        iface.messageBar().pushMessage("Error", "The json has no url.",
+            level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
-        if manholes_layerList and pipes_layerList and measuring_points_layerList:
-            # Get project name from the json saved in the same folder as the "manholes" layer
-            layer_dir = get_layer_dir(manholes_layerList[0])
-            zip_path = os.path.join(layer_dir, "{}.zip".format(project_name))
+        zip_path = os.path.join(temp_dir, "{}.zip".format(project_name))
+        form = MultiPartForm()
+        filename = os.path.basename(zip_path)
+        form.add_field('Upload shapefiles', 'Upload shapefiles')
+        form.add_file('shape_files', str(filename), fileHandle=open(zip_path, 'rb'))
 
-            form = MultiPartForm()
-            filename = os.path.basename(zip_path)
-            form.add_field('Upload reviews', 'Upload reviews')
-            form.add_file('shape_files', filename, fileHandle=open(zip_path, 'rb'))
+        url = zip_url
+        request = urllib2.Request(url.encode('utf-8'))
+        request.add_header(b'User-agent', b'beoordelingstool')
+        request.add_header(b'username', username.encode('utf-8'))
+        request.add_header(b'password', password.encode('utf-8'))
+        body = str(form)
+        request.add_header(b'Content-type', form.get_content_type())
+        request.add_header(b'Content-length', str(len(body)))  # XXX Python 3
+        request.add_data(body)
 
-            url = zip_url
-            request = urllib2.Request(url)
-            request.add_header('User-agent', 'beoordelingstool')
-            request.add_header('username', username)
-            request.add_header('password', password)
-            body = str(form)
-            request.add_header('Content-type', form.get_content_type())
-            request.add_header('Content-length', len(body))
-            request.add_data(body)
-
-            fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-            open(logfile, 'w').write(request.get_data())
-
-            answer = urllib2.urlopen(request).read()
-            iface.messageBar().pushMessage("Info", "JSON and zip uploaded.",
-                level=QgsMessageBar.INFO, duration=20)
+        answer = urllib2.urlopen(request).read()
 
 
 class MultiPartForm(object):
@@ -1015,4 +1006,4 @@ class MultiPartForm(object):
         flattened = list(itertools.chain(*parts))
         flattened.append('--' + self.boundary + '--')
         flattened.append('')
-        return '\r\n'.join(flattened)
+        return b'\r\n'.join(flattened)

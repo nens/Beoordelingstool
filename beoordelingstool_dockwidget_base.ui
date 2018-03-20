@@ -71,7 +71,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Upload json</string>
+        <string>Upload voortgang</string>
        </property>
       </widget>
      </widget>
@@ -85,9 +85,9 @@
        </rect>
       </property>
       <property name="title">
-       <string>Upload final</string>
+       <string>Upload zip</string>
       </property>
-      <widget class="QPushButton" name="pushbutton_upload_final_json">
+      <widget class="QPushButton" name="pushbutton_upload_zip_json">
        <property name="geometry">
         <rect>
          <x>130</x>
@@ -97,7 +97,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Upload zip and json</string>
+        <string>Upload zip</string>
        </property>
       </widget>
      </widget>
