@@ -1,5 +1,11 @@
 # Changelog
 
+0.7 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
 0.6 (2018-03-20)
 ----------------
 
