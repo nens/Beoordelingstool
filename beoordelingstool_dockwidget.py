@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  BeoordelingstoolDockWidget
@@ -46,6 +45,7 @@ from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
 from .beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
+from .multi_part_form import MultiPartForm as MultiPartFormZip
 
 # Import functions
 from .utils.layer import get_layer_dir
@@ -206,6 +206,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         review_json = self.convert_shps_to_json()
         # upload json to server (get url from json)
         save_json_to_server(review_json, user_data)
+        iface.messageBar().pushMessage("Info", "JSON uploaded.", level=QgsMessageBar.INFO, duration=0)
 
     def upload_final(self, user_data):
         """Upload the final version (json + zip with shapefiles and qmls)."""
@@ -884,12 +885,10 @@ def save_json_to_server(review_json, user_data):
             request.add_header('Content-length', len(body))
             request.add_data(body)
 
-            fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-            open(logfile, 'w').write(request.get_data())
+            # fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
+            # open(logfile, 'w').write(request.get_data())
 
             answer = urllib2.urlopen(request).read()
-            iface.messageBar().pushMessage("Info", "JSON uploaded.",
-                level=QgsMessageBar.INFO, duration=20)
         else:
             iface.messageBar().pushMessage("Error", "Shapefiles missing. You \
                 should have a manholes, pipes and measuring stations layer.",
@@ -926,36 +925,42 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
     # Check user login credentials ()  # not needed, checked when json is uploaded
     username = user_data["username"]
     password = user_data["password"]
+    print(type(username), type(password))
     if zip_url is None:
         iface.messageBar().pushMessage("Error", "The json has no url.",
             level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
         zip_path = os.path.join(temp_dir, "{}.zip".format(project_name))
-
-        print zip_path
-        form = MultiPartForm()
+        form = MultiPartFormZip()
         filename = os.path.basename(zip_path)
         form.add_field('Upload shapefiles', 'Upload shapefiles')
-        form.add_file('shape_files', filename, fileHandle=open(zip_path,
-            'rb'))
+        form.add_file('shape_files', str(filename), fileHandle=open(zip_path, 'rb')) #  rU # zip_path
 
         url = zip_url
-        request = urllib2.Request(url)
-        request.add_header('User-agent', 'beoordelingstool')
-        request.add_header('username', username)
-        request.add_header('password', password)
+        request = urllib2.Request(url.encode('utf-8'))
+        request.add_header(b'User-agent', b'beoordelingstool')
+        request.add_header(b'username', username.encode('utf-8'))
+        request.add_header(b'password', password.encode('utf-8'))
+        # request.add_header('shape_files', zip_path)
         body = str(form)
-        request.add_header('Content-type', form.get_content_type())
-        request.add_header('Content-length', len(body))
+        # body_unicode = 
+        request.add_header(b'Content-type', form.get_content_type())
+        request.add_header(b'Content-length', str(len(body)))  # XXX Python 3
         request.add_data(body)
 
-        fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-        open(logfile, 'w').write(request.get_data())
+        print type(body)
+        print body[:300]
 
+        # fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
+        # open(logfile, 'w').write(request.get_data())
+
+        # try:
         answer = urllib2.urlopen(request).read()
-        iface.messageBar().pushMessage("Info", "JSON and zip uploaded.",
-            level=QgsMessageBar.INFO, duration=20)
+        # except UnicodeDecodeError:
+        #     # obj is byte string
+        #     ascii_text = str(body).encode('string_escape')
+        #     return unicode(ascii_text)
 
 
 class MultiPartForm(object):
@@ -1019,4 +1024,4 @@ class MultiPartForm(object):
         flattened = list(itertools.chain(*parts))
         flattened.append('--' + self.boundary + '--')
         flattened.append('')
-        return '\r\n'.join(flattened)
+        return b'\r\n'.join(flattened)
