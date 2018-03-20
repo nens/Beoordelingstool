@@ -45,7 +45,6 @@ from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
 from .beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
-from .multi_part_form import MultiPartForm as MultiPartFormZip
 
 # Import functions
 from .utils.layer import get_layer_dir
@@ -885,9 +884,6 @@ def save_json_to_server(review_json, user_data):
             request.add_header('Content-length', len(body))
             request.add_data(body)
 
-            # fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-            # open(logfile, 'w').write(request.get_data())
-
             answer = urllib2.urlopen(request).read()
         else:
             iface.messageBar().pushMessage("Error", "Shapefiles missing. You \
@@ -925,42 +921,28 @@ def save_zip_to_server(project_name, temp_dir, zip_url, user_data):
     # Check user login credentials ()  # not needed, checked when json is uploaded
     username = user_data["username"]
     password = user_data["password"]
-    print(type(username), type(password))
     if zip_url is None:
         iface.messageBar().pushMessage("Error", "The json has no url.",
             level=QgsMessageBar.CRITICAL, duration=0)
         return
     else:
         zip_path = os.path.join(temp_dir, "{}.zip".format(project_name))
-        form = MultiPartFormZip()
+        form = MultiPartForm()
         filename = os.path.basename(zip_path)
         form.add_field('Upload shapefiles', 'Upload shapefiles')
-        form.add_file('shape_files', str(filename), fileHandle=open(zip_path, 'rb')) #  rU # zip_path
+        form.add_file('shape_files', str(filename), fileHandle=open(zip_path, 'rb'))
 
         url = zip_url
         request = urllib2.Request(url.encode('utf-8'))
         request.add_header(b'User-agent', b'beoordelingstool')
         request.add_header(b'username', username.encode('utf-8'))
         request.add_header(b'password', password.encode('utf-8'))
-        # request.add_header('shape_files', zip_path)
         body = str(form)
-        # body_unicode = 
         request.add_header(b'Content-type', form.get_content_type())
         request.add_header(b'Content-length', str(len(body)))  # XXX Python 3
         request.add_data(body)
 
-        print type(body)
-        print body[:300]
-
-        # fd2, logfile = tempfile.mkstemp(prefix="uploadlog", suffix=".txt")
-        # open(logfile, 'w').write(request.get_data())
-
-        # try:
         answer = urllib2.urlopen(request).read()
-        # except UnicodeDecodeError:
-        #     # obj is byte string
-        #     ascii_text = str(body).encode('string_escape')
-        #     return unicode(ascii_text)
 
 
 class MultiPartForm(object):
