@@ -1,6 +1,6 @@
 # Changelog
 
-0.6 (unreleased)
+0.6 (2018-03-20)
 ----------------
 
 - User can no longer choose to overwrite existing shapefiles when opening a json to prevent accidentally overwriting shapefiles.
