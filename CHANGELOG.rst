@@ -3,7 +3,7 @@
 0.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added Trigger field to measuring_point.
 
 
 0.6 (2018-03-20)
