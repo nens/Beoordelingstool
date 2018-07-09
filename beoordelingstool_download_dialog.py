@@ -105,9 +105,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             init_path = os.path.expanduser("~")
         if file_type == FILE_TYPE_JSON:
             filename = QFileDialog.getOpenFileName(None,
-                                                 'Open json file',
-                                                 init_path,
-                                                 'JSON (*.json)')
+                                                   'Open json file',
+                                                   init_path,
+                                                   'JSON (*.json)')
 
         if filename:
             settings.setValue('last_used_import_path',
@@ -491,6 +491,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
         opmerking.SetWidth(255)
         layer.CreateField(opmerking)
+        artrigger = ogr.FieldDefn("Trigger", ogr.OFTString)
+        artrigger.SetWidth(32)
+        layer.CreateField(artrigger)
         return layer
 
     def feature_to_manholes_shp(self, layer, manhole):
@@ -549,6 +552,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         herstelmaatregel = manhole["Herstelmaatregel"]
         # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
         opmerking = manhole["Opmerking"]
+        artrigger = manhole['Trigger']
 
         # Set values
         feature = ogr.Feature(layer.GetLayerDefn())
@@ -595,6 +599,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         feature.SetField("CDD", str(CDD))
         feature.SetField("Herstelmaa", str(herstelmaatregel))
         feature.SetField("Opmerking", str(opmerking))
+        feature.SetField('Trigger', str(artrigger))
         layer.CreateFeature(feature)
 
         feature = None
@@ -749,12 +754,19 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         AXH = ogr.FieldDefn("AXH", ogr.OFTString)
         AXH.SetWidth(255)
         layer.CreateField(AXH)
+
         herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
         herstelmaatregel.SetWidth(255)
         layer.CreateField(herstelmaatregel)
+
         opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
         opmerking.SetWidth(255)
         layer.CreateField(opmerking)
+
+        artrigger = ogr.FieldDefn("Trigger", ogr.OFTString)
+        artrigger.SetWidth(255)
+        layer.CreateField(artrigger)
+
         ZC = ogr.FieldDefn("ZC", ogr.OFTString)
         ZC.SetWidth(255)
         layer.CreateField(ZC)
@@ -826,6 +838,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         herstelmaatregel = pipe["Herstelmaatregel"]
         # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
         opmerking = pipe["Opmerking"]
+        artrigger = pipe.get("Trigger", '')
         ZC = pipe["ZC"]
 
         # Set values
@@ -881,6 +894,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         feature.SetField("AXH", str(AXH))
         feature.SetField("Herstelmaa", str(herstelmaatregel))
         feature.SetField("Opmerking", str(opmerking))
+        feature.SetField('Trigger', str(artrigger))
+
         feature.SetField("ZC", str(ZC))
         layer.CreateFeature(feature)
 
@@ -898,60 +913,26 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         Returns:
             (shapefile layer) layer: A shapefile layer.
         """
+
         PIPES_ID = ogr.FieldDefn("PIPE_ID", ogr.OFTString)
         PIPES_ID.SetWidth(255)
         layer.CreateField(PIPES_ID)
-        x = ogr.FieldDefn("x", ogr.OFTString)
-        x.SetWidth(255)
-        layer.CreateField(x)
-        y = ogr.FieldDefn("y", ogr.OFTString)
-        y.SetWidth(255)
-        layer.CreateField(y)
-        A = ogr.FieldDefn("A", ogr.OFTString)
-        A.SetWidth(255)
-        layer.CreateField(A)
-        B = ogr.FieldDefn("B", ogr.OFTString)
-        B.SetWidth(255)
-        layer.CreateField(B)
-        C = ogr.FieldDefn("C", ogr.OFTString)
-        C.SetWidth(255)
-        layer.CreateField(C)
-        D = ogr.FieldDefn("D", ogr.OFTString)
-        D.SetWidth(255)
-        layer.CreateField(D)
-        E = ogr.FieldDefn("E", ogr.OFTString)
-        E.SetWidth(255)
-        layer.CreateField(E)
-        F = ogr.FieldDefn("F", ogr.OFTString)
-        F.SetWidth(255)
-        layer.CreateField(F)
-        G = ogr.FieldDefn("G", ogr.OFTString)
-        G.SetWidth(255)
-        layer.CreateField(G)
-        I = ogr.FieldDefn("I", ogr.OFTString)
-        I.SetWidth(255)
-        layer.CreateField(I)
-        J = ogr.FieldDefn("J", ogr.OFTString)
-        J.SetWidth(255)
-        layer.CreateField(J)
-        K = ogr.FieldDefn("K", ogr.OFTString)
-        K.SetWidth(255)
-        layer.CreateField(K)
-        M = ogr.FieldDefn("M", ogr.OFTString)
-        M.SetWidth(255)
-        layer.CreateField(M)
-        N = ogr.FieldDefn("N", ogr.OFTString)
-        N.SetWidth(255)
-        layer.CreateField(N)
-        O = ogr.FieldDefn("O", ogr.OFTString)
-        O.SetWidth(255)
-        layer.CreateField(O)
+
+        for fld in 'xyABCDEFGIJKMNO':
+            dummy = ogr.FieldDefn(fld, ogr.OFTString)
+            dummy.SetWidth(255)
+            layer.CreateField(dummy)
+
         herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
         herstelmaatregel.SetWidth(255)
         layer.CreateField(herstelmaatregel)
+
         opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
         opmerking.SetWidth(255)
         layer.CreateField(opmerking)
+        artrigger = ogr.FieldDefn("Trigger", ogr.OFTString)
+        artrigger.SetWidth(32)
+        layer.CreateField(artrigger)
         return layer
 
     def feature_to_measuring_points_shp(self, layer, pipe_id, measuring_point):
@@ -969,22 +950,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Get values
         x = float(measuring_point["x"]) if measuring_point["x"] else 0.0
         y = float(measuring_point["y"]) if measuring_point["y"] else 0.0
-        A = measuring_point.get("A", None)
-        B = measuring_point.get("B", None)
-        C = measuring_point.get("C", None)
-        D = measuring_point.get("D", None)
-        E = measuring_point.get("E", None)
-        F = measuring_point.get("F", None)
-        G = measuring_point.get("G", None)
-        I = measuring_point.get("I", None)
-        J = measuring_point.get("J", None)
-        K = measuring_point.get("K", None)
-        M = measuring_point.get("M", None)
-        N = measuring_point.get("N", None)
-        O = measuring_point.get("O", None)
-        herstelmaatregel = measuring_point["Herstelmaatregel"] if measuring_point["Herstelmaatregel"] else ""
-        # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
+        herstelmaatregel = measuring_point.get("Herstelmaatregel", '')
         opmerking = measuring_point["Opmerking"] if measuring_point["Opmerking"] else ""
+        artrigger = measuring_point['Trigger']
 
         # Set values
         feature = ogr.Feature(layer.GetLayerDefn())
@@ -994,21 +962,13 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         feature.SetField("PIPE_ID", str(pipe_id))
         feature.SetField("x", str(x))
         feature.SetField("y", str(y))
-        feature.SetField("A", str(A))
-        feature.SetField("B", str(B))
-        feature.SetField("C", str(C))
-        feature.SetField("D", str(D))
-        feature.SetField("E", str(E))
-        feature.SetField("F", str(F))
-        feature.SetField("G", str(G))
-        feature.SetField("I", str(I))
-        feature.SetField("J", str(J))
-        feature.SetField("K", str(K))
-        feature.SetField("M", str(M))
-        feature.SetField("N", str(N))
-        feature.SetField("O", str(O))
-        feature.SetField("Herstelmaa", str(herstelmaatregel))
-        feature.SetField("Opmerking", str(opmerking))
+
+        for fld in list('ABCDEFGIJKMNO'):
+            feature.SetField(fld, str(measuring_point.get(fld, None)))
+
+        for fld in ['Herstelmaa', 'Opmerking', 'Trigger']:
+            feature.SetField(fld, str(measuring_point.get(fld, '')))
+
         layer.CreateFeature(feature)
 
         feature = None
