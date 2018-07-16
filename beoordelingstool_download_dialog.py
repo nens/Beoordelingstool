@@ -262,7 +262,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         if os.path.exists(manholes_path) or overwrite_shapefiles is True:
             try:
                 driver.DeleteDataSource(manholes_path)
-                print("{} deleted.".format(manholes_path)
+                print("{} deleted.".format(manholes_path))
             except Exception as e:
                 print "{} not found.".format(manholes_path)
         layer = data_source.CreateLayer(SHP_NAME_MANHOLES, srs, ogr.wkbPoint)
