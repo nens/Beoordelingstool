@@ -41,6 +41,8 @@ from .utils.constants import JSON_NAME
 from .utils.constants import SHP_NAME_MANHOLES
 from .utils.constants import SHP_NAME_PIPES
 from .utils.constants import SHP_NAME_MEASURING_POINTS
+from .utils.constants import ZB_A_FIELDS
+from .utils.constants import ZB_C_FIELDS
 
 LAYER_STYLES_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layer_styles'))
 
@@ -51,7 +53,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
 
     # closingPlugin = pyqtSignal()
-
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -105,9 +106,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             init_path = os.path.expanduser("~")
         if file_type == FILE_TYPE_JSON:
             filename = QFileDialog.getOpenFileName(None,
-                                                 'Open json file',
-                                                 init_path,
-                                                 'JSON (*.json)')
+                                                   'Open json file',
+                                                   init_path,
+                                                   'JSON (*.json)')
 
         if filename:
             settings.setValue('last_used_import_path',
@@ -130,12 +131,15 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             if self.directory != '':
                 if os.path.exists(manholes_path) or os.path.exists(pipes_path) or os.path.exists(pipes_path):
                     iface.messageBar().pushMessage("Warning", "Manholes, \
-                        pipes or measuring stations shapefile already exists.",
-                        level=QgsMessageBar.WARNING, duration=20)
+                    pipes or measuring stations shapefile already exists.",
+                                                   level=QgsMessageBar.WARNING, duration=20)
                 else:
                     self.save_shapefiles(overwrite_shapefiles=True)
             else:
-                iface.messageBar().pushMessage("Warning", "No shapefile directory found.", level=QgsMessageBar.WARNING, duration=0)
+                iface.messageBar()\
+                     .pushMessage("Warning",
+                                  "No shapefile directory found.",
+                                  level=QgsMessageBar.WARNING, duration=0)
         else:
             iface.messageBar().pushMessage("Warning", "No json found.", level=QgsMessageBar.WARNING, duration=0)
 
@@ -176,9 +180,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (boolean) overwrite_shapefiles: Whether the user wants to
                 overwrite existing shapefiles.
         """
-        print "Overwrite shapefiles: {}.".format(overwrite_shapefiles)
+        print("Overwrite shapefiles: {}.".format(overwrite_shapefiles))
         self.save_shapefiles(overwrite_shapefiles)
-
 
     def save_shapefiles(self, overwrite_shapefiles=True):
         """
@@ -228,7 +231,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             (string) directory: The directory to save the shapefiles in.
             (json) manholes: The manholes to save in the shapefile.
             (boolean) overwrite_shapefiles: An optional parameter, telling
-                whether or not possible existing shapefiles should be 
+                whether or not possible existing shapefiles should be
                 overwritten. The default is set to False, to not
                 accidentally overwrite shapefiles.
         """
@@ -244,11 +247,14 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
             if os.path.exists(manholes_path) or overwrite_shapefiles is True:
                 try:
                     driver.DeleteDataSource(manholes_path)
-                    print "{} deleted.".format(manholes_path)
+                    print("{} deleted.".format(manholes_path))
                 except Exception as e:
-                    print "{} not found.".format(manholes_path)
+                    print("{} not found.".format(manholes_path))
             else:
-                iface.messageBar().pushMessage("Error", "Shapefiles already exist.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                iface.messageBar()\
+                     .pushMessage("Error",
+                                  "Shapefiles already exist.",
+                                  level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
                 return
         srs = osr.SpatialReference()
         # manholes[0]["CRS"]  # "Netherlands-RD"
@@ -256,7 +262,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         if os.path.exists(manholes_path) or overwrite_shapefiles is True:
             try:
                 driver.DeleteDataSource(manholes_path)
-                print "{} deleted.".format(manholes_path)
+                print("{} deleted.".format(manholes_path))
             except Exception as e:
                 print "{} not found.".format(manholes_path)
         layer = data_source.CreateLayer(SHP_NAME_MANHOLES, srs, ogr.wkbPoint)
@@ -278,7 +284,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 The pipes json can have nested assets, known as measuring
                 points.
             (boolean) overwrite_shapefiles: An optional parameter, telling
-                whether or not possible existing shapefiles should be 
+                whether or not possible existing shapefiles should be
                 overwritten. The default is set to False, to not
                 accidentally overwrite shapefiles.
         """
@@ -299,7 +305,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 except Exception as e:
                     print "{} not found.".format(pipes_path)
             else:
-                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                iface.messageBar().pushMessage("Error",
+                                               "data_source is None.",
+                                               level=QgsMessageBar.CRITICAL, duration=0)
                 return
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
@@ -327,7 +335,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
                 except Exception as e:
                     print "{} not found.".format(measuring_points_path)
             else:
-                iface.messageBar().pushMessage("Error", "data_source is None.", level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
+                iface.messageBar()\
+                      .pushMessage("Error", "data_source is None.",
+                                   level=QgsMessageBar.CRITICAL, duration=0)  # does not say anythong to user
                 return
         srs = osr.SpatialReference()
         # pipes[0]["Beginpunt CRS"]  # "Netherlands-RD"
@@ -371,126 +381,22 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         Returns:
             (shapefile layer) layer: A shapefile layer.
         """
-        CAA = ogr.FieldDefn("CAA", ogr.OFTString)
-        CAA.SetWidth(255)
-        layer.CreateField(CAA)
-        CAJ = ogr.FieldDefn("CAJ", ogr.OFTString)
-        CAJ.SetWidth(255)
-        layer.CreateField(CAJ)
-        CAL = ogr.FieldDefn("CAL", ogr.OFTString)
-        CAL.SetWidth(255)
-        layer.CreateField(CAL)
-        CAM = ogr.FieldDefn("CAM", ogr.OFTString)
-        CAM.SetWidth(255)
-        layer.CreateField(CAM)
-        CAN = ogr.FieldDefn("CAN", ogr.OFTString)
-        CAN.SetWidth(255)
-        layer.CreateField(CAN)
-        CAO = ogr.FieldDefn("CAO", ogr.OFTString)
-        CAO.SetWidth(255)
-        layer.CreateField(CAO)
-        CAQ = ogr.FieldDefn("CAQ", ogr.OFTString)
-        CAQ.SetWidth(255)
-        layer.CreateField(CAQ)
-        CAR = ogr.FieldDefn("CAR", ogr.OFTString)
-        CAR.SetWidth(255)
-        layer.CreateField(CAR)
-        CBA = ogr.FieldDefn("CBA", ogr.OFTString)
-        CBA.SetWidth(255)
-        layer.CreateField(CBA)
-        CBB = ogr.FieldDefn("CBB", ogr.OFTString)
-        CBB.SetWidth(255)
-        layer.CreateField(CBB)
-        CBC = ogr.FieldDefn("CBC", ogr.OFTString)
-        CBC.SetWidth(255)
-        layer.CreateField(CBC)
-        CBD = ogr.FieldDefn("CBD", ogr.OFTString)
-        CBD.SetWidth(255)
-        layer.CreateField(CBD)
-        CBE = ogr.FieldDefn("CBE", ogr.OFTString)
-        CBE.SetWidth(255)
-        layer.CreateField(CBE)
-        CBF = ogr.FieldDefn("CBF", ogr.OFTString)
-        CBF.SetWidth(255)
-        layer.CreateField(CBF)
-        CBH = ogr.FieldDefn("CBH", ogr.OFTString)
-        CBH.SetWidth(255)
-        layer.CreateField(CBH)
-        CBI = ogr.FieldDefn("CBI", ogr.OFTString)
-        CBI.SetWidth(255)
-        layer.CreateField(CBI)
-        CBJ = ogr.FieldDefn("CBJ", ogr.OFTString)
-        CBJ.SetWidth(255)
-        layer.CreateField(CBJ)
-        CBK = ogr.FieldDefn("CBK", ogr.OFTString)
-        CBK.SetWidth(255)
-        layer.CreateField(CBK)
-        CBL = ogr.FieldDefn("CBL", ogr.OFTString)
-        CBL.SetWidth(255)
-        layer.CreateField(CBL)
-        CBM = ogr.FieldDefn("CBM", ogr.OFTString)
-        CBM.SetWidth(255)
-        layer.CreateField(CBM)
-        CBO = ogr.FieldDefn("CBO", ogr.OFTString)
-        CBO.SetWidth(255)
-        layer.CreateField(CBO)
-        CBP = ogr.FieldDefn("CBP", ogr.OFTString)
-        CBP.SetWidth(255)
-        layer.CreateField(CBP)
-        CCA = ogr.FieldDefn("CCA", ogr.OFTString)
-        CCA.SetWidth(255)
-        layer.CreateField(CCA)
-        CCB = ogr.FieldDefn("CCB", ogr.OFTString)
-        CCB.SetWidth(255)
-        layer.CreateField(CCB)
-        CCC = ogr.FieldDefn("CCC", ogr.OFTString)
-        CCC.SetWidth(255)
-        layer.CreateField(CCC)
-        CCD = ogr.FieldDefn("CCD", ogr.OFTString)
-        CCD.SetWidth(255)
-        layer.CreateField(CCD)
-        CCK = ogr.FieldDefn("CCK", ogr.OFTString)
-        CCK.SetWidth(255)
-        layer.CreateField(CCK)
-        CCM = ogr.FieldDefn("CCM", ogr.OFTString)
-        CCM.SetWidth(255)
-        layer.CreateField(CCM)
-        CCN = ogr.FieldDefn("CCN", ogr.OFTString)
-        CCN.SetWidth(255)
-        layer.CreateField(CCN)
-        CCO = ogr.FieldDefn("CCO", ogr.OFTString)
-        CCO.SetWidth(255)
-        layer.CreateField(CCO)
-        CCP = ogr.FieldDefn("CCP", ogr.OFTString)
-        CCP.SetWidth(255)
-        layer.CreateField(CCP)
-        CCQ = ogr.FieldDefn("CCQ", ogr.OFTString)
-        CCQ.SetWidth(255)
-        layer.CreateField(CCQ)
-        CCR = ogr.FieldDefn("CCR", ogr.OFTString)
-        CCR.SetWidth(255)
-        layer.CreateField(CCR)
-        CCS = ogr.FieldDefn("CCS", ogr.OFTString)
-        CCS.SetWidth(255)
-        layer.CreateField(CCS)
-        CDA = ogr.FieldDefn("CDA", ogr.OFTString)
-        CDA.SetWidth(255)
-        layer.CreateField(CDA)
-        CDB = ogr.FieldDefn("CDB", ogr.OFTString)
-        CDB.SetWidth(255)
-        layer.CreateField(CDB)
-        CDC = ogr.FieldDefn("CDC", ogr.OFTString)
-        CDC.SetWidth(255)
-        layer.CreateField(CDC)
-        CDD = ogr.FieldDefn("CDD", ogr.OFTString)
-        CDD.SetWidth(255)
-        layer.CreateField(CDD)
+        for fld in ZB_C_FIELDS:
+            dummy = ogr.FieldDefn(fld, ogr.OFTString)
+            dummy.SetWidth(255)
+            layer.CreateField(dummy)
+
         herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
         herstelmaatregel.SetWidth(255)
         layer.CreateField(herstelmaatregel)
+
         opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
         opmerking.SetWidth(255)
         layer.CreateField(opmerking)
+
+        artrigger = ogr.FieldDefn("Trigger", ogr.OFTString)
+        artrigger.SetWidth(32)
+        layer.CreateField(artrigger)
         return layer
 
     def feature_to_manholes_shp(self, layer, manhole):
@@ -505,96 +411,22 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         Returns:
             (shapefile layer) layer: A shapefile layer.
         """
-        # Get values
-        CAA = manhole["CAA"]
         x = manhole["x"]
         y = manhole["y"]
-        CAJ = manhole.get("CAJ", ' ')
-        CAL = manhole.get("CAL", ' ')
-        CAM = manhole.get("CAM", ' ')
-        CAN = manhole.get("CAN", ' ')
-        CAO = manhole.get("CAO", ' ')
-        CAQ = manhole.get("CAQ", ' ')
-        CAR = manhole.get("CAR", ' ')
-        CBA = manhole.get("CBA", ' ')
-        CBB = manhole.get("CBB", ' ')
-        CBC = manhole.get("CBC", ' ')
-        CBD = manhole.get("CBD", ' ')
-        CBE = manhole.get("CBE", ' ')
-        CBF = manhole.get("CBF", ' ')
-        CBH = manhole.get("CBH", ' ')
-        CBI = manhole.get("CBI", ' ')
-        CBJ = manhole.get("CBJ", ' ')
-        CBK = manhole.get("CBK", ' ')
-        CBL = manhole.get("CBL", ' ')
-        CBM = manhole.get("CBM", ' ')
-        CBO = manhole.get("CBO", ' ')
-        CBP = manhole.get("CBP", ' ')
-        CCA = manhole.get("CCA", ' ')
-        CCB = manhole.get("CCB", ' ')
-        CCC = manhole.get("CCC", ' ')
-        CCD = manhole.get("CCD", ' ')
-        CCK = manhole.get("CCK", ' ')
-        CCM = manhole.get("CCM", ' ')
-        CCN = manhole.get("CCN", ' ')
-        CCO = manhole.get("CCO", ' ')
-        CCP = manhole.get("CCP", ' ')
-        CCQ = manhole.get("CCQ", ' ')
-        CCR = manhole.get("CCR", ' ')
-        CCS = manhole.get("CCS", ' ')
-        CDA = manhole.get("CDA", ' ')
-        CDB = manhole.get("CDB", ' ')
-        CDC = manhole.get("CDC", ' ')
-        CDD = manhole.get("CDD", ' ')
-        herstelmaatregel = manhole["Herstelmaatregel"]
-        # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
-        opmerking = manhole["Opmerking"]
-
-        # Set values
-        feature = ogr.Feature(layer.GetLayerDefn())
         wkt = "POINT({} {})".format(x, y)
+
+        feature = ogr.Feature(layer.GetLayerDefn())
         point = ogr.CreateGeometryFromWkt(wkt)
+
         feature.SetGeometry(point)
-        feature.SetField("CAA", str(CAA))
-        feature.SetField("CAJ", str(CAJ))
-        feature.SetField("CAL", str(CAL))
-        feature.SetField("CAM", str(CAM))
-        feature.SetField("CAN", str(CAN))
-        feature.SetField("CAO", str(CAO))
-        feature.SetField("CAQ", str(CAQ))
-        feature.SetField("CAR", str(CAR))
-        feature.SetField("CBA", str(CBA))
-        feature.SetField("CBB", str(CBB))
-        feature.SetField("CBC", str(CBC))
-        feature.SetField("CBD", str(CBD))
-        feature.SetField("CBE", str(CBE))
-        feature.SetField("CBF", str(CBF))
-        feature.SetField("CBH", str(CBH))
-        feature.SetField("CBI", str(CBI))
-        feature.SetField("CBJ", str(CBJ))
-        feature.SetField("CBK", str(CBK))
-        feature.SetField("CBL", str(CBL))
-        feature.SetField("CBM", str(CBM))
-        feature.SetField("CBO", str(CBO))
-        feature.SetField("CBP", str(CBP))
-        feature.SetField("CCA", str(CCA))
-        feature.SetField("CCB", str(CCB))
-        feature.SetField("CCC", str(CCC))
-        feature.SetField("CCD", str(CCD))
-        feature.SetField("CCK", str(CCK))
-        feature.SetField("CCM", str(CCM))
-        feature.SetField("CCN", str(CCN))
-        feature.SetField("CCO", str(CCO))
-        feature.SetField("CCP", str(CCP))
-        feature.SetField("CCQ", str(CCQ))
-        feature.SetField("CCR", str(CCR))
-        feature.SetField("CCS", str(CCS))
-        feature.SetField("CDA", str(CDA))
-        feature.SetField("CDB", str(CDB))
-        feature.SetField("CDC", str(CDC))
-        feature.SetField("CDD", str(CDD))
-        feature.SetField("Herstelmaa", str(herstelmaatregel))
-        feature.SetField("Opmerking", str(opmerking))
+
+        for fld in ZB_C_FIELDS:
+            feature.SetField(fld, str(manhole.get(fld, ' ')))
+
+        feature.SetField("Herstelmaa", str(manhole.get('Herstelmaatregel', '')))
+        feature.SetField("Opmerking", str(manhole.get("Opmerking", '')))
+        feature.SetField('Trigger', str(manhole.get('Trigger', '')))
+
         layer.CreateFeature(feature)
 
         feature = None
@@ -614,150 +446,24 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         ID = ogr.FieldDefn("ID", ogr.OFTString)
         ID.SetWidth(255)
         layer.CreateField(ID)
-        AAA = ogr.FieldDefn("AAA", ogr.OFTString)
-        AAA.SetWidth(255)
-        layer.CreateField(AAA)
-        AAB = ogr.FieldDefn("AAB", ogr.OFTString)
-        AAB.SetWidth(255)
-        layer.CreateField(AAB)
-        AAD = ogr.FieldDefn("AAD", ogr.OFTString)
-        AAD.SetWidth(255)
-        layer.CreateField(AAD)
-        AAE = ogr.FieldDefn("AAE", ogr.OFTString)
-        AAE.SetWidth(255)
-        layer.CreateField(AAE)
-        AAF = ogr.FieldDefn("AAF", ogr.OFTString)
-        AAF.SetWidth(255)
-        layer.CreateField(AAF)
-        AAG = ogr.FieldDefn("AAG", ogr.OFTString)
-        AAG.SetWidth(255)
-        layer.CreateField(AAG)
-        AAJ = ogr.FieldDefn("AAJ", ogr.OFTString)
-        AAJ.SetWidth(255)
-        layer.CreateField(AAJ)
-        AAK = ogr.FieldDefn("AAK", ogr.OFTString)
-        AAK.SetWidth(255)
-        layer.CreateField(AAK)
-        AAL = ogr.FieldDefn("AAL", ogr.OFTString)
-        AAL.SetWidth(255)
-        layer.CreateField(AAL)
-        AAM = ogr.FieldDefn("AAM", ogr.OFTString)
-        AAM.SetWidth(255)
-        layer.CreateField(AAM)
-        AAN = ogr.FieldDefn("AAN", ogr.OFTString)
-        AAN.SetWidth(255)
-        layer.CreateField(AAN)
-        AAO = ogr.FieldDefn("AAO", ogr.OFTString)
-        AAO.SetWidth(255)
-        layer.CreateField(AAO)
-        AAP = ogr.FieldDefn("AAP", ogr.OFTString)
-        AAP.SetWidth(255)
-        layer.CreateField(AAP)
-        AAQ = ogr.FieldDefn("AAQ", ogr.OFTString)
-        AAQ.SetWidth(255)
-        layer.CreateField(AAQ)
-        ABA = ogr.FieldDefn("ABA", ogr.OFTString)
-        ABA.SetWidth(255)
-        layer.CreateField(ABA)
-        ABB = ogr.FieldDefn("ABB", ogr.OFTString)
-        ABB.SetWidth(255)
-        layer.CreateField(ABB)
-        ABC = ogr.FieldDefn("ABC", ogr.OFTString)
-        ABC.SetWidth(255)
-        layer.CreateField(ABC)
-        ABE = ogr.FieldDefn("ABE", ogr.OFTString)
-        ABE.SetWidth(255)
-        layer.CreateField(ABE)
-        ABF = ogr.FieldDefn("ABF", ogr.OFTString)
-        ABF.SetWidth(255)
-        layer.CreateField(ABF)
-        ABH = ogr.FieldDefn("ABH", ogr.OFTString)
-        ABH.SetWidth(255)
-        layer.CreateField(ABH)
-        ABI = ogr.FieldDefn("ABI", ogr.OFTString)
-        ABI.SetWidth(255)
-        layer.CreateField(ABI)
-        ABJ = ogr.FieldDefn("ABJ", ogr.OFTString)
-        ABJ.SetWidth(255)
-        layer.CreateField(ABJ)
-        ABK = ogr.FieldDefn("ABK", ogr.OFTString)
-        ABK.SetWidth(255)
-        layer.CreateField(ABK)
-        ABL = ogr.FieldDefn("ABL", ogr.OFTString)
-        ABL.SetWidth(255)
-        layer.CreateField(ABL)
-        ABM = ogr.FieldDefn("ABM", ogr.OFTString)
-        ABM.SetWidth(255)
-        layer.CreateField(ABM)
-        ABP = ogr.FieldDefn("ABP", ogr.OFTString)
-        ABP.SetWidth(255)
-        layer.CreateField(ABP)
-        ABQ = ogr.FieldDefn("ABQ", ogr.OFTString)
-        ABQ.SetWidth(255)
-        layer.CreateField(ABQ)
-        ABS = ogr.FieldDefn("ABS", ogr.OFTString)
-        ABS.SetWidth(255)
-        layer.CreateField(ABS)
-        ACA = ogr.FieldDefn("ACA", ogr.OFTString)
-        ACA.SetWidth(255)
-        layer.CreateField(ACA)
-        ACB = ogr.FieldDefn("ACB", ogr.OFTString)
-        ACB.SetWidth(255)
-        layer.CreateField(ACB)
-        ACC = ogr.FieldDefn("ACC", ogr.OFTString)
-        ACC.SetWidth(255)
-        layer.CreateField(ACC)
-        ACD = ogr.FieldDefn("ACD", ogr.OFTString)
-        ACD.SetWidth(255)
-        layer.CreateField(ACD)
-        ACG = ogr.FieldDefn("ACG", ogr.OFTString)
-        ACG.SetWidth(255)
-        layer.CreateField(ACG)
-        ACJ = ogr.FieldDefn("ACJ", ogr.OFTString)
-        ACJ.SetWidth(255)
-        layer.CreateField(ACJ)
-        ACK = ogr.FieldDefn("ACK", ogr.OFTString)
-        ACK.SetWidth(255)
-        layer.CreateField(ACK)
-        ACM = ogr.FieldDefn("ACM", ogr.OFTString)
-        ACM.SetWidth(255)
-        layer.CreateField(ACM)
-        ACN = ogr.FieldDefn("ACN", ogr.OFTString)
-        ACN.SetWidth(255)
-        layer.CreateField(ACN)
-        ADA = ogr.FieldDefn("ADA", ogr.OFTString)
-        ADA.SetWidth(255)
-        layer.CreateField(ADA)
-        ADB = ogr.FieldDefn("ADB", ogr.OFTString)
-        ADB.SetWidth(255)
-        layer.CreateField(ADB)
-        ADC = ogr.FieldDefn("ADC", ogr.OFTString)
-        ADC.SetWidth(255)
-        layer.CreateField(ADC)
-        AXA = ogr.FieldDefn("AXA", ogr.OFTString)
-        AXA.SetWidth(255)
-        layer.CreateField(AXA)
-        AXB = ogr.FieldDefn("AXB", ogr.OFTString)
-        AXB.SetWidth(255)
-        layer.CreateField(AXB)
-        AXF = ogr.FieldDefn("AXF", ogr.OFTString)
-        AXF.SetWidth(255)
-        layer.CreateField(AXF)
-        AXG = ogr.FieldDefn("AXG", ogr.OFTString)
-        AXG.SetWidth(255)
-        layer.CreateField(AXG)
-        AXH = ogr.FieldDefn("AXH", ogr.OFTString)
-        AXH.SetWidth(255)
-        layer.CreateField(AXH)
+
+        for fld in ZB_A_FIELDS:
+            dummy = ogr.FieldDefn(fld, ogr.OFTString)
+            dummy.SetWidth(255)
+            layer.CreateField(dummy)
+
         herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
         herstelmaatregel.SetWidth(255)
         layer.CreateField(herstelmaatregel)
+
         opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
         opmerking.SetWidth(255)
         layer.CreateField(opmerking)
-        ZC = ogr.FieldDefn("ZC", ogr.OFTString)
-        ZC.SetWidth(255)
-        layer.CreateField(ZC)
+
+        artrigger = ogr.FieldDefn("Trigger", ogr.OFTString)
+        artrigger.SetWidth(255)
+        layer.CreateField(artrigger)
+
         return layer
 
     def feature_to_pipes_shp(self, layer, id_nr, pipe):
@@ -826,6 +532,7 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         herstelmaatregel = pipe["Herstelmaatregel"]
         # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
         opmerking = pipe["Opmerking"]
+        artrigger = pipe.get("Trigger", '')
         ZC = pipe["ZC"]
 
         # Set values
@@ -881,6 +588,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         feature.SetField("AXH", str(AXH))
         feature.SetField("Herstelmaa", str(herstelmaatregel))
         feature.SetField("Opmerking", str(opmerking))
+        feature.SetField('Trigger', str(artrigger))
+
         feature.SetField("ZC", str(ZC))
         layer.CreateFeature(feature)
 
@@ -898,60 +607,26 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         Returns:
             (shapefile layer) layer: A shapefile layer.
         """
+
         PIPES_ID = ogr.FieldDefn("PIPE_ID", ogr.OFTString)
         PIPES_ID.SetWidth(255)
         layer.CreateField(PIPES_ID)
-        x = ogr.FieldDefn("x", ogr.OFTString)
-        x.SetWidth(255)
-        layer.CreateField(x)
-        y = ogr.FieldDefn("y", ogr.OFTString)
-        y.SetWidth(255)
-        layer.CreateField(y)
-        A = ogr.FieldDefn("A", ogr.OFTString)
-        A.SetWidth(255)
-        layer.CreateField(A)
-        B = ogr.FieldDefn("B", ogr.OFTString)
-        B.SetWidth(255)
-        layer.CreateField(B)
-        C = ogr.FieldDefn("C", ogr.OFTString)
-        C.SetWidth(255)
-        layer.CreateField(C)
-        D = ogr.FieldDefn("D", ogr.OFTString)
-        D.SetWidth(255)
-        layer.CreateField(D)
-        E = ogr.FieldDefn("E", ogr.OFTString)
-        E.SetWidth(255)
-        layer.CreateField(E)
-        F = ogr.FieldDefn("F", ogr.OFTString)
-        F.SetWidth(255)
-        layer.CreateField(F)
-        G = ogr.FieldDefn("G", ogr.OFTString)
-        G.SetWidth(255)
-        layer.CreateField(G)
-        I = ogr.FieldDefn("I", ogr.OFTString)
-        I.SetWidth(255)
-        layer.CreateField(I)
-        J = ogr.FieldDefn("J", ogr.OFTString)
-        J.SetWidth(255)
-        layer.CreateField(J)
-        K = ogr.FieldDefn("K", ogr.OFTString)
-        K.SetWidth(255)
-        layer.CreateField(K)
-        M = ogr.FieldDefn("M", ogr.OFTString)
-        M.SetWidth(255)
-        layer.CreateField(M)
-        N = ogr.FieldDefn("N", ogr.OFTString)
-        N.SetWidth(255)
-        layer.CreateField(N)
-        O = ogr.FieldDefn("O", ogr.OFTString)
-        O.SetWidth(255)
-        layer.CreateField(O)
+
+        for fld in 'xyABCDEFGIJKMNO':
+            dummy = ogr.FieldDefn(fld, ogr.OFTString)
+            dummy.SetWidth(255)
+            layer.CreateField(dummy)
+
         herstelmaatregel = ogr.FieldDefn("Herstelmaa", ogr.OFTString)
         herstelmaatregel.SetWidth(255)
         layer.CreateField(herstelmaatregel)
+
         opmerking = ogr.FieldDefn("Opmerking", ogr.OFTString)
         opmerking.SetWidth(255)
         layer.CreateField(opmerking)
+        artrigger = ogr.FieldDefn("Trigger", ogr.OFTString)
+        artrigger.SetWidth(32)
+        layer.CreateField(artrigger)
         return layer
 
     def feature_to_measuring_points_shp(self, layer, pipe_id, measuring_point):
@@ -969,22 +644,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         # Get values
         x = float(measuring_point["x"]) if measuring_point["x"] else 0.0
         y = float(measuring_point["y"]) if measuring_point["y"] else 0.0
-        A = measuring_point.get("A", None)
-        B = measuring_point.get("B", None)
-        C = measuring_point.get("C", None)
-        D = measuring_point.get("D", None)
-        E = measuring_point.get("E", None)
-        F = measuring_point.get("F", None)
-        G = measuring_point.get("G", None)
-        I = measuring_point.get("I", None)
-        J = measuring_point.get("J", None)
-        K = measuring_point.get("K", None)
-        M = measuring_point.get("M", None)
-        N = measuring_point.get("N", None)
-        O = measuring_point.get("O", None)
-        herstelmaatregel = measuring_point["Herstelmaatregel"] if measuring_point["Herstelmaatregel"] else ""
-        # herstelmaatregel = HERSTELMAATREGEL_DEFAULT
+        herstelmaatregel = measuring_point.get("Herstelmaatregel", '')
         opmerking = measuring_point["Opmerking"] if measuring_point["Opmerking"] else ""
+        artrigger = measuring_point['Trigger']
 
         # Set values
         feature = ogr.Feature(layer.GetLayerDefn())
@@ -994,21 +656,13 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         feature.SetField("PIPE_ID", str(pipe_id))
         feature.SetField("x", str(x))
         feature.SetField("y", str(y))
-        feature.SetField("A", str(A))
-        feature.SetField("B", str(B))
-        feature.SetField("C", str(C))
-        feature.SetField("D", str(D))
-        feature.SetField("E", str(E))
-        feature.SetField("F", str(F))
-        feature.SetField("G", str(G))
-        feature.SetField("I", str(I))
-        feature.SetField("J", str(J))
-        feature.SetField("K", str(K))
-        feature.SetField("M", str(M))
-        feature.SetField("N", str(N))
-        feature.SetField("O", str(O))
-        feature.SetField("Herstelmaa", str(herstelmaatregel))
-        feature.SetField("Opmerking", str(opmerking))
+
+        for fld in list('ABCDEFGIJKMNO'):
+            feature.SetField(fld, str(measuring_point.get(fld, None)))
+
+        for fld in ['Herstelmaa', 'Opmerking', 'Trigger']:
+            feature.SetField(fld, str(measuring_point.get(fld, '')))
+
         layer.CreateFeature(feature)
 
         feature = None
