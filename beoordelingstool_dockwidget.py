@@ -486,7 +486,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 .setPlainText(str(f["Opmerking"])
                               if type(f["Opmerking"]) is not QPyNullVariant else "")
 
-            self.value_measpoint_trigger.setText(str(f.get("Trigger", '')))
+            self.value_measpoint_trigger.setText(str(f["Trigger"]))
 
             self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(f["PIPE_ID"]))
 
