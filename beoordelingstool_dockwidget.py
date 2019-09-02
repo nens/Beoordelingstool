@@ -346,6 +346,10 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         layer.changeAttributeValue(fid, 39, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+        iface.messageBar().pushMessage(
+            "Info", "Manhole saved", level=QgsMessageBar.INFO, duration=5
+        )
+
 
     def get_selected_pipe(self):
         layer = iface.activeLayer()
@@ -415,6 +419,9 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         layer.changeAttributeValue(fid, 47, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+        iface.messageBar().pushMessage(
+            "Info", "Pipe saved", level=QgsMessageBar.INFO, duration=5
+        )
 
     def show_measuring_point(self):
         """Show the measuring point that belongs to a certain pipe."""
@@ -660,6 +667,9 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         layer.changeAttributeValue(fid, 17, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+        iface.messageBar().pushMessage(
+            "Info", "Measuring point saved", level=QgsMessageBar.INFO, duration=5
+        )
 
 
 def create_manholes_json(manholes_layer):
