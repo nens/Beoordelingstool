@@ -646,7 +646,8 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         y = float(measuring_point["y"]) if measuring_point["y"] else 0.0
         herstelmaatregel = measuring_point.get("Herstelmaatregel", '')
         opmerking = measuring_point["Opmerking"] if measuring_point["Opmerking"] else ""
-        artrigger = measuring_point['Trigger']
+        trigger = measuring_point.get('Trigger', '')
+        # artrigger = measuring_point['Trigger']
 
         # Set values
         feature = ogr.Feature(layer.GetLayerDefn())
@@ -660,8 +661,9 @@ class BeoordelingstoolDownloadDialog(QtGui.QDialog, FORM_CLASS):
         for fld in list('ABCDEFGIJKMNO'):
             feature.SetField(fld, str(measuring_point.get(fld, None)))
 
-        for fld in ['Herstelmaa', 'Opmerking', 'Trigger']:
-            feature.SetField(fld, str(measuring_point.get(fld, '')))
+        feature.SetField('Herstelmaa', herstelmaatregel)
+        feature.SetField('Opmerking', opmerking)
+        feature.SetField('Trigger', trigger)
 
         layer.CreateFeature(feature)
 
