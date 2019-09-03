@@ -493,8 +493,13 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                     0, idx, QTableWidgetItem(text_to_display)
                 )
                 continue
+
+            input_text = ''
+            if code in field_names:
+                input_text = str(feature[code])
+
             self.tablewidget_measuring_points.setItem(
-                0, idx, QTableWidgetItem(feature[code] if code in feature else '')
+                0, idx, QTableWidgetItem(QTableWidgetItem(input_text, 1))
             )
 
     def get_selected_measuring_point(self):
