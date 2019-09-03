@@ -477,7 +477,12 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
 
     def _display_measuring_point_attributes(self, feature):
-        for idx, code in zip(range(1, 14), list('ABCDEFGIKLMNO')):
+        field_names = set(field.name() for field in feature.fields())
+
+        self.tablewidget_measuring_points.setItem(
+            0, 0, QTableWidgetItem(feature["PIPE_ID"])
+        )
+        for idx, code in enumerate(list('ABCDEFGIJKLMNO'), start=1):
             if code == 'A':
                 # Translate feature A into its description
                 text_to_display = RIBX_CODE_DESCRIPTION_MAPPING.get(
