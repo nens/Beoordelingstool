@@ -363,63 +363,45 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             "Info", "Manhole saved", level=QgsMessageBar.INFO, duration=5
         )
 
+    def show_pipe(self):
+        """Show the pipe to which a measuring point belongs."""
+        pipe_id = int(self.tablewidget_measuring_points.itemAt(0,0).text()) if self.tablewidget_measuring_points.itemAt(0,0) else 1
+        self.display_pipe(pipe_id)
 
     def get_selected_pipe(self):
-        layer = iface.activeLayer()
-        fields = layer.dataProvider().fields()
-        for f in layer.selectedFeatures():
-            self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(f["Herstelmaa"]))) \
-                if self.field_combobox_pipes.findText(str(f["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
-            self.value_plaintextedit_pipes.setPlainText(str(f["Opmerking"]) if type(f["Opmerking"]) is not QPyNullVariant else "")
+        selected_pipes = self.pipes.selectedFeatures()
+        if len(selected_pipes) > 0:
+            # always show the first pipe
+            self.display_pipe(selected_pipes[0].id())
 
-            for index, field in enumerate(["AAA",
-                                           "AAB",
-                                           "AAD",
-                                           "AAE",
-                                           "AAF",
-                                           "AAG",
-                                           "AAJ",
-                                           "AAK",
-                                           "AAL",
-                                           "AAM",
-                                           "AAN",
-                                           "AAO",
-                                           "AAP",
-                                           "AAQ",
-                                           "ABA",
-                                           "ABB",
-                                           "ABC",
-                                           "ABE",
-                                           "ABF",
-                                           "ABH",
-                                           "ABI",
-                                           "ABJ",
-                                           "ABK",
-                                           "ABL",
-                                           "ABM",
-                                           "ABP",
-                                           "ABQ",
-                                           "ABS",
-                                           "ACA",
-                                           "ACB",
-                                           "ACC",
-                                           "ACD",
-                                           "ACG",
-                                           "ACJ",
-                                           "ACK",
-                                           "ACM",
-                                           "ACN",
-                                           "ADA",
-                                           "ADB",
-                                           "ADC",
-                                           "AXA",
-                                           "AXB",
-                                           "AXF",
-                                           "AXG",
-                                           "AXH"]):
-                value = f[field] if type(f[field]) is not QPyNullVariant else ""
-                self.tablewidget_pipes.setItem(0, index, QTableWidgetItem(value))
-            self.selected_pipe_id = f.id()
+    def display_pipe(self, pipe_id):
+        """Show the pipe_id attributes on the pipe-tab"""
+        pipe = self.pipes.getFeatures(QgsFeatureRequest(pipe_id)).next()
+
+        hestelmaatregel = self.field_combobox_pipes.findText(str(pipe["Herstelmaa"]))
+        if hestelmaatregel:
+            self.field_combobox_pipes.setCurrentIndex(hestelmaatregel)
+        else:
+            self.field_combobox_pipes.setCurrentIndex(0)
+
+        opmerking = pipe['Opmerking']
+        if opmerking:
+            self.value_plaintextedit_pipes.setPlainText(opmerking)
+        else:
+            self.value_plaintextedit_pipes.setPlainText("")
+
+        for index, field in enumerate(PIPE_FIELDS):
+            value = pipe[field] if type(pipe[field]) is not QPyNullVariant else ""
+            self.tablewidget_pipes.setItem(0, index, QTableWidgetItem(value))
+
+        iface.setActiveLayer(self.pipes)
+        self.pipes.triggerRepaint()
+        # Go to the pipe tab
+        self.tabWidget.setCurrentIndex(2)
+        self.pipes.setSelectedFeatures([pipe_id])
+
+        # Not sure if this is needed
+        self.selected_pipe_id = pipe.id()
 
     def save_beoordeling_leidingen(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
