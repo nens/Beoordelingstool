@@ -57,6 +57,7 @@ from .utils.constants import JSON_KEY_PROJ
 from .utils.constants import JSON_KEY_NAME
 from .utils.constants import JSON_KEY_URL
 from .utils.constants import JSON_KEY_SLUG
+from .utils.constants import PIPE_FIELDS
 # Shapefile names
 from .utils.constants import SHAPEFILE_LIST
 from .utils.constants import SHP_NAME_MANHOLES
@@ -71,7 +72,12 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(
+            self,
+            parent=None,
+            manhole_layer=None,
+            pipe_layer=None,
+            measuring_point_layer=None):
         """Constructor."""
         super(BeoordelingstoolDockWidget, self).__init__(parent)
         # Set up the user interface from Designer.
@@ -82,6 +88,13 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.setupUi(self)
         self.add_herstelmaatregelen()
         self.tabWidget.currentChanged.connect(self.tab_changed)
+
+        self.manholes = manhole_layer
+        self.pipes = pipe_layer
+        self.measuring_points = measuring_point_layer
+
+        # Enable the 'Select Feature` tool by default.
+        iface.actionSelect().trigger()
 
         # General tab
         self.set_project_properties()
