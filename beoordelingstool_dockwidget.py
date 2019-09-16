@@ -93,6 +93,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.pipes = pipe_layer
         self.measuring_points = measuring_point_layer
 
+        self.pipes.selectionChanged.connect(self.get_selected_pipe)
+
         # Enable the 'Select Feature` tool by default.
         iface.actionSelect().trigger()
 
@@ -370,7 +372,12 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
     def get_selected_pipe(self):
         selected_pipes = self.pipes.selectedFeatures()
-        if len(selected_pipes) > 0:
+        if len(selected_pipes) > 1:
+            # Set the pipe selection to the first pipe. This will cause a
+            # selectionChanged-signal which will call this method again.
+            self.pipes.setSelectedFeatures([selected_pipes[0].id()])
+            return
+        if len(selected_pipes) == 1:
             # always show the first pipe
             self.display_pipe(selected_pipes[0].id())
 
@@ -398,7 +405,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.pipes.triggerRepaint()
         # Go to the pipe tab
         self.tabWidget.setCurrentIndex(2)
-        self.pipes.setSelectedFeatures([pipe_id])
 
         # Not sure if this is needed
         self.selected_pipe_id = pipe.id()
