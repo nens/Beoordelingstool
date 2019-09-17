@@ -118,8 +118,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         # Pipes tab
         self.selected_pipe_id = 0
-        self.pushbutton_get_selected_pipe.clicked.connect(
-            self.get_selected_pipe)
         self.pushbutton_save_attribute_pipes.clicked.connect(
             self.save_beoordeling_leidingen)
         self.pushbutton_pipe_to_measuring_point.clicked.connect(
@@ -127,8 +125,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         # Measuring points tab
         self.selected_measuring_point_id = 0
-        self.pushbutton_get_selected_measuring_point.clicked.connect(
-            self.get_selected_measuring_point)
         self.pushbutton_save_attribute_measuring_points.clicked.connect(
             self.save_beoordeling_measuring_points)
         self.pushbutton_measuring_points_previous.clicked.connect(
@@ -310,7 +306,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
     def get_selected_manhole(self):
         layer = iface.activeLayer()
-        fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
             self.field_combobox_manholes.setCurrentIndex(self.field_combobox_manholes.findText(str(f["Herstelmaa"]))) \
                 if self.field_combobox_manholes.findText(str(f["Herstelmaa"])) else self.field_combobox_manholes.setCurrentIndex(0)
@@ -344,10 +339,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         ).next()
         pipe_id = int(measure_point.attribute('PIPE_ID'))
         self.pipes.setSelectedFeatures([pipe_id])
-
-        # pipe_id = int(self.tablewidget_measuring_points.itemAt(0,0).text()) if self.tablewidget_measuring_points.itemAt(0,0) else 1
-        # self.get_selected_pipe()
-        # self.display_pipe(pipe_id)
 
     def get_selected_pipe(self):
         selected_pipes = self.pipes.selectedFeatures()
@@ -384,8 +375,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.pipes.triggerRepaint()
         # Go to the pipe tab
         self.tabWidget.setCurrentIndex(2)
-
-        # Not sure if this is needed
         self.selected_pipe_id = pipe.id()
 
     def save_beoordeling_leidingen(self):
@@ -434,7 +423,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
     def _display_measuring_point_attributes(self, feature):
         self.mark_feature(feature)
         # Trigger
-        # TODO
+        trigger = feature.attribute('Trigger') or ''
+        self.value_measpoint_trigger.setText(trigger)
 
         # Herstelmaatregel:
         hmr = 0 or self.field_combobox_measuring_points.findText(
@@ -457,8 +447,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
             if code == 'A':
                 # Translate feature A into its description
                 text_to_display = RIBX_CODE_DESCRIPTION_MAPPING.get(
-                    feature["A"],
-                    feature["A"]
+                    feature["A"], feature["A"]
                 )
                 self.tablewidget_measuring_points.setItem(
                     0, idx, QTableWidgetItem(text_to_display)
