@@ -137,6 +137,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.selected_measuring_points_ids = []
         self.measure_point_marker = QgsVertexMarker(iface.mapCanvas())
         self.measure_point_marker.setColor(Qt.blue)
+        self.disable_next_measuring_point_button()
+        self.disable_previous_measuring_point_button()
 
     def closeEvent(self, event):
         self.measure_point_marker.hide()
@@ -171,12 +173,9 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         folder as the layer is used as the project name.
         """
         # Check if the manholes, pipes and measuring_points layers exist
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
-        if manholes_layerList and pipes_layerList and measuring_points_layerList:
+        if self.manholes and self.pipes and self.measuring_points:
             # Get project name from the json saved in the same folder as the "manholes" layer
-            layer_dir = get_layer_dir(manholes_layerList[0])
+            layer_dir = get_layer_dir(self.manholes)
             json_path = os.path.join(layer_dir, JSON_NAME)
             try:
                 data = json.load(open(json_path))
@@ -229,7 +228,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
     def upload_final(self, user_data):
         """Upload the final version (json + zip with shapefiles and qmls)."""
-        print "final"
         review_json = self.convert_shps_to_json()
         # Upload JSON
         save_json_to_server(review_json, user_data)
@@ -320,12 +318,14 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
     def save_beoordeling_putten(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
-        fid = self.selected_manhole_id
+        manhole_id = self.selected_manhole_id
+        if not manhole_id is None:
+            return
         herstelmaatregel = str(self.field_combobox_manholes.currentText())
         opmerking = str(self.value_plaintextedit_manholes.toPlainText())
         layer.startEditing()
-        layer.changeAttributeValue(fid, 38, herstelmaatregel)  # Herstelmaatregel
-        layer.changeAttributeValue(fid, 39, opmerking)  # Opmerking
+        layer.changeAttributeValue(manhole_id, 38, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(manhole_id, 39, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
         iface.messageBar().pushMessage(
@@ -381,6 +381,8 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
         pipe_id = self.selected_pipe_id
+        if pipe_id is None:
+            return
         herstelmaatregel = str(self.field_combobox_pipes.currentText())
         opmerking = str(self.value_plaintextedit_pipes.toPlainText())
         layer.startEditing()
@@ -540,12 +542,14 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
     def save_beoordeling_measuring_points(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
-        fid = self.selected_measuring_point_id
+        measuring_point_id = self.selected_measuring_point_id
+        if measuring_point_id is None:
+            return
         herstelmaatregel = str(self.field_combobox_measuring_points.currentText())
         opmerking = str(self.value_plaintextedit_measuring_points.toPlainText())
         layer.startEditing()
-        layer.changeAttributeValue(fid, 16, herstelmaatregel)  # Herstelmaatregel
-        layer.changeAttributeValue(fid, 17, opmerking)  # Opmerking
+        layer.changeAttributeValue(measuring_point_id, 16, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(measuring_point_id, 17, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
         iface.messageBar().pushMessage(

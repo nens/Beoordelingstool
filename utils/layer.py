@@ -23,8 +23,6 @@
 
 import os
 
-from qgis.utils import iface
-
 
 def get_layer_dir(layer):
     """
@@ -36,6 +34,6 @@ def get_layer_dir(layer):
     Returns
         (str) directory: The directory in which the layer is saved.
     """
-    layer_path = iface.activeLayer().dataProvider().dataSourceUri()
-    (directory, shapefile_name) = os.path.split(layer_path)
+    layer_path = layer.dataProvider().dataSourceUri()
+    directory, shapefile_name = os.path.split(layer_path)
     return directory
