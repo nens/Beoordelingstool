@@ -96,6 +96,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.pipes = pipe_layer
         self.measuring_points = measuring_point_layer
 
+        self.manholes.selectionChanged.connect(self.get_selected_manhole)
         self.pipes.selectionChanged.connect(self.get_selected_pipe)
         self.measuring_points.selectionChanged.connect(self.get_selected_measuring_point)
 
@@ -111,8 +112,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         # Manholes tab
         self.selected_manhole_id = 0
-        self.pushbutton_get_selected_manhole.clicked.connect(
-            self.get_selected_manhole)
         self.pushbutton_save_attribute_manholes.clicked.connect(
             self.save_beoordeling_putten)
 
@@ -522,7 +521,7 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         else:
             self.enable_previous_measuring_point_button()
 
-        if current + 1 == total:
+        if current + 1 >= total:
             self.disable_next_measuring_point_button()
         elif current + 1 < total:
             self.enable_next_measuring_point_button()
