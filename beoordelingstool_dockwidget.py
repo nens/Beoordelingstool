@@ -312,19 +312,20 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 value = f[field] if type(f[field]) is not QPyNullVariant else ""
                 self.tablewidget_manholes.setItem(0, index, QTableWidgetItem(value))
 
+            self.mark_feature(f)
             self.selected_manhole_id = f.id()
 
     def save_beoordeling_putten(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
         manhole_id = self.selected_manhole_id
-        if not manhole_id is None:
+        if manhole_id is None:
             return
         herstelmaatregel = str(self.field_combobox_manholes.currentText())
         opmerking = str(self.value_plaintextedit_manholes.toPlainText())
         layer.startEditing()
-        layer.changeAttributeValue(manhole_id, 38, herstelmaatregel)  # Herstelmaatregel
-        layer.changeAttributeValue(manhole_id, 39, opmerking)  # Opmerking
+        layer.changeAttributeValue(manhole_id, 55, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(manhole_id, 56, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
         iface.messageBar().pushMessage(
