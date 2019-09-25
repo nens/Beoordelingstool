@@ -1,6 +1,6 @@
 # Changelog
 
-0.8 (unreleased)
+0.8 (2019-09-25)
 ----------------
 
 - Set a layout in all qml-files, this makes them auto-scale when you enlarge the screen.
