@@ -3,7 +3,16 @@
 0.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Set a layout in all qml-files, this makes them auto-scale when you enlarge the screen.
+- Show notification to user whenever he/she saves a manhole/pipe/measuring point.
+- Fixed 'herstelmaatregel' not properly loaded from the json into the shapefile.
+- Fixed 'herstelmaatregel'/'opmerking' not being saved to the correct field index.
+- Configured the qgis feature-selection-tool to be enabled when loading the plugin.
+- Automatically load and display the attributes from the selected manhole/pipe/measuring point.
+  Also removed the 'select manhole/pipe/measuring point'-button as it became obsolete
+  due to this change.
+- Enabled/disabled next/previous button of measuring points when you select the last/first
+  measuring point.
 
 
 0.7 (2018-08-02)
