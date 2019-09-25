@@ -251,7 +251,11 @@ class Beoordelingstool:
                 self.download_dialog.show()
             else:
                 # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = BeoordelingstoolDockWidget()
+                self.dockwidget = BeoordelingstoolDockWidget(
+                    manhole_layer=manholes_layerList[0],
+                    pipe_layer=pipes_layerList[0],
+                    measuring_point_layer=measuring_points_layerList[0]
+                )
                 # DOWNLOAD
 
                 # connect to provide cleanup on closing of dockwidget

@@ -32,6 +32,7 @@ import tempfile
 import urllib2
 import zipfile
 
+from PyQt4.QtCore import Qt
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtCore import QPyNullVariant
@@ -42,6 +43,7 @@ from qgis.core import QgsExpression
 from qgis.core import QgsFeatureRequest
 from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMessageBar
+from qgis.gui import QgsVertexMarker
 from qgis.utils import iface
 
 from .beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
@@ -50,13 +52,15 @@ from .beoordelingstool_login_dialog import BeoordelingstoolLoginDialog
 from .utils.layer import get_layer_dir
 
 # import constants
-from .utils.constants import HERSTELMAATREGELEN
+from .utils.constants import HERSTELMAATREGELEN, RIBX_CODE_DESCRIPTION_MAPPING, \
+    MANHOLE_FIELDS
 # json properties
 from .utils.constants import JSON_NAME
 from .utils.constants import JSON_KEY_PROJ
 from .utils.constants import JSON_KEY_NAME
 from .utils.constants import JSON_KEY_URL
 from .utils.constants import JSON_KEY_SLUG
+from .utils.constants import PIPE_FIELDS
 # Shapefile names
 from .utils.constants import SHAPEFILE_LIST
 from .utils.constants import SHP_NAME_MANHOLES
@@ -71,7 +75,12 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(
+            self,
+            parent=None,
+            manhole_layer=None,
+            pipe_layer=None,
+            measuring_point_layer=None):
         """Constructor."""
         super(BeoordelingstoolDockWidget, self).__init__(parent)
         # Set up the user interface from Designer.
@@ -83,6 +92,17 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.add_herstelmaatregelen()
         self.tabWidget.currentChanged.connect(self.tab_changed)
 
+        self.manholes = manhole_layer
+        self.pipes = pipe_layer
+        self.measuring_points = measuring_point_layer
+
+        self.manholes.selectionChanged.connect(self.get_selected_manhole)
+        self.pipes.selectionChanged.connect(self.get_selected_pipe)
+        self.measuring_points.selectionChanged.connect(self.get_selected_measuring_point)
+
+        # Enable the 'Select Feature` tool by default.
+        iface.actionSelect().trigger()
+
         # General tab
         self.set_project_properties()
         self.pushbutton_upload_voortgang_json.clicked.connect(
@@ -92,15 +112,11 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         # Manholes tab
         self.selected_manhole_id = 0
-        self.pushbutton_get_selected_manhole.clicked.connect(
-            self.get_selected_manhole)
         self.pushbutton_save_attribute_manholes.clicked.connect(
             self.save_beoordeling_putten)
 
         # Pipes tab
         self.selected_pipe_id = 0
-        self.pushbutton_get_selected_pipe.clicked.connect(
-            self.get_selected_pipe)
         self.pushbutton_save_attribute_pipes.clicked.connect(
             self.save_beoordeling_leidingen)
         self.pushbutton_pipe_to_measuring_point.clicked.connect(
@@ -108,8 +124,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
         # Measuring points tab
         self.selected_measuring_point_id = 0
-        self.pushbutton_get_selected_measuring_point.clicked.connect(
-            self.get_selected_measuring_point)
         self.pushbutton_save_attribute_measuring_points.clicked.connect(
             self.save_beoordeling_measuring_points)
         self.pushbutton_measuring_points_previous.clicked.connect(
@@ -119,7 +133,14 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.pushbutton_measuring_points_next.clicked.connect(
             self.show_next_measuring_point)
 
+        self.selected_measuring_points_ids = []
+        self.measure_point_marker = QgsVertexMarker(iface.mapCanvas())
+        self.measure_point_marker.setColor(Qt.blue)
+        self.disable_next_measuring_point_button()
+        self.disable_previous_measuring_point_button()
+
     def closeEvent(self, event):
+        self.measure_point_marker.hide()
         self.closingPlugin.emit()
         event.accept()
 
@@ -151,12 +172,9 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
         folder as the layer is used as the project name.
         """
         # Check if the manholes, pipes and measuring_points layers exist
-        manholes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MANHOLES)
-        pipes_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
-        measuring_points_layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
-        if manholes_layerList and pipes_layerList and measuring_points_layerList:
+        if self.manholes and self.pipes and self.measuring_points:
             # Get project name from the json saved in the same folder as the "manholes" layer
-            layer_dir = get_layer_dir(manholes_layerList[0])
+            layer_dir = get_layer_dir(self.manholes)
             json_path = os.path.join(layer_dir, JSON_NAME)
             try:
                 data = json.load(open(json_path))
@@ -209,7 +227,6 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
     def upload_final(self, user_data):
         """Upload the final version (json + zip with shapefiles and qmls)."""
-        print "final"
         review_json = self.convert_shps_to_json()
         # Upload JSON
         save_json_to_server(review_json, user_data)
@@ -286,385 +303,258 @@ class BeoordelingstoolDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
     def get_selected_manhole(self):
         layer = iface.activeLayer()
-        fields = layer.dataProvider().fields()
         for f in layer.selectedFeatures():
             self.field_combobox_manholes.setCurrentIndex(self.field_combobox_manholes.findText(str(f["Herstelmaa"]))) \
                 if self.field_combobox_manholes.findText(str(f["Herstelmaa"])) else self.field_combobox_manholes.setCurrentIndex(0)
             self.value_plaintextedit_manholes.setPlainText(f["Opmerking"] if type(f["Opmerking"]) is not QPyNullVariant else "")
 
-            for index, field in enumerate(["CAA",
-                                           "CAJ",
-                                           "CAL",
-                                           "CAM",
-                                           "CAN",
-                                           "CAO",
-                                           "CAQ",
-                                           "CAR",
-                                           "CBA",
-                                           "CBB",
-                                           "CBC",
-                                           "CBD",
-                                           "CBE",
-                                           "CBF",
-                                           "CBH",
-                                           "CBI",
-                                           "CBJ",
-                                           "CBK",
-                                           "CBL",
-                                           "CBM",
-                                           "CBO",
-                                           "CBP",
-                                           "CCA",
-                                           "CCB",
-                                           "CCC",
-                                           "CCD",
-                                           "CCK",
-                                           "CCM",
-                                           "CCN",
-                                           "CCO",
-                                           "CCP",
-                                           "CCQ",
-                                           "CCR",
-                                           "CCS",
-                                           "CDA",
-                                           "CDB",
-                                           "CDC",
-                                           "CDD"]):
+            for index, field in enumerate(MANHOLE_FIELDS):
                 value = f[field] if type(f[field]) is not QPyNullVariant else ""
                 self.tablewidget_manholes.setItem(0, index, QTableWidgetItem(value))
 
+            self.mark_feature(f)
             self.selected_manhole_id = f.id()
 
     def save_beoordeling_putten(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
-        fid = self.selected_manhole_id
+        manhole_id = self.selected_manhole_id
+        if manhole_id is None:
+            return
         herstelmaatregel = str(self.field_combobox_manholes.currentText())
         opmerking = str(self.value_plaintextedit_manholes.toPlainText())
         layer.startEditing()
-        layer.changeAttributeValue(fid, 38, herstelmaatregel)  # Herstelmaatregel
-        layer.changeAttributeValue(fid, 39, opmerking)  # Opmerking
+        layer.changeAttributeValue(manhole_id, 55, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(manhole_id, 56, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+        iface.messageBar().pushMessage(
+            "Info", "Manhole saved", level=QgsMessageBar.INFO, duration=5
+        )
+
+    def show_pipe(self):
+        """Show the pipe to which a measuring point belongs."""
+        measure_point = self.measuring_points.getFeatures(
+            QgsFeatureRequest().setFilterFid(self.selected_measuring_point_id)
+        ).next()
+        pipe_id = int(measure_point.attribute('PIPE_ID'))
+        self.pipes.setSelectedFeatures([pipe_id])
 
     def get_selected_pipe(self):
-        layer = iface.activeLayer()
-        fields = layer.dataProvider().fields()
-        for f in layer.selectedFeatures():
-            self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(f["Herstelmaa"]))) \
-                if self.field_combobox_pipes.findText(str(f["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
-            self.value_plaintextedit_pipes.setPlainText(str(f["Opmerking"]) if type(f["Opmerking"]) is not QPyNullVariant else "")
+        selected_pipes = self.pipes.selectedFeatures()
+        if len(selected_pipes) > 1:
+            # Set the pipe selection to the first pipe. This will cause a
+            # selectionChanged-signal which will call this method again.
+            self.pipes.setSelectedFeatures([selected_pipes[0].id()])
+            return
+        if len(selected_pipes) == 1:
+            # always show the first pipe
+            self.display_pipe(selected_pipes[0].id())
 
-            for index, field in enumerate(["AAA",
-                                           "AAB",
-                                           "AAD",
-                                           "AAE",
-                                           "AAF",
-                                           "AAG",
-                                           "AAJ",
-                                           "AAK",
-                                           "AAL",
-                                           "AAM",
-                                           "AAN",
-                                           "AAO",
-                                           "AAP",
-                                           "AAQ",
-                                           "ABA",
-                                           "ABB",
-                                           "ABC",
-                                           "ABE",
-                                           "ABF",
-                                           "ABH",
-                                           "ABI",
-                                           "ABJ",
-                                           "ABK",
-                                           "ABL",
-                                           "ABM",
-                                           "ABP",
-                                           "ABQ",
-                                           "ABS",
-                                           "ACA",
-                                           "ACB",
-                                           "ACC",
-                                           "ACD",
-                                           "ACG",
-                                           "ACJ",
-                                           "ACK",
-                                           "ACM",
-                                           "ACN",
-                                           "ADA",
-                                           "ADB",
-                                           "ADC",
-                                           "AXA",
-                                           "AXB",
-                                           "AXF",
-                                           "AXG",
-                                           "AXH"]):
-                value = f[field] if type(f[field]) is not QPyNullVariant else ""
-                self.tablewidget_pipes.setItem(0, index, QTableWidgetItem(value))
-            self.selected_pipe_id = f.id()
+    def display_pipe(self, pipe_id):
+        """Show the pipe_id attributes on the pipe-tab"""
+        pipe = self.pipes.getFeatures(QgsFeatureRequest(pipe_id)).next()
+
+        hestelmaatregel = self.field_combobox_pipes.findText(str(pipe["Herstelmaa"]))
+        if hestelmaatregel:
+            self.field_combobox_pipes.setCurrentIndex(hestelmaatregel)
+        else:
+            self.field_combobox_pipes.setCurrentIndex(0)
+
+        opmerking = pipe['Opmerking']
+        if opmerking:
+            self.value_plaintextedit_pipes.setPlainText(opmerking)
+        else:
+            self.value_plaintextedit_pipes.setPlainText("")
+
+        for index, field in enumerate(PIPE_FIELDS):
+            value = pipe[field] if type(pipe[field]) is not QPyNullVariant else ""
+            self.tablewidget_pipes.setItem(0, index, QTableWidgetItem(value))
+
+        iface.setActiveLayer(self.pipes)
+        self.pipes.triggerRepaint()
+        # Go to the pipe tab
+        self.tabWidget.setCurrentIndex(2)
+        self.selected_pipe_id = pipe.id()
 
     def save_beoordeling_leidingen(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
-        fid = self.selected_pipe_id
+        pipe_id = self.selected_pipe_id
+        if pipe_id is None:
+            return
         herstelmaatregel = str(self.field_combobox_pipes.currentText())
         opmerking = str(self.value_plaintextedit_pipes.toPlainText())
         layer.startEditing()
-        layer.changeAttributeValue(fid, 46, herstelmaatregel)  # Herstelmaatregel
-        layer.changeAttributeValue(fid, 47, opmerking)  # Opmerking
+        layer.changeAttributeValue(pipe_id, 68, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(pipe_id, 69, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+        iface.messageBar().pushMessage(
+            "Info", "Pipe saved", level=QgsMessageBar.INFO, duration=5
+        )
 
     def show_measuring_point(self):
         """Show the measuring point that belongs to a certain pipe."""
-        try:
-            current_measuring_point_pipe_id = self.tablewidget_measuring_points.itemAt(0,0).text()
-        except:  # No measuring point selected
-            current_measuring_point_pipe_id = -1
-        # if current_measuring_point_pipe_id != self.selected_pipe_id:
-        layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_MEASURING_POINTS)
-        if layerList:
-            layer = layerList[0]
-            expr = QgsExpression("\"PIPE_ID\" IS '{}'".format(self.selected_pipe_id))
-            measuring_points = layer.getFeatures(QgsFeatureRequest(expr))  #.next()
-            ids = [measuring_point.id() for measuring_point in measuring_points]  # select only the features for which the expression is true
-            if ids:
-                first_id = ids[0]
-                last_id = ids[-1]
-                # Show selected measuring point if it belongs to the selected pipe
-                if self.selected_measuring_point_id >= first_id and self.selected_measuring_point_id <= last_id:
-                    pass
-                # Show first measuring point that belongs to the selected pipe:
-                else:
-                    self.selected_measuring_point_id = first_id
+        if not self.measuring_points:
+            iface.messageBar().pushMessage(
+                "Error", "There is no measuring points layer.",
+                level=QgsMessageBar.CRITICAL, duration=0
+            )
+            return
 
-                layer.setSelectedFeatures([int(self.selected_measuring_point_id)])
-                new_feature = layer.selectedFeatures()[0]
+        expr = QgsExpression("\"PIPE_ID\" IS '{}'".format(self.selected_pipe_id))
+        measuring_points = self.measuring_points.getFeatures(QgsFeatureRequest(expr))
+        ids = [measuring_point.id() for measuring_point in measuring_points]
+        if len(ids) == 0:
+            iface.messageBar().pushMessage(
+                "Warning", "There are no measuring points connected to this pipe.",
+                level=QgsMessageBar.WARNING, duration=0
+            )
+            return
 
-                # Set values
-                hmr = 0 or self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))
-                self.field_combobox_measuring_points.setCurrentIndex(hmr)
+        # Setting the selected measure points causes the measure_points onchange to trigger
+        # which calls get_selected_measuring_point() to display the measure point.
+        self.measuring_points.setSelectedFeatures(ids)
 
-                self.value_plaintextedit_measuring_points\
-                    .setPlainText(new_feature["Opmerking"] if 'Opmerking' in new_feature and
-                                  type(new_feature["Opmerking"]) is not QPyNullVariant else '')
+        iface.setActiveLayer(self.measuring_points)
+        self.measuring_points.triggerRepaint()
+        # Go to measuring points tab
+        self.tabWidget.setCurrentIndex(3)
 
-                self.value_measpoint_trigger.setText(str(new_feature["Trigger"]))
+    def _display_measuring_point_attributes(self, feature):
+        self.mark_feature(feature)
+        # Trigger
+        trigger = feature.attribute('Trigger') or ''
+        self.value_measpoint_trigger.setText(trigger)
 
-                self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
+        # Herstelmaatregel:
+        hmr = 0 or self.field_combobox_measuring_points.findText(
+            str(feature["Herstelmaa"]))
+        self.field_combobox_measuring_points.setCurrentIndex(hmr)
 
-                for idx, code in zip(range(1, 14), list('ABCDEFGIKLMNO')):
-                    self.tablewidget_measuring_points\
-                        .setItem(0, idx,
-                                 QTableWidgetItem(new_feature[code] if code in new_feature else ''))
+        # Opmerking:
+        self.value_plaintextedit_measuring_points.setPlainText(
+            str(feature["Opmerking"]) if type(feature["Opmerking"]) is not QPyNullVariant else ""
+        )
 
-                iface.setActiveLayer(layer)
-                layer.triggerRepaint()
-                # Go to measuring points tab
-                self.tabWidget.setCurrentIndex(3)
-            else:
-                iface.messageBar().pushMessage("Warning",
-                                               "There are no measuring points connected to this pipe.",
-                                               level=QgsMessageBar.WARNING, duration=0)
-        else:
-            iface.messageBar().pushMessage("Error",
-                                           "There is no measuring points layer.",
-                                           level=QgsMessageBar.CRITICAL, duration=0)
+        # Pipe ID
+        self.tablewidget_measuring_points.setItem(
+            0, 0, QTableWidgetItem(feature["PIPE_ID"])
+        )
+
+        # Other attributes:
+        field_names = set(field.name() for field in feature.fields())
+        for idx, code in enumerate(list('ABCDEFGIJKLMNO'), start=1):
+            if code == 'A':
+                # Translate feature A into its description
+                text_to_display = RIBX_CODE_DESCRIPTION_MAPPING.get(
+                    feature["A"], feature["A"]
+                )
+                self.tablewidget_measuring_points.setItem(
+                    0, idx, QTableWidgetItem(text_to_display)
+                )
+                continue
+
+            input_text = ''
+            if code in field_names:
+                input_text = str(feature[code])
+
+            self.tablewidget_measuring_points.setItem(
+                0, idx, QTableWidgetItem(QTableWidgetItem(input_text, 1))
+            )
+
+    def mark_feature(self, feature):
+        """Set the marker to feature"""
+        self.measure_point_marker.setCenter(
+            feature.geometry().asPoint()
+        )
+        self.measure_point_marker.setVisible(True)
 
     def get_selected_measuring_point(self):
-
-        layer = iface.activeLayer()
-        fields = layer.dataProvider().fields()
-
-        for f in layer.selectedFeatures():
-
-            hmr = 0 or self.field_combobox_measuring_points.findText(str(f["Herstelmaa"]))
-            self.field_combobox_measuring_points.setCurrentIndex(hmr)
-
-            self.value_plaintextedit_measuring_points\
-                .setPlainText(str(f["Opmerking"])
-                              if type(f["Opmerking"]) is not QPyNullVariant else "")
-
-            self.value_measpoint_trigger.setText(str(f["Trigger"]))
-
-            self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(f["PIPE_ID"]))
-
-            for idx, code in zip(range(1, 14), list('ABCDEFGIKLMNO')):
-                self.tablewidget_measuring_points\
-                    .setItem(0, idx,
-                             QTableWidgetItem(f[code] if code in f else ''))
-
-            self.selected_measuring_point_id = f.id()
+        layer = self.measuring_points
+        measuring_point_ids = [feature.id() for feature in layer.selectedFeatures()]
+        if len(measuring_point_ids) > 0:
+            # We have some measuring points in our selection
+            # Display the first one:
+            self.selected_measuring_points_ids = measuring_point_ids
+            feature = layer.selectedFeatures()[0]
+            self.selected_measuring_point_id = feature.id()
+            self._display_measuring_point_attributes(feature)
+            self.display_measuring_points_count()
 
     def show_previous_measuring_point(self):
         """Show the next measuring point."""
-
-        if self.selected_measuring_point_id <= 0:
-            iface.messageBar().pushMessage("Info",
-                                           "This pipe has no previous measuring point.",
-                                           level=QgsMessageBar.INFO, duration=0)
-            return
-
-        current_measuring_point_id = self.selected_measuring_point_id
-        current_pipe_id = self.selected_pipe_id
-
-        layer = iface.activeLayer()
-        features_amount = layer.featureCount()
-        measuring_point_id_new = self.selected_measuring_point_id - 1
-
-        if measuring_point_id_new > -1:
-            layer.setSelectedFeatures([int(measuring_point_id_new)])
-            new_feature = layer.selectedFeatures()[0]
-            pipe_id_new = int(new_feature["PIPE_ID"])
-
-            # Only show the new measuring point if it belongs to the same
-            # pipe
-            if current_pipe_id == pipe_id_new:
-                # Set values
-                self.selected_measuring_point_id = measuring_point_id_new
-
-                # Update Measuring points tab and tablewidget
-                hmr = 0 or self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))
-                self.field_combobox_measuring_points.setCurrentIndex(hmr)
-
-                self.value_plaintextedit_measuring_points\
-                    .setPlainText(new_feature["Opmerking"] if new_feature["Opmerking"] and
-                                  type(new_feature["Opmerking"]) is not QPyNullVariant else '')
-
-                self.value_measpoint_trigger.setText(str(new_feature["Trigger"]))
-
-                self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
-
-                for idx, code in zip(range(1, 14), list('ABCDEFGIKLMNO')):
-                    self.tablewidget_measuring_points\
-                        .setItem(0, idx,
-                                 QTableWidgetItem(new_feature[code] if code in new_feature else ''))
-
-                layer.triggerRepaint()
-            else:
-                layer.setSelectedFeatures([int(self.selected_measuring_point_id)])
-                iface.messageBar().pushMessage("Info",
-                                               "This pipe has no previous measuring point.",
-                                               level=QgsMessageBar.INFO, duration=0)
-
-    def show_pipe(self):
-        """Show the pipe to which a measuring point belongs."""
-        pipe_id = int(self.tablewidget_measuring_points.itemAt(0,0).text()) if self.tablewidget_measuring_points.itemAt(0,0) else 1
-        self.selected_pipe_id = pipe_id
-        layerList = QgsMapLayerRegistry.instance().mapLayersByName(SHP_NAME_PIPES)
-        if layerList:
-            layer = layerList[0]
-            layer.setSelectedFeatures([self.selected_pipe_id])
-            new_feature = layer.selectedFeatures()[0]
-            self.field_combobox_pipes.setCurrentIndex(self.field_combobox_pipes.findText(str(new_feature["Herstelmaa"]))) \
-                if self.field_combobox_pipes.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_pipes.setCurrentIndex(0)
-            self.value_plaintextedit_pipes.setPlainText(str(new_feature["Opmerking"]) if type(new_feature["Opmerking"]) is not QPyNullVariant else "")
-            self.tablewidget_pipes.setItem(0, 0, QTableWidgetItem(new_feature["AAA"]))
-            self.tablewidget_pipes.setItem(0, 1, QTableWidgetItem(new_feature["AAB"]))
-            self.tablewidget_pipes.setItem(0, 2, QTableWidgetItem(new_feature["AAD"]))
-            self.tablewidget_pipes.setItem(0, 3, QTableWidgetItem(new_feature["AAE"]))
-            self.tablewidget_pipes.setItem(0, 4, QTableWidgetItem(new_feature["AAF"]))
-            self.tablewidget_pipes.setItem(0, 5, QTableWidgetItem(new_feature["AAG"]))
-            self.tablewidget_pipes.setItem(0, 6, QTableWidgetItem(new_feature["AAJ"]))
-            self.tablewidget_pipes.setItem(0, 7, QTableWidgetItem(new_feature["AAK"]))
-            self.tablewidget_pipes.setItem(0, 8, QTableWidgetItem(new_feature["AAL"]))
-            self.tablewidget_pipes.setItem(0, 9, QTableWidgetItem(new_feature["AAM"]))
-            self.tablewidget_pipes.setItem(0, 10, QTableWidgetItem(new_feature["AAN"]))
-            self.tablewidget_pipes.setItem(0, 11, QTableWidgetItem(new_feature["AAO"]))
-            self.tablewidget_pipes.setItem(0, 12, QTableWidgetItem(new_feature["AAP"]))
-            self.tablewidget_pipes.setItem(0, 13, QTableWidgetItem(new_feature["AAQ"]))
-            self.tablewidget_pipes.setItem(0, 14, QTableWidgetItem(new_feature["ABA"]))
-            self.tablewidget_pipes.setItem(0, 15, QTableWidgetItem(new_feature["ABB"]))
-            self.tablewidget_pipes.setItem(0, 16, QTableWidgetItem(new_feature["ABC"]))
-            self.tablewidget_pipes.setItem(0, 17, QTableWidgetItem(new_feature["ABE"]))
-            self.tablewidget_pipes.setItem(0, 18, QTableWidgetItem(new_feature["ABF"]))
-            self.tablewidget_pipes.setItem(0, 19, QTableWidgetItem(new_feature["ABH"]))
-            self.tablewidget_pipes.setItem(0, 20, QTableWidgetItem(new_feature["ABI"]))
-            self.tablewidget_pipes.setItem(0, 21, QTableWidgetItem(new_feature["ABJ"]))
-            self.tablewidget_pipes.setItem(0, 22, QTableWidgetItem(new_feature["ABK"]))
-            self.tablewidget_pipes.setItem(0, 23, QTableWidgetItem(new_feature["ABL"]))
-            self.tablewidget_pipes.setItem(0, 24, QTableWidgetItem(new_feature["ABM"]))
-            self.tablewidget_pipes.setItem(0, 25, QTableWidgetItem(new_feature["ABP"]))
-            self.tablewidget_pipes.setItem(0, 26, QTableWidgetItem(new_feature["ABQ"]))
-            self.tablewidget_pipes.setItem(0, 27, QTableWidgetItem(new_feature["ABS"]))
-            self.tablewidget_pipes.setItem(0, 28, QTableWidgetItem(new_feature["ACA"]))
-            self.tablewidget_pipes.setItem(0, 29, QTableWidgetItem(new_feature["ACB"]))
-            self.tablewidget_pipes.setItem(0, 30, QTableWidgetItem(new_feature["ACC"]))
-            self.tablewidget_pipes.setItem(0, 31, QTableWidgetItem(new_feature["ACD"]))
-            self.tablewidget_pipes.setItem(0, 32, QTableWidgetItem(new_feature["ACG"]))
-            self.tablewidget_pipes.setItem(0, 33, QTableWidgetItem(new_feature["ACJ"]))
-            self.tablewidget_pipes.setItem(0, 34, QTableWidgetItem(new_feature["ACK"]))
-            self.tablewidget_pipes.setItem(0, 35, QTableWidgetItem(new_feature["ACM"]))
-            self.tablewidget_pipes.setItem(0, 36, QTableWidgetItem(new_feature["ACN"]))
-            self.tablewidget_pipes.setItem(0, 37, QTableWidgetItem(new_feature["ADA"]))
-            self.tablewidget_pipes.setItem(0, 38, QTableWidgetItem(new_feature["ADB"]))
-            self.tablewidget_pipes.setItem(0, 39, QTableWidgetItem(new_feature["ADC"]))
-            self.tablewidget_pipes.setItem(0, 40, QTableWidgetItem(new_feature["AXA"]))
-            self.tablewidget_pipes.setItem(0, 41, QTableWidgetItem(new_feature["AXB"]))
-            self.tablewidget_pipes.setItem(0, 42, QTableWidgetItem(new_feature["AXF"]))
-            self.tablewidget_pipes.setItem(0, 43, QTableWidgetItem(new_feature["AXG"]))
-            self.tablewidget_pipes.setItem(0, 44, QTableWidgetItem(new_feature["AXH"]))
-            iface.setActiveLayer(layer)
-            layer.triggerRepaint()
-            # Go to the pipe tab
-            self.tabWidget.setCurrentIndex(2)
+        current_index = self.selected_measuring_points_ids.index(
+            self.selected_measuring_point_id
+        )
+        self.selected_measuring_point_id = self.selected_measuring_points_ids[
+            current_index - 1]
+        new_measuring_points = self.measuring_points.getFeatures(
+            QgsFeatureRequest().setFilterFid(self.selected_measuring_point_id)
+        )
+        new_measuring_point = list(new_measuring_points)[0]
+        self._display_measuring_point_attributes(new_measuring_point)
+        self.display_measuring_points_count()
 
     def show_next_measuring_point(self):
         """Show the next measuring point."""
-        # Only show if still same pipe
-        # Show message if first id and clicked on again (can't go further)
-        current_measuring_point_id = self.selected_measuring_point_id
-        current_pipe_id = self.selected_pipe_id
+        current_index = self.selected_measuring_points_ids.index(
+            self.selected_measuring_point_id
+        )
+        self.selected_measuring_point_id = self.selected_measuring_points_ids[current_index + 1]
+        new_measuring_points = self.measuring_points.getFeatures(
+            QgsFeatureRequest().setFilterFid(self.selected_measuring_point_id)
+        )
+        new_measuring_point = list(new_measuring_points)[0]
+        self._display_measuring_point_attributes(new_measuring_point)
+        self.display_measuring_points_count()
 
-        layer = iface.activeLayer()
-        features_amount = layer.featureCount()
-        measuring_point_id_new = self.selected_measuring_point_id + 1
-        if measuring_point_id_new < features_amount:
-            layer.setSelectedFeatures([int(self.selected_measuring_point_id) + 1])
-            new_feature = layer.selectedFeatures()[0]
-            pipe_id_new = int(new_feature["PIPE_ID"])
-            # Only show the new measuring point if it belongs to the same
-            # pipe
-            if current_pipe_id == pipe_id_new:
-                # Set values
-                self.selected_measuring_point_id = measuring_point_id_new
-                # Update Measuring points tab and tablewidget
+    def display_measuring_points_count(self):
+        current = self.selected_measuring_points_ids.index(
+            self.selected_measuring_point_id
+        )
+        total = len(self.selected_measuring_points_ids)
+        self.Nr_measuring_points.setText('{} / {}'.format(current + 1, total))
 
-                self.field_combobox_measuring_points.setCurrentIndex(self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"]))) \
-                    if self.field_combobox_measuring_points.findText(str(new_feature["Herstelmaa"])) else self.field_combobox_measuring_points.setCurrentIndex(0)
-                opmerking = new_feature["Opmerking"] if new_feature["Opmerking"] and type(new_feature["Opmerking"]) is not QPyNullVariant else ''
-                self.value_plaintextedit_measuring_points.setPlainText(opmerking)
-                self.tablewidget_measuring_points.setItem(0, 0, QTableWidgetItem(new_feature["PIPE_ID"]))
-                self.tablewidget_measuring_points.setItem(0, 1, QTableWidgetItem(new_feature["A"]))
-                self.tablewidget_measuring_points.setItem(0, 2, QTableWidgetItem(new_feature["B"]))
-                self.tablewidget_measuring_points.setItem(0, 3, QTableWidgetItem(new_feature["C"]))
-                self.tablewidget_measuring_points.setItem(0, 4, QTableWidgetItem(new_feature["D"]))
-                self.tablewidget_measuring_points.setItem(0, 5, QTableWidgetItem(new_feature["E"]))
-                self.tablewidget_measuring_points.setItem(0, 6, QTableWidgetItem(new_feature["F"]))
-                self.tablewidget_measuring_points.setItem(0, 7, QTableWidgetItem(new_feature["G"]))
-                self.tablewidget_measuring_points.setItem(0, 8, QTableWidgetItem(new_feature["I"]))
-                self.tablewidget_measuring_points.setItem(0, 9, QTableWidgetItem(new_feature["J"]))
-                self.tablewidget_measuring_points.setItem(0, 10, QTableWidgetItem(new_feature["K"] if new_feature["K"] else None))
-                self.tablewidget_measuring_points.setItem(0, 11, QTableWidgetItem(new_feature["M"]))
-                self.tablewidget_measuring_points.setItem(0, 12, QTableWidgetItem(new_feature["N"]))
-                self.tablewidget_measuring_points.setItem(0, 13, QTableWidgetItem(new_feature["O"]))
-                layer.triggerRepaint()
-            else:
-                layer.setSelectedFeatures([int(self.selected_measuring_point_id)])
-                iface.messageBar().pushMessage("Info", "This pipe has no next measuring point.", level=QgsMessageBar.INFO, duration=0)
+        if current == 0:
+            self.disable_previous_measuring_point_button()
+        else:
+            self.enable_previous_measuring_point_button()
+
+        if current + 1 >= total:
+            self.disable_next_measuring_point_button()
+        elif current + 1 < total:
+            self.enable_next_measuring_point_button()
+
+    def disable_previous_measuring_point_button(self):
+        self.pushbutton_measuring_points_previous.setDisabled(True)
+
+    def enable_previous_measuring_point_button(self):
+        self.pushbutton_measuring_points_previous.setEnabled(True)
+
+    def disable_next_measuring_point_button(self):
+        self.pushbutton_measuring_points_next.setDisabled(True)
+
+    def enable_next_measuring_point_button(self):
+        self.pushbutton_measuring_points_next.setEnabled(True)
 
     def save_beoordeling_measuring_points(self):
         """Save herstelmaatregel and opmerking in the shapefile."""
         layer = iface.activeLayer()
-        fid = self.selected_measuring_point_id
+        measuring_point_id = self.selected_measuring_point_id
+        if measuring_point_id is None:
+            return
         herstelmaatregel = str(self.field_combobox_measuring_points.currentText())
         opmerking = str(self.value_plaintextedit_measuring_points.toPlainText())
         layer.startEditing()
-        layer.changeAttributeValue(fid, 16, herstelmaatregel)  # Herstelmaatregel
-        layer.changeAttributeValue(fid, 17, opmerking)  # Opmerking
+        layer.changeAttributeValue(measuring_point_id, 16, herstelmaatregel)  # Herstelmaatregel
+        layer.changeAttributeValue(measuring_point_id, 17, opmerking)  # Opmerking
         layer.commitChanges()
         layer.triggerRepaint()
+        iface.messageBar().pushMessage(
+            "Info", "Measuring point saved", level=QgsMessageBar.INFO, duration=5
+        )
 
 
 def create_manholes_json(manholes_layer):
