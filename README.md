@@ -28,3 +28,13 @@ These tests can be run by using `make test` [2].
 ```
 $ nosetests --with-doctest
 ```
+
+## Releasing
+To make a new release, use zest.releaser with the qgisreleaser plugin, like in
+our other qgis projects.
+
+Releasing it to https://plugins.lizard.net used to be "scp", now you have to
+use `upload-artifact.sh`. Look inside that file: you'll need to set one
+environment variable. Afterwards, run it like this:
+
+    $ ./upload-artifact.sh Beoordelingstool.0.9.zip
