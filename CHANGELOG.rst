@@ -3,7 +3,8 @@
 0.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Administrative internal change: releasing to plugins.lizard.net now happens
+  via ``./upload-artifact.sh`` .
 
 
 0.8 (2019-09-25)
