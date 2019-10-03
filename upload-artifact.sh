@@ -15,3 +15,5 @@ curl -X POST \
      -F key=${BEOORDELINGSTOOL_ARTIFACTS_KEY} \
      -F artifact=@$1 \
      https://artifacts.lizard.net/upload/${PROJECT}/
+
+@echo "Uploaded to plugins.lizard.net via https://artifacts.lizard.net"
