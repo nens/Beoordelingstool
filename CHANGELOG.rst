@@ -1,4 +1,5 @@
-# Changelog
+Changelog
+=========
 
 0.9 (unreleased)
 ----------------
