@@ -62,7 +62,7 @@
  <renderer-v2 forceraster="0" symbollevels="0" type="RuleRenderer" enableorderby="0">
   <rules key="{eae7d24f-325f-4021-9ed3-0f5983e75447}">
    <rule filter="&quot;Trigger&quot; = 'Ingrijp' AND (&quot;Herstelmaa&quot; = '' OR &quot;Herstelmaa&quot; IS NULL)" key="{93759a70-289d-4258-b057-8a54b6ea631c}" symbol="0" label="Niet beoordeeld - Ingrijp"/>
-   <rule description="Niet beoordeeld - Waarschuwing" filter="&quot;Trigger&quot; = 'Waarschuwing' AND (&quot;Herstelmaa&quot; = '' OR &quot;Herstelma&quot; IS NULL)" key="{9b01ac1f-8423-4e07-8dea-855d55ea9bcb}" symbol="1" label="Niet beoordeeld - Waarschuwing"/>
+   <rule description="Niet beoordeeld - Waarschuwing" filter="&quot;Trigger&quot; = 'Waarschuwing' AND (&quot;Herstelmaa&quot; = '' OR &quot;Herstelmaa&quot; IS NULL)" key="{9b01ac1f-8423-4e07-8dea-855d55ea9bcb}" symbol="1" label="Niet beoordeeld - Waarschuwing"/>
    <rule filter="&quot;Herstelmaa&quot; != '' OR &quot;Herstelmaa&quot; IS NOT NULL" key="{0f43af2b-4f12-4457-ae98-e55f200618d0}" symbol="2" label="Beoordeeld"/>
   </rules>
   <symbols>
