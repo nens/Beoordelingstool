@@ -4,6 +4,7 @@ Changelog
 0.9 (unreleased)
 ----------------
 
+- Bug-fix to measuring-point filter-rules: added a missing 'a' to 'Herstelma'.
 - Administrative internal change: releasing to plugins.lizard.net now happens
   via ``./upload-artifact.sh`` .
 
