@@ -16,4 +16,4 @@ curl -X POST \
      -F artifact=@$1 \
      https://artifacts.lizard.net/upload/${PROJECT}/
 
-@echo "Uploaded to plugins.lizard.net via https://artifacts.lizard.net"
+echo "Uploaded to plugins.lizard.net via https://artifacts.lizard.net"
