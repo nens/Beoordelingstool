@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.9 (unreleased)
+0.9 (2019-12-16)
 ----------------
 
 - Bug-fix to measuring-point filter-rules: added a missing 'a' to 'Herstelma'.
